@@ -2,3 +2,4 @@ node_modules/
 temp_style_check.txt
 Admin/config/service_account.json
 .env
+test_db_conn.js

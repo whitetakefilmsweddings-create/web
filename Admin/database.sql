@@ -33,4 +33,4 @@ CREATE TABLE IF NOT EXISTS invoices (
 -- Default Admin (Password: admin123)
 -- Hash generated using password_hash('admin123', PASSWORD_DEFAULT)
 INSERT INTO admins (email, password) VALUES 
-('admin@whitetake.com', 'admin@whitetake.com');
+('admin@whitetakefilms', 'Whitetake@924');
