@@ -1286,7 +1286,20 @@ app.get('/pannl/api.php', async (req, res) => {
 
     const images = {};
     results.forEach(row => {
-      images[row.section_key] = row.image_path;
+      if (row.image_path) {
+        if (row.image_path.startsWith('http://') || row.image_path.startsWith('https://')) {
+          images[row.section_key] = row.image_path;
+        } else {
+          let relativePath = row.image_path;
+          if (relativePath.startsWith('/')) {
+            relativePath = relativePath.slice(1);
+          }
+          const absolutePath = path.join(__dirname, relativePath);
+          if (fs.existsSync(absolutePath)) {
+            images[row.section_key] = row.image_path;
+          }
+        }
+      }
     });
 
     res.json({ success: true, page, images });
