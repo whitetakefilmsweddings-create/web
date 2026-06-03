@@ -41,29 +41,52 @@
     <link href="assets/css/about-gallery.css" rel="stylesheet">
     
     <style>
-        /* Glassmorphic Sticky Header Overlay override */
-        .wpo-site-header .navigation.sticky-header {
-            background: rgba(0, 0, 0, 0.4) !important;
-            backdrop-filter: blur(8px) !important;
-            -webkit-backdrop-filter: blur(8px) !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
-            padding: 5px 130px !important;
+        /* CSS to hide cloned sticky header completely */
+        .sticky-header {
+            display: none !important;
         }
-        @media (max-width: 1700px) {
-            .wpo-site-header .navigation.sticky-header {
-                padding: 5px 50px !important;
-            }
+
+        /* Toggleable Dropdown Header Styles */
+        .wpo-site-header .navigation {
+            transition: transform 0.4s ease, opacity 0.4s ease;
         }
-        @media (max-width: 1400px) {
-            .wpo-site-header .navigation.sticky-header {
-                padding: 5px 20px !important;
-            }
+        
+        .wpo-site-header.header-hidden .navigation {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
         }
-        @media (max-width: 991px) {
-            .wpo-site-header .navigation.sticky-header {
-                padding: 10px 20px !important;
-            }
+
+        /* Header Dropdown Arrow Indicator */
+        .header-dropdown-trigger {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            color: #ffffff;
+            width: 50px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10000;
+            transition: background 0.3s, transform 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .header-dropdown-trigger:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+        .header-dropdown-trigger i {
+            transition: transform 0.4s ease;
+            font-size: 12px;
+        }
+        .wpo-site-header.header-hidden + .header-dropdown-trigger i {
+            transform: rotate(180deg);
         }
     </style>
 
@@ -154,6 +177,27 @@
         </div>
     </header>
     <!-- end of header -->
+    
+    <!-- Dropdown Arrow Trigger -->
+    <div class="header-dropdown-trigger" id="dropdownTrigger" title="Toggle Navigation Menu">
+        <i class="fa fa-chevron-up"></i>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const header = document.querySelector('.wpo-site-header');
+            const trigger = document.getElementById('dropdownTrigger');
+            
+            if (header && trigger) {
+                // Initialize state: header is hidden on start, click to drop down
+                header.classList.add('header-hidden');
+                
+                trigger.addEventListener('click', function() {
+                    header.classList.toggle('header-hidden');
+                });
+            }
+        });
+    </script>
     <!-- start of hero -->
     <link href="assets/css/hero-video.css" rel="stylesheet">
     <section class="static-hero-video wpo-hero-style-3">

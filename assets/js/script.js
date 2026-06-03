@@ -979,9 +979,9 @@ wpo-service-active SLIDER
     ==========================================================================*/
     $(window).on("scroll", function () {
 
-        if ($(".wpo-site-header").length) {
-            stickyMenu($('.wpo-site-header .navigation'), "sticky-on");
-        }
+        // if ($(".wpo-site-header").length) {
+        //     stickyMenu($('.wpo-site-header .navigation'), "sticky-on");
+        // }
 
         toggleBackToTopBtn();
 
