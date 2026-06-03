@@ -192,18 +192,24 @@ async function initDatabases() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
-    const [images] = await panlePool.query('SELECT COUNT(*) as count FROM section_images');
-    if (images[0].count === 0) {
-      const defaults = [
-        ['home', 'intimate_1', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg'],
-        ['home', 'intimate_2', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg'],
-        ['home', 'intimate_3', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg'],
-        ['home', 'about_middle', 'assets/images/about.jpg'],
-        ['home', 'about_right', 'assets/images/couple/3.jpg']
-      ];
-      for (const row of defaults) {
-        await panlePool.query('INSERT INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
-      }
+    const defaults = [
+      ['home', 'intimate_1', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg'],
+      ['home', 'intimate_2', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg'],
+      ['home', 'intimate_3', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg'],
+      ['home', 'about_middle', 'assets/images/about.jpg'],
+      ['home', 'about_right', 'assets/images/couple/3.jpg'],
+      ['about', 'about_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
+      ['cinematic-wedding-films', 'cinematic_wedding_films_title_bg', 'pic/service/Cinematic%20Wedding%20Films.webp'],
+      ['wedding-photography', 'wedding_photography_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
+      ['pre-wedding-shoots', 'pre_wedding_shoots_title_bg', 'pic/service/Pre-Wedding%20Shoots.webp'],
+      ['engagement-reception', 'engagement_reception_title_bg', 'pic/service/Engagement%20_Reception.webp'],
+      ['drone-coverage', 'drone_coverage_title_bg', 'pic/service/dron.webp'],
+      ['albums-prints', 'albums_prints_title_bg', 'pic/service/album.webp'],
+      ['gallery', 'gallery_title_bg', 'assets/images/slider/s3.jpg'],
+      ['contact', 'contact_title_bg', 'assets/images/slider/s3.jpg']
+    ];
+    for (const row of defaults) {
+      await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
     }
 
     console.log('Databases initialized and updated.');
@@ -1198,6 +1204,10 @@ app.post('/pannl/login.php', (req, res) => {
 app.get('/pannl/logout.php', (req, res) => {
   req.session.adminLoggedIn = false;
   res.redirect('/pannl/login.php');
+});
+
+app.get('/pannl/Image_admin', checkPannlAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'Image_admin'));
 });
 
 app.get('/pannl/index.php', checkPannlAuth, async (req, res) => {

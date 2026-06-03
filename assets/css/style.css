@@ -1,4 +1,4 @@
-﻿@charset "UTF-8";
+@charset "UTF-8";
 /*------------------------------------------------------------------
 [Master Stylesheet]
 Theme Name:     Feelings - Wedding & Planner HTML5 Template
@@ -76,7 +76,7 @@ Version:        1.0.0
 /*---------------------------
 	Fonts
 ----------------------------*/
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Mulish:ital,wght@0,200..1000;1,200..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Great+Vibes&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap");
 
 /* 1.1	Theme Reset Style */
 html {
@@ -16495,298 +16495,367 @@ box-shadow: 0px 1px 5px rgba(255, 255, 255, 0.1);
   visibility: visible;
 }
 
-
-
-
-
 /*--------------------------------------------------------------
-# Replicated Intimate Wedding Section from weddingbellsstories.com
+# Redesigned Couples Session Section (Nicepage UI Style)
 --------------------------------------------------------------*/
-.intimate-wrap {
-    display: flex;
-    padding: 70px 40px 95px 85px;
-    background-color: #fff;
+.couples-session-section {
+    padding: 100px 0;
+    background-color: #ffffff;
     position: relative;
+    overflow: hidden;
+    border-top: 1px solid #eeeeee;
+    border-bottom: 1px solid #eeeeee;
 }
 
-.intimate-con {
-    width: 29%;
-    display: flex;
-    flex-direction: column;
-    gap: 55px;
-    align-items: flex-start;
+.couples-sheet {
+    max-width: 1140px;
+    margin: 0 auto;
+    position: relative;
+    min-height: 750px;
+    padding: 0 15px;
 }
 
-.intimate-con--in {
+/* Left Collage Wrapper */
+.couples-images-wrapper {
+    position: absolute;
+    top: 20px;
+    left: 0;
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-    color: #4b4b4b;
-    line-height: 1.5;
+    height: 750px;
+    z-index: 2;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg)) translateY(var(--scroll-translate-y, 0px));
+    transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.intimate-con--head {
-    font-family: "Cormorant Garamond", serif;
+.couples-img {
+    position: absolute;
+    overflow: hidden;
+    box-shadow: 5px 5px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.u-image-circle {
+    border-radius: 50% !important;
+}
+
+.couples-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s ease;
+}
+
+.couples-img:hover img {
+    transform: scale(1.04);
+}
+
+/* Animation setup for staggered entrance */
+.couples-shape-ring,
+.couples-img-1,
+.couples-img-2,
+.couples-shape-solid,
+.couples-group {
+    opacity: 0;
+    transition: opacity 1.2s cubic-bezier(0.25, 1, 0.5, 1), transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, filter 0.3s ease;
+}
+
+/* Initial States (receded, shifted down, scaled down) */
+.couples-shape-ring {
+    transform: translate3d(0, 50px, -100px) scale(0.8);
+}
+.couples-img-1 {
+    transform: translate3d(0, 80px, -40px) scale(0.85);
+}
+.couples-img-2 {
+    transform: translate3d(0, 100px, -10px) scale(0.8);
+}
+.couples-shape-solid {
+    transform: translate3d(0, 120px, 20px) scale(0.7);
+}
+.couples-group {
+    transform: translateY(40px);
+}
+
+/* Active Staggered Reveal States (triggered on scroll view) */
+.couples-session-section.reveal-active .couples-shape-ring {
+    opacity: 1;
+    transform: translate3d(0, 0, -40px) scale(1);
+    transition-delay: 0.1s;
+}
+.couples-session-section.reveal-active .couples-group {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.25s;
+}
+.couples-session-section.reveal-active .couples-img-1 {
+    opacity: 1;
+    transform: translate3d(0, 0, 20px) scale(1);
+    transition-delay: 0.4s;
+}
+.couples-session-section.reveal-active .couples-img-2 {
+    opacity: 1;
+    transform: translate3d(0, 0, 60px) scale(1);
+    transition-delay: 0.55s;
+}
+.couples-session-section.reveal-active .couples-shape-solid {
+    opacity: 1;
+    transform: translate3d(0, 0, 100px) scale(1);
+    transition-delay: 0.7s;
+}
+
+/* Overlapping circles positions matching Nicepage ID: 220718 */
+.couples-img-1 {
+    width: 500px;
+    height: 500px;
+    top: 250px;
+    left: 0px;
+    z-index: 2;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+}
+
+.couples-session-section.reveal-active .couples-img-1:hover {
+    transform: translate3d(0, 0, 35px) scale(1.02);
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.25);
+}
+
+.couples-img-2 {
+    width: 250px;
+    height: 250px;
+    top: 470px;
+    left: 330px;
+    border: 8px solid #d4d9dc;
+    z-index: 4;
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.25);
+}
+
+.couples-session-section.reveal-active .couples-img-2:hover {
+    transform: translate3d(0, 0, 75px) scale(1.02);
+    box-shadow: 0 45px 90px rgba(0, 0, 0, 0.35);
+}
+
+/* Peach Ring outline shape */
+.couples-shape-ring {
+    position: absolute;
+    width: 180px;
+    height: 180px;
+    top: 180px;
+    left: 0px;
+    z-index: 1;
+    filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
+}
+
+.couples-shape-ring svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Solid Peach Circle */
+.couples-shape-solid {
+    position: absolute;
+    width: 130px;
+    height: 130px;
+    background-color: #000000;
+    border-radius: 50%;
+    top: 600px;
+    left: 0px;
+    z-index: 3;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.3);
+}
+
+/* Right Content Group */
+.couples-group {
+    position: absolute;
+    top: 250px;
+    right: 0;
+    width: 500px;
+    z-index: 5;
+    background: #ffffff;
+    padding: 30px 40px;
+}
+
+.couples-title {
+    font-family: 'Cormorant Garamond', serif;
     font-size: 50px;
-    line-height: 1;
-    margin-bottom: 10px;
-    color: #555;
-    font-weight: 300; /* Light weight */
+    line-height: 1.1;
+    font-weight: 300;
+    color: #555555;
+    text-transform: uppercase;
+    margin: 0 0 10px;
 }
 
-.intimate-con--sub {
+.couples-subtitle {
+    font-family: 'Mulish', sans-serif;
+    font-size: 15px;
     color: #707070;
     margin-bottom: 30px;
 }
 
-.intimate-con--qoute {
-    font-size: 14px;
-    font-weight: 400;
-    color: #bebebe;
-    padding-right: 25px;
-    display: flex;
-    gap: 5px;
-    flex-direction: column;
-    line-height: 1.5;
-}
-
-.intimate-con--qoute span {
-    font-size: 11px;
-    font-style: italic;
-    display: block;
-}
-
-.intimate-img {
-    width: 71%;
-    display: flex;
-    gap: 35px;
-    justify-content: flex-end;
-    align-items: center;
-    position: relative;
-    z-index: 2;
-}
-
-.intimate-img--in {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    font-size: 12px;
-    font-weight: 400;
-    color: #000;
-}
-
-.intimate-img--in:hover .intimate-img--out {
-    clip-path: inset(12px 12px 12px 12px);
-}
-
-.intimate-img--in:hover img {
-    transform: scale(1.05);
-}
-
-.intimate-img--in img {
-    width: 100%;
-    object-fit: cover;
-    transform: scale(1);
-    transition: all .8s cubic-bezier(.25, .46, .45, .94);
-}
-
-.intimate-img--out {
-    transform: translateX(0);
-    clip-path: inset(0 0 0 0);
-    transition: all .8s cubic-bezier(.25, .46, .45, .94);
-}
-
-.intimate-img--cont {
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    gap: 2px;
-    font-family: "Mulish", sans-serif;
-}
-
-.intimate-img--cont-location {
-    font-size: 9px;
-    font-style: italic;
-    color: #4b4b4b;
-}
-
-.intimate-img__one {
-    width: 270px;
-    margin-top: -15px;
-}
-
-.intimate-img__two {
-    width: 205px;
-    margin-top: 25%;
-}
-
-.intimate-img__three {
-    width: 195px;
-    margin-top: 6%;
-}
-
-.intimate-arrow {
-    position: absolute;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background-color: #020202;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #707070;
+.couples-desc {
+    font-family: 'Mulish', sans-serif;
     font-size: 15px;
-    color: #717171;
-    z-index: 3;
-    top: -20px;
-    cursor: pointer;
-    left: 0;
-    right: 0;
-    margin: auto;
+    line-height: 1.8;
+    color: #707070;
+    margin: 0 0 35px;
+    text-align: left;
 }
 
-.intimate-arrow-icon {
-    top: 10px;
-    position: absolute;
-    animation: upanddwown 3s infinite;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.couples-btn {
+    display: inline-block;
+    background: #000000;
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 15px 45px;
+    border: 1px solid #000000;
+    transition: all 0.3s ease;
 }
 
-.intimate--map {
-    position: absolute;
-    width: 80%;
-    display: flex;
-    left: 0;
-    top: 0;
-    z-index: -1;
+.couples-btn:hover {
+    background: #ffffff;
+    color: #000000;
 }
 
-.intimate--map img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.intimate--shape {
-    position: absolute;
-    width: 65%;
-    height: 470px;
-    background-color: #f4f0ed;
-    right: 0;
-    bottom: 0;
-    border-top-left-radius: 150px;
-    z-index: 1;
-}
-
-.intimate--location {
-    position: absolute;
-    width: 85%;
-    height: 70%;
-    bottom: -2px;
-    right: 0;
-    z-index: 1;
-}
-
-.intimate--location img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.intimate-with {
-    position: absolute;
-    width: 100px;
-    height: 45px;
-    right: 0;
-    bottom: -20px;
-    z-index: 2;
-}
-
-.intimate-with img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-@keyframes upanddwown {
-    0% {
-        top: 10px;
+/* Responsive CSS */
+@media (max-width: 1199px) {
+    .couples-sheet {
+        min-height: 650px;
     }
-    50% {
-        top: 50%;
+    .couples-images-wrapper {
+        height: 650px;
     }
-    100% {
-        top: 10px;
+    .couples-group {
+        width: 420px;
+        top: 220px;
+        padding: 25px;
     }
-}
-
-/* Responsive adjustments */
-@media (max-width: 1200px) {
-    .intimate-wrap {
-        padding: 30px 40px 55px 45px;
+    .couples-img-1 {
+        width: 420px;
+        height: 420px;
+        top: 220px;
+        left: 0px;
+    }
+    .couples-img-2 {
+        width: 220px;
+        height: 220px;
+        top: 400px;
+        left: 280px;
+    }
+    .couples-shape-solid {
+        width: 110px;
+        height: 110px;
+        top: 500px;
+        left: 0px;
+    }
+    .couples-shape-ring {
+        width: 150px;
+        height: 150px;
+        top: 160px;
+        left: 0px;
+    }
+    .couples-title {
+        font-size: 38px;
     }
 }
 
 @media (max-width: 991px) {
-    .intimate-wrap {
-        padding: 30px;
-        flex-direction: column;
+    .couples-sheet {
+        min-height: auto;
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 50px;
     }
-    .intimate-con,
-    .intimate-img {
+    .couples-group {
+        position: relative;
+        top: 0;
+        right: 0;
         width: 100%;
+        padding: 0;
+        text-align: center;
     }
-    .intimate-con--head {
-        margin-top: 0;
-        font-size: 30px;
-        line-height: 30px;
+    .couples-desc {
+        text-align: center;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
     }
-    .intimate-con--sub {
-        margin-bottom: 20px;
+    .couples-btn {
+        margin: 0 auto;
     }
-    .intimate-con {
-        gap: 30px;
-    }
-    .intimate--location {
-        height: auto;
-    }
-    .intimate-img--in {
-        width: calc(100% - (35px * 2)/ 3);
-    }
-    .intimate-img--in img {
+    .couples-images-wrapper {
+        position: relative;
+        top: 0;
+        left: 0;
         width: 100%;
-        height: 100%;
-        object-fit: contain;
+        max-width: 650px;
+        height: 650px;
+        margin: 0 auto;
     }
-    .intimate-img {
-        flex-wrap: wrap;
-        gap: 30px;
+    .couples-img-1 {
+        width: 480px;
+        height: 480px;
+        left: 50px;
+        top: 10px;
     }
-    .intimate-img--in {
-        margin-top: 0 !important;
+    .couples-img-2 {
+        width: 260px;
+        height: 260px;
+        top: 320px;
+        left: 340px;
     }
-    .intimate-img--in.intimate-img__one {
-        margin: 0;
-        width: 100%;
-        margin-top: 60px !important;
-        border-radius: 10px;
-        overflow: hidden;
+    .couples-shape-solid {
+        width: 130px;
+        height: 130px;
+        top: 340px;
+        left: 10px;
     }
-    .intimate-img--in.intimate-img__three,
-    .intimate-img--in.intimate-img__two {
-        width: calc((100% - 35px)/ 2);
-        margin-bottom: 60px;
+    .couples-shape-ring {
+        width: 180px;
+        height: 180px;
+        top: -50px;
+        left: 15px;
     }
-    .intimate--map {
-        top: -21%;
+}
+
+@media (max-width: 575px) {
+    .couples-title {
+        font-size: 28px;
     }
-    .intimate--location {
-        bottom: auto;
-        top: 22%;
-        width: 100%;
+    .couples-images-wrapper {
+        max-width: 100%;
+        height: 440px;
+    }
+    .couples-img-1 {
+        width: 320px;
+        height: 320px;
+        left: 30px;
+    }
+    .couples-img-2 {
+        width: 180px;
+        height: 180px;
+        top: 220px;
+        left: 160px;
+        border-width: 6px;
+    }
+    .couples-shape-solid {
+        width: 90px;
+        height: 90px;
+        top: 230px;
+        left: 0px;
+    }
+    .couples-shape-ring {
+        width: 120px;
+        height: 120px;
+        top: -30px;
+        left: 10px;
+    }
+    .couples-btn {
+        padding: 12px 35px;
+        letter-spacing: 2px;
     }
 }
 

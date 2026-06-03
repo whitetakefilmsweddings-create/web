@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Page Image Management</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=Mulish:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #060606;
+            --sidebar-color: #0d0d0d;
+            --card-color: #121212;
+            --border-color: #1f1f1f;
+            --accent-color: #c5a880;
+            --accent-glow: rgba(197, 168, 128, 0.15);
+            --text-main: #f5f5f5;
+            --text-secondary: #9f9f9f;
+            --text-muted: #555555;
+            --success-color: #4aff4a;
+            --error-color: #ff4a4a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Mulish', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1, h2, h3, h4, .logo {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Sidebar styling */
+        .sidebar {
+            width: 300px;
+            background-color: var(--sidebar-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            color: #fff;
+            margin-bottom: 35px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            font-weight: 300;
+            color: var(--accent-color);
+        }
+
+        .menu-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+            padding-left: 10px;
+        }
+
+        .menu-list {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-bottom: 20px;
+            padding-right: 5px;
+        }
+
+        /* Scrollbar styling for sidebar menu */
+        .menu-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .menu-list::-webkit-scrollbar-thumb {
+            background-color: var(--border-color);
+            border-radius: 4px;
+        }
+
+        .menu-item {
+            margin-bottom: 6px;
+        }
+
+        .menu-item a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .menu-item a i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+            transition: transform 0.3s;
+        }
+
+        .menu-item a:hover {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.02);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-item.active a {
+            background-color: var(--accent-glow);
+            color: var(--accent-color);
+            border-color: rgba(197, 168, 128, 0.25);
+            font-weight: 700;
+        }
+
+        .menu-item.active a i {
+            transform: scale(1.1);
+        }
+
+        .nav-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        .footer-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .back-btn {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #fff;
+        }
+
+        .logout-btn {
+            background-color: #922222;
+            color: #fff;
+            border: none;
+        }
+
+        .logout-btn:hover {
+            background-color: #b32d2d;
+            box-shadow: 0 4px 15px rgba(179, 45, 45, 0.3);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex-grow: 1;
+            padding: 45px 50px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 25px;
+            animation: slideIn 0.5s ease;
+        }
+
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-header p {
+            font-size: 15px;
+            font-weight: 300;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        /* Card Section Styling */
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 35px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .section-card {
+            background-color: var(--card-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: transparent;
+            transition: background-color 0.3s;
+        }
+
+        .section-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(197, 168, 128, 0.3);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .section-card:hover::before {
+            background-color: var(--accent-color);
+        }
+
+        .card-header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .section-card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.2px;
+        }
+
+        .section-card-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Image Container & Previews */
+        .img-container {
+            width: 100%;
+            height: 400px;
+            background-color: #080808;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #1a1a1a;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .section-card:hover .img-container img {
+            transform: scale(1.03);
+        }
+
+        .no-img-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .no-img-placeholder i {
+            font-size: 32px;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: auto;
+        }
+
+        /* File dropzone */
+        .file-dropzone {
+            border: 1.5px dashed var(--border-color);
+            background-color: #090909;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-dropzone:hover {
+            border-color: var(--accent-color);
+            background-color: rgba(197, 168, 128, 0.02);
+        }
+
+        .file-dropzone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .file-dropzone i {
+            font-size: 20px;
+            color: var(--accent-color);
+        }
+
+        .file-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .submit-btn {
+            background-color: var(--text-main);
+            color: #000;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--accent-color);
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        .submit-btn:disabled {
+            background-color: #222;
+            color: var(--text-muted);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: #000;
+            border-radius: 3px;
+            display: none;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--accent-color);
+            border-radius: 3px;
+            transition: width 0.2s ease;
+            box-shadow: 0 0 10px rgba(197, 168, 128, 0.5);
+        }
+
+        .status-msg {
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            min-height: 20px;
+            margin-top: -5px;
+        }
+
+        .status-msg.success {
+            color: var(--success-color);
+        }
+
+        .status-msg.error {
+            color: var(--error-color);
+        }
+
+        .status-msg.loading {
+            color: var(--accent-color);
+        }
+
+        /* Size Info Badges */
+        .badge-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .size-badge {
+            background-color: #1a1a1a;
+            color: var(--accent-color);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(197, 168, 128, 0.15);
+        }
+
+        .section-badge {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-transform: uppercase;
+        }
+
+        /* Toast message styling */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #121212;
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--accent-color);
+            padding: 18px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 100;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast-success i {
+            color: var(--success-color);
+        }
+
+        .toast-error i {
+            color: var(--error-color);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            border-top-color: var(--accent-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-grow: 1;
+            color: var(--text-secondary);
+        }
+
+        /* Responsiveness */
+        @media (max-width: 1024px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px;
+            }
+            .logo {
+                margin-bottom: 15px;
+            }
+            .menu-list {
+                display: flex;
+                gap: 8px;
+                overflow-x: auto;
+                overflow-y: hidden;
+                white-space: nowrap;
+                margin-bottom: 10px;
+                padding-bottom: 5px;
+            }
+            .menu-item {
+                margin-bottom: 0;
+            }
+            .menu-item a {
+                padding: 10px 14px;
+            }
+            .content-area {
+                padding: 30px 20px;
+            }
+            .nav-footer {
+                display: none; /* Hide footer btns on mobile sidebar, place elsewhere if needed */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sections-grid {
+                grid-template-columns: 1fr;
+            }
+            .img-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar navigation -->
+    <div class="sidebar">
+        <div class="logo">WhiteTake<span>Films</span></div>
+        
+        <div class="menu-title">Select Website Page</div>
+        <ul class="menu-list" id="sidebar-menu">
+            <!-- Dynamic menu items will be injected here -->
+        </ul>
+        
+        <div class="nav-footer">
+            <a href="/pannl/index.php" class="footer-btn back-btn">
+                <i class="fa-solid fa-house-chimney"></i> Back to Main
+            </a>
+            <a href="/pannl/logout.php" class="footer-btn logout-btn">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main content area -->
+    <div class="content-area">
+        <div class="page-header">
+            <h1 id="page-title">Loading Page...</h1>
+            <p id="page-desc">...</p>
+        </div>
+        
+        <div id="content-display" class="sections-grid">
+            <!-- Dynamic section cards will load here -->
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading sections and images...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="toast">
+        <i id="toast-icon" class="fa-solid"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <script>
+        // Pages Configuration mapping
+        const PAGE_CONFIG = {
+            'home': {
+                title: 'Home Page',
+                desc: 'Customize the landing page banners, intimate story highlight images, and about us section graphics.',
+                icon: 'fa-house',
+                sections: {
+                    'intimate_1': { title: 'Intimate Story Card 1', desc: 'First card showcase image (Krishna & Connor)' },
+                    'intimate_2': { title: 'Intimate Story Card 2', desc: 'Second card showcase image (Sai & Aishwarya)' },
+                    'intimate_3': { title: 'Intimate Story Card 3', desc: 'Third card showcase image (Reshma & Rajiv)' },
+                    'about_middle': { title: 'About Section - Middle Image', desc: 'Landscape image in the middle of about grid' },
+                    'about_right': { title: 'About Section - Right Image', desc: 'Landscape image on the right side of about grid' }
+                }
+            },
+            'about': {
+                title: 'About Us',
+                desc: 'Customize the Header Title background image for the About page.',
+                icon: 'fa-address-card',
+                sections: {
+                    'about_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'cinematic-wedding-films': {
+                title: 'Cinematic Films',
+                desc: 'Customize the Header Title background image for Cinematic Wedding Films service.',
+                icon: 'fa-video',
+                sections: {
+                    'cinematic_wedding_films_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'wedding-photography': {
+                title: 'Wedding Photography',
+                desc: 'Customize the Header Title background image for Wedding Photography service.',
+                icon: 'fa-camera',
+                sections: {
+                    'wedding_photography_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'pre-wedding-shoots': {
+                title: 'Pre-Wedding Shoots',
+                desc: 'Customize the Header Title background image for Pre-Wedding Shoots service.',
+                icon: 'fa-user-friends',
+                sections: {
+                    'pre_wedding_shoots_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'engagement-reception': {
+                title: 'Engagement & Reception',
+                desc: 'Customize the Header Title background image for Engagement & Reception service.',
+                icon: 'fa-ring',
+                sections: {
+                    'engagement_reception_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'drone-coverage': {
+                title: 'Drone Coverage',
+                desc: 'Customize the Header Title background image for Drone Coverage service.',
+                icon: 'fa-helicopter',
+                sections: {
+                    'drone_coverage_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'albums-prints': {
+                title: 'Albums & Prints',
+                desc: 'Customize the Header Title background image for Albums & Prints service.',
+                icon: 'fa-book-open',
+                sections: {
+                    'albums_prints_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'gallery': {
+                title: 'Gallery',
+                desc: 'Customize the Header Title background image for the main Gallery portfolio page.',
+                icon: 'fa-images',
+                sections: {
+                    'gallery_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            },
+            'contact': {
+                title: 'Contact Us',
+                desc: 'Customize the Header Title background image for the Contact page.',
+                icon: 'fa-paper-plane',
+                sections: {
+                    'contact_title_bg': { title: 'Header Title Background', desc: 'Top banner background image behind page title' }
+                }
+            }
+        };
+
+        let currentActivePage = 'home';
+
+        // Initialize Page
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar();
+            loadPageData(currentActivePage);
+        });
+
+        // Render Sidebar Menu
+        function renderSidebar() {
+            const menu = document.getElementById('sidebar-menu');
+            menu.innerHTML = '';
+            
+            Object.entries(PAGE_CONFIG).forEach(([key, config]) => {
+                const li = document.createElement('li');
+                li.className = `menu-item ${key === currentActivePage ? 'active' : ''}`;
+                li.id = `menu-${key}`;
+                
+                li.innerHTML = `
+                    <a href="#" onclick="switchPage(event, '${key}')">
+                        <span><i class="fa-solid ${config.icon}"></i> ${config.title}</span>
+                        <i class="fa-solid fa-chevron-right" style="font-size: 10px; margin-right: 0; opacity: 0.5;"></i>
+                    </a>
+                `;
+                menu.appendChild(li);
+            });
+        }
+
+        // Switch Page
+        function switchPage(event, pageKey) {
+            if (event) event.preventDefault();
+            if (pageKey === currentActivePage) return;
+
+            // Remove active classes
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            
+            // Add active class to new item
+            document.getElementById(`menu-${pageKey}`).classList.add('active');
+            
+            currentActivePage = pageKey;
+            loadPageData(pageKey);
+        }
+
+        // Fetch & Load Sections/Images for Selected Page
+        function loadPageData(pageKey) {
+            const titleEl = document.getElementById('page-title');
+            const descEl = document.getElementById('page-desc');
+            const container = document.getElementById('content-display');
+
+            const pageInfo = PAGE_CONFIG[pageKey];
+            titleEl.innerText = pageInfo.title;
+            descEl.innerText = pageInfo.desc;
+
+            // Show loading
+            container.innerHTML = `
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p>Loading ${pageInfo.title} sections...</p>
+                </div>
+            `;
+
+            // Call API
+            fetch(`/pannl/api.php?page=${pageKey}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        renderSections(pageKey, data.images);
+                    } else {
+                        container.innerHTML = `
+                            <div class="loading-container">
+                                <i class="fa-solid fa-circle-exclamation" style="font-size: 40px; color: var(--error-color);"></i>
+                                <p>Failed to load data: ${data.message}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = `
+                        <div class="loading-container">
+                            <i class="fa-solid fa-circle-exclamation" style="font-size: 40px; color: var(--error-color);"></i>
+                            <p>Error connecting to API: ${err.message}</p>
+                        </div>
+                    `;
+                });
+        }
+
+        // Render sections grid
+        function renderSections(pageKey, imagesMap) {
+            const container = document.getElementById('content-display');
+            container.innerHTML = '';
+
+            const pageInfo = PAGE_CONFIG[pageKey];
+            
+            Object.entries(pageInfo.sections).forEach(([secKey, secConfig]) => {
+                const currentImgPath = imagesMap[secKey] || '';
+                let formattedImgPath = currentImgPath;
+                if (currentImgPath && !currentImgPath.match(/^https?:\/\//) && !currentImgPath.startsWith('/')) {
+                    formattedImgPath = '/' + currentImgPath;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'section-card';
+                card.id = `card-${secKey}`;
+
+                card.innerHTML = `
+                    <div class="card-header-info">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="section-card-title">${secConfig.title}</span>
+                            <div class="badge-container">
+                                <span class="section-badge">${secKey}</span>
+                            </div>
+                        </div>
+                        <span class="section-card-desc">${secConfig.desc}</span>
+                    </div>
+
+                    <div class="img-container" id="preview-container-${secKey}">
+                        ${currentImgPath ? `
+                            <img src="${formattedImgPath}" alt="${secConfig.title}" id="img-preview-${secKey}">
+                        ` : `
+                            <div class="no-img-placeholder">
+                                <i class="fa-regular fa-image"></i>
+                                <span>No Image Configured</span>
+                            </div>
+                        `}
+                    </div>
+
+                    <form class="upload-form" id="form-${secKey}" onsubmit="handleUpload(event, '${secKey}')">
+                        <div class="badge-container" style="justify-content: space-between; margin-bottom: 2px;">
+                            <span class="size-badge">Output: 1080 x 1350 px</span>
+                        </div>
+                        
+                        <div class="file-dropzone">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span class="file-label" id="label-${secKey}">Select or Drop Image</span>
+                            <input type="file" name="image" accept="image/*" required onchange="fileSelected('${secKey}', this)">
+                        </div>
+
+                        <div class="progress-container" id="progress-container-${secKey}">
+                            <div class="progress-bar" id="progress-bar-${secKey}"></div>
+                        </div>
+
+                        <div class="status-msg" id="status-${secKey}"></div>
+
+                        <button type="submit" class="submit-btn" id="submit-${secKey}" disabled>
+                            <i class="fa-solid fa-crop-simple"></i> Upload & Auto-Crop
+                        </button>
+                    </form>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Triggered when file input value changes
+        function fileSelected(secKey, input) {
+            const label = document.getElementById(`label-${secKey}`);
+            const submitBtn = document.getElementById(`submit-${secKey}`);
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                label.innerText = file.name;
+                submitBtn.disabled = false;
+                
+                // Show localized file preview in container
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewContainer = document.getElementById(`preview-container-${secKey}`);
+                    previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview" style="opacity: 0.6;">`;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                label.innerText = "Select or Drop Image";
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Handle AJAX upload
+        function handleUpload(event, secKey) {
+            event.preventDefault();
+            
+            const form = document.getElementById(`form-${secKey}`);
+            const submitBtn = document.getElementById(`submit-${secKey}`);
+            const progressContainer = document.getElementById(`progress-container-${secKey}`);
+            const progressBar = document.getElementById(`progress-bar-${secKey}`);
+            const statusMsg = document.getElementById(`status-${secKey}`);
+            const previewContainer = document.getElementById(`preview-container-${secKey}`);
+            
+            const formData = new FormData(form);
+            formData.append('section_key', secKey);
+
+            // UI state updates
+            submitBtn.disabled = true;
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            statusMsg.className = 'status-msg loading';
+            statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Resizing & uploading...';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/pannl/upload.php', true);
+
+            // Progress tracking
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = `${percent}%`;
+                }
+            });
+
+            // On completion
+            xhr.onload = function() {
+                progressContainer.style.display = 'none';
+                
+                if (xhr.status === 200) {
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.success) {
+                            // Upload success
+                            statusMsg.className = 'status-msg success';
+                            statusMsg.innerHTML = '<i class="fa-solid fa-circle-check"></i> Image updated successfully!';
+                            
+                            // Load correct path (absolute local path)
+                            let newSrc = res.path;
+                            if (!newSrc.match(/^https?:\/\//) && !newSrc.startsWith('/')) {
+                                newSrc = '/' + newSrc;
+                            }
+                            
+                            // Refresh preview with cache buster
+                            previewContainer.innerHTML = `<img src="${newSrc}?t=${new Date().getTime()}" alt="Uploaded image">`;
+                            
+                            // Reset form elements
+                            form.reset();
+                            document.getElementById(`label-${secKey}`).innerText = "Select or Drop Image";
+                            
+                            showToast('Success', 'Image updated and cropped to 1080 x 1350!', 'success');
+                        } else {
+                            // Upload failure reported by backend
+                            statusMsg.className = 'status-msg error';
+                            statusMsg.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Error: ${res.message}`;
+                            showToast('Error', res.message, 'error');
+                            submitBtn.disabled = false;
+                        }
+                    } catch (e) {
+                        statusMsg.className = 'status-msg error';
+                        statusMsg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Server response parse error.';
+                        showToast('Error', 'Invalid server response.', 'error');
+                        submitBtn.disabled = false;
+                    }
+                } else {
+                    statusMsg.className = 'status-msg error';
+                    statusMsg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Upload failed. HTTP error ' + xhr.status;
+                    showToast('Error', 'HTTP upload failed.', 'error');
+                    submitBtn.disabled = false;
+                }
+            };
+
+            xhr.onerror = function() {
+                progressContainer.style.display = 'none';
+                statusMsg.className = 'status-msg error';
+                statusMsg.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Connection error.';
+                showToast('Error', 'Connection failed.', 'error');
+                submitBtn.disabled = false;
+            };
+
+            xhr.send(formData);
+        }
+
+        // Display float toast message
+        function showToast(title, message, type) {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msgSpan = document.getElementById('toast-message');
+
+            toast.className = `toast toast-${type}`;
+            msgSpan.innerText = message;
+
+            if (type === 'success') {
+                icon.className = 'fa-solid fa-circle-check';
+            } else {
+                icon.className = 'fa-solid fa-circle-exclamation';
+            }
+
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

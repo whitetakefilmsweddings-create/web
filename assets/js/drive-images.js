@@ -127,7 +127,7 @@ async function initServicePage(category, galleryContainerId) {
     // Set Hero Background
     const heroFile = files.find(f => f.name.toLowerCase().includes('hero')) || files[0];
     const heroSection = document.querySelector('.wpo-page-title');
-    if (heroSection && heroFile) {
+    if (heroSection && heroFile && heroSection.getAttribute('data-custom-bg-set') !== 'true') {
         heroSection.style.backgroundImage = `url('${getDriveImageUrl(heroFile)}')`;
         heroSection.style.backgroundSize = 'cover';
         heroSection.style.backgroundPosition = 'center';
