@@ -647,14 +647,12 @@
         const PAGE_CONFIG = {
             'home': {
                 title: 'Home Page',
-                desc: 'Customize the landing page banners, intimate story highlight images, and about us section graphics.',
+                desc: 'Customize the landing page banners and intimate story highlight images.',
                 icon: 'fa-house',
                 sections: {
                     'intimate_1': { title: 'Intimate Story Card 1', desc: 'First card showcase image (Krishna & Connor)' },
                     'intimate_2': { title: 'Intimate Story Card 2', desc: 'Second card showcase image (Sai & Aishwarya)' },
-                    'intimate_3': { title: 'Intimate Story Card 3', desc: 'Third card showcase image (Reshma & Rajiv)' },
-                    'about_middle': { title: 'About Section - Middle Image', desc: 'Landscape image in the middle of about grid' },
-                    'about_right': { title: 'About Section - Right Image', desc: 'Landscape image on the right side of about grid' }
+                    'intimate_3': { title: 'Intimate Story Card 3', desc: 'Third card showcase image (Reshma & Rajiv)' }
                 }
             },
             'about': {

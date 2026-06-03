@@ -196,8 +196,6 @@ async function initDatabases() {
       ['home', 'intimate_1', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg'],
       ['home', 'intimate_2', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg'],
       ['home', 'intimate_3', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg'],
-      ['home', 'about_middle', 'assets/images/about.jpg'],
-      ['home', 'about_right', 'assets/images/couple/3.jpg'],
       ['about', 'about_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
       ['cinematic-wedding-films', 'cinematic_wedding_films_title_bg', 'pic/service/Cinematic%20Wedding%20Films.webp'],
       ['wedding-photography', 'wedding_photography_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
@@ -211,6 +209,8 @@ async function initDatabases() {
     for (const row of defaults) {
       await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
     }
+    // Clean up deprecated home page sections no longer in use
+    await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
 
     console.log('Databases initialized and updated.');
   } catch (err) {

@@ -208,25 +208,6 @@
     </section>
     <!-- end of wpo-about-section -->
 
-    <!-- start of about-grid-section -->
-    <section class="about-grid-section">
-        <div class="about-grid-container">
-            <div class="about-grid-left">
-                <h2 class="about-grid-title">ABOUT<br>US</h2>
-                <div class="about-grid-subtitle">Luxurious Wedding Photography and Cinematography</div>
-                <p class="about-grid-desc">Modern Elegance: Capturing designs featuring clean lines, storytelling palettes, and high-quality cinematic visuals that reflect your unique love story.</p>
-            </div>
-            <div class="about-grid-middle">
-                <img src="assets/images/about.jpg" id="about-grid-img-middle" alt="About WhiteTake Films">
-            </div>
-            <div class="about-grid-right">
-                <img src="assets/images/couple/3.jpg" id="about-grid-img-right" alt="Couple Session">
-                <h3 class="about-grid-right-title">Our Philosophy</h3>
-                <p class="about-grid-right-desc">At WhiteTake Films, we believe in creating luxurious, personalized memories that reflect our couples' authentic emotions and lifestyles.</p>
-            </div>
-        </div>
-    </section>
-    <!-- end of about-grid-section -->
 
     <!-- start wpo-service-section-s2 -->
     <section class="wpo-service-section-s2 section-padding" id="service">
@@ -892,9 +873,7 @@
                         const mappings = {
                             'intimate_1': 'intimate-img-1',
                             'intimate_2': 'intimate-img-2',
-                            'intimate_3': 'intimate-img-3',
-                            'about_middle': 'about-grid-img-middle',
-                            'about_right': 'about-grid-img-right'
+                            'intimate_3': 'intimate-img-3'
                         };
                         for (const [key, elementId] of Object.entries(mappings)) {
                             if (res.images[key]) {
