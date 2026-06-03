@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - WhiteTake</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/Admin/assets/css/style.css" rel="stylesheet">
+    <style>
+        body { background-color: #ffffff; color: #000; }
+        
+        /* Folder Card Design */
+        .folder-card {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .folder-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        }
+        .folder-cover {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .folder-placeholder {
+            height: 180px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            color: #dee2e6;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .folder-body {
+            padding: 15px;
+            background: #fff;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .folder-name {
+            font-weight: 600;
+            color: #000;
+            text-align: center;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(var(--grid-item-size, 150px), 1fr)); 
+            gap: 2px; 
+            --grid-item-size: 150px; /* Default */
+            touch-action: pan-y;
+        }
+        @media (max-width: 768px) {
+            .gallery-grid {
+                --grid-item-size: 80px;
+            }
+        }
+        .gallery-item { 
+            aspect-ratio: 1; 
+            overflow: hidden; 
+            cursor: pointer; 
+            position: relative; 
+            background: #f0f0f0;
+            transition: opacity 0.3s;
+        }
+        .gallery-item.selected {
+            border: 2px solid #0d6efd;
+        }
+        /* Checkbox Overlay */
+        .checkbox-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .custom-checkbox {
+            width: 24px;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .gallery-item.selected .custom-checkbox {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .gallery-item.selected .custom-checkbox::after {
+            content: "\F26E";
+            font-family: "bootstrap-icons";
+            color: white;
+            font-size: 16px;
+        }
+        
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+        .gallery-item:hover img { transform: scale(1.02); }
+
+        /* Image Name Overlay */
+        .image-name-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: 20px 5px 5px;
+            font-size: 0.75rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .gallery-item:hover .image-name-overlay { opacity: 1; }
+        @media (max-width: 768px) {
+            .image-name-overlay { opacity: 1; background: rgba(0,0,0,0.5); padding: 5px; }
+        }
+
+        /* Zoom Control */
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 200px;
+        }
+        
+        /* View Button */
+        .view-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s;
+            cursor: pointer;
+            z-index: 20;
+            color: #333;
+        }
+        .view-btn:hover {
+            background: #fff;
+            transform: scale(1.1);
+        }
+        .gallery-item:hover .view-btn {
+            opacity: 1;
+        }
+        @media (max-width: 768px) {
+            .view-btn { opacity: 0.8; }
+        }
+        .zoom-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #e0e0e0;
+            outline: none;
+        }
+        .zoom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #000;
+            cursor: pointer;
+            transition: background .15s ease-in-out;
+        }
+        
+        .lightbox { display: none; position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .lightbox img { max-width: 90%; max-height: 90vh; object-fit: contain; box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+        .close-lightbox { position: absolute; top: 25px; right: 30px; color: white; font-size: 45px; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
+        .close-lightbox:hover { opacity: 1; }
+        .download-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            opacity: 0; 
+            transition: all 0.3s;
+            color: black;
+            z-index: 10;
+        }
+        .download-btn:hover { background: white; transform: scale(1.1); color: black; }
+        .gallery-item:hover .download-btn { opacity: 1; }
+        
+        @media (max-width: 768px) {
+            .download-btn { opacity: 1; bottom: 5px; right: 5px; width: 35px; height: 35px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4" style="padding-bottom: 80px;">
+        <div class="d-flex align-items-center mb-4 flex-wrap gap-3">
+            <% if (folderId !== rootFolderId) { %>
+                <a href="javascript:history.back()" class="btn btn-outline-dark btn-sm rounded-pill px-3"><i class="bi bi-arrow-left"></i> Back</a>
+            <% } %>
+            <h2 class="mb-0 fw-bold me-auto">Gallery</h2>
+            
+            <!-- Zoom Slider -->
+            <div class="zoom-control">
+                <i class="bi bi-grid-3x3-gap-fill text-muted small"></i>
+                <input type="range" class="form-range zoom-slider" min="100" max="500" value="150" id="zoomSlider">
+                <i class="bi bi-square-fill text-muted small"></i>
+            </div>
+            
+            <a href="/Admin/client/selections.php" class="btn btn-primary btn-sm rounded-pill px-3 ms-md-3">
+                <i class="bi bi-check2-all"></i> View Selections
+            </a>
+
+            <% if (zipFileId) { %>
+                 <a href="/Admin/client/download.php?id=<%= zipFileId %>&name=<%= encodeURIComponent('gallery_download.zip') %>" class="btn btn-dark btn-sm rounded-pill px-3 shadow-sm"><i class="bi bi-cloud-download"></i> Download All</a>
+            <% } else if (folderId) { %>
+                 <a href="/Admin/client/download_zip.php?folder_id=<%= folderId %>&folder_name=<%= encodeURIComponent(client.name) %>" class="btn btn-dark btn-sm rounded-pill px-3 shadow-sm"><i class="bi bi-cloud-download"></i> Download All (ZIP)</a>
+            <% } %>
+        </div>
+        
+        <% if (error) { %>
+            <div class="alert alert-warning"><%= error %></div>
+        <% } %>
+
+        <!-- Folders Grid -->
+        <% 
+        const folders = files.filter(f => f.type === 'folder');
+        if (folders.length > 0) { 
+        %>
+            <h5 class="mb-3 text-muted">Folders</h5>
+            <div class="row g-4 mb-5">
+                <% folders.forEach(function(f) { %>
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                        <a href="<%= f.link %>" class="text-decoration-none">
+                            <div class="folder-card">
+                                <% if (f.cover) { %>
+                                    <img src="<%= f.cover %>" class="folder-cover" load="lazy">
+                                <% } else { %>
+                                    <div class="folder-placeholder">
+                                        <i class="bi bi-folder" style="font-size: 4rem;"></i>
+                                    </div>
+                                <% } %>
+                                <div class="folder-body">
+                                    <div class="folder-name"><%= f.name %></div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+
+        <!-- Images Grid -->
+        <h5 class="mb-3 text-muted">Photos</h5>
+        <div class="gallery-grid">
+            <% 
+            const images = files.filter(f => f.type === 'image');
+            images.forEach(function(f) { 
+                const isSelected = selections.includes(f.id);
+                const itemClass = isSelected ? 'gallery-item selected' : 'gallery-item';
+            %>
+                <div class="<%= itemClass %>" 
+                     data-id="<%= f.id %>"
+                     onclick="toggleSelection(this, '<%= f.id %>', event)">
+                    <div class="checkbox-overlay">
+                        <div class="custom-checkbox"></div>
+                    </div>
+                    
+                    <div class="view-btn" onclick="handleViewClick(this, '<%= f.src %>', '<%= f.id %>', '<%= f.name.replace(/'/g, '\\\'') %>', event)">
+                        <i class="bi bi-arrows-fullscreen"></i>
+                    </div>
+
+                    <img src="<%= f.src %>" loading="lazy">
+                    
+                    <div class="image-name-overlay"><%= f.name %></div>
+                    <a href="/Admin/client/download.php?id=<%= f.id %>&name=<%= encodeURIComponent(f.name) %>" class="download-btn" onclick="event.stopPropagation()" title="Download Image">
+                        <i class="bi bi-download"></i>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLightbox()">
+        <span class="close-lightbox" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" src="">
+        <a id="lightbox-dl" href="#" class="btn btn-light rounded-pill px-4 py-2 position-absolute" style="bottom: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); font-weight: 600;">
+            <i class="bi bi-cloud-download me-2"></i> Download Original
+        </a>
+    </div>
+
+    <!-- Nav -->
+    <nav class="bottom-nav">
+        <a href="/Admin/client/dashboard.php" class="nav-item">
+            <i class="bi bi-grid"></i>
+            <span>Home</span>
+        </a>
+        <a href="/Admin/client/gallery.php" class="nav-item active">
+            <i class="bi bi-images"></i>
+            <span>Gallery</span>
+        </a>
+        <a href="/Admin/client/selections.php" class="nav-item">
+            <i class="bi bi-check2-square"></i>
+            <span>Selections</span>
+        </a>
+        <a href="/Admin/client/invoices.php" class="nav-item">
+            <i class="bi bi-receipt"></i>
+            <span>Invoices</span>
+        </a>
+        <a href="/Admin/client/logout.php" class="nav-item">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </a>
+    </nav>
+    
+    <script>
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxDl = document.getElementById('lightbox-dl');
+        
+        function openLightbox(src, id, name) { 
+            lightboxImg.src = src; 
+            lightboxDl.href = '/Admin/client/download.php?id=' + id + '&name=' + encodeURIComponent(name);
+            lightbox.style.display = 'flex'; 
+        }
+        function closeLightbox() { lightbox.style.display = 'none'; }
+
+        // Zoom Logic
+        const zoomSlider = document.getElementById('zoomSlider');
+        const galleryGrid = document.querySelector('.gallery-grid');
+        
+        if (zoomSlider && galleryGrid) {
+            function setGridSize(size) {
+                const min = parseInt(zoomSlider.min);
+                const max = parseInt(zoomSlider.max);
+                const clampedSize = Math.min(Math.max(size, min), max);
+                
+                galleryGrid.style.setProperty('--grid-item-size', clampedSize + 'px');
+                zoomSlider.value = clampedSize;
+            }
+
+            function updateSliderMax() {
+                const containerWidth = galleryGrid.clientWidth;
+                zoomSlider.max = (containerWidth / 2) - 10;
+                
+                if (window.innerWidth < 768) {
+                    zoomSlider.min = 60;
+                    const currentSize = parseFloat(getComputedStyle(galleryGrid).getPropertyValue('--grid-item-size'));
+                    zoomSlider.value = currentSize;
+                } else {
+                    zoomSlider.min = 100;
+                }
+            }
+            
+            window.addEventListener('resize', updateSliderMax);
+            setTimeout(updateSliderMax, 100);
+
+            zoomSlider.addEventListener('input', (e) => {
+                galleryGrid.style.setProperty('--grid-item-size', e.target.value + 'px');
+            });
+
+            // Mobile Pinch to Zoom
+            let initialDistance = 0;
+            let initialSize = 0;
+
+            galleryGrid.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    initialDistance = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+                    initialSize = parseFloat(getComputedStyle(galleryGrid).getPropertyValue('--grid-item-size')) || 150;
+                }
+            }, { passive: true });
+
+            galleryGrid.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    const currentDistance = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
+                    );
+
+                    if (initialDistance > 0) {
+                        const scale = currentDistance / initialDistance;
+                        const newSize = initialSize * scale;
+                        setGridSize(newSize);
+                    }
+                }
+            }, { passive: true });
+        }
+
+        function handleViewClick(btn, src, id, name, event) {
+            event.stopPropagation();
+            openLightbox(src, id, name);
+        }
+
+        function toggleSelection(element, id, event) {
+            const isSelected = element.classList.contains('selected');
+            const action = isSelected ? 'deselect' : 'select';
+            
+            if (isSelected) {
+                element.classList.remove('selected');
+            } else {
+                element.classList.add('selected');
+            }
+
+            fetch('/Admin/client/ajax_selection.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file_id: id, action: action })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    if (isSelected) element.classList.add('selected');
+                    else element.classList.remove('selected');
+                    alert('Error updating selection: ' + data.error);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                if (isSelected) element.classList.add('selected');
+                else element.classList.remove('selected');
+            });
+        }
+    </script>
+</body>
+</html>
