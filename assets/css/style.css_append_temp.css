@@ -1,0 +1,26 @@
+/* Updated Divider Styling */
+.hero-shape-divider {
+    position: absolute;
+    bottom: -1px;
+    /* overlapping slightly to prevent gaps */
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    z-index: 2;
+}
+
+.hero-shape-divider svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 100px;
+    /* Reduced height for subtler look */
+}
+
+@media (max-width: 768px) {
+    .hero-shape-divider svg {
+        height: 50px;
+        /* Smaller on mobile */
+    }
+}

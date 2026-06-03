@@ -1,0 +1,144 @@
+/*--------------------------------------------------------------
+# wpo-pricing-section
+--------------------------------------------------------------*/
+.wpo-pricing-section {
+    position: relative;
+    padding-bottom: 25px;
+    /* Adjust as needed */
+    background-color: #f9f9f9;
+    /* Match service section bg */
+}
+
+.wpo-section-title {
+    margin-bottom: 60px;
+    text-align: center;
+}
+
+.wpo-section-title span {
+    font-size: 16px;
+    color: #c0aa83;
+    /* Gold-ish color common in wedding themes */
+    font-weight: 400; /* Regular weight */
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+}
+
+.wpo-section-title h2 {
+    font-size: 36px;
+    color: #2a2a2a;
+    margin: 0;
+    font-family: "Cormorant Garamond", serif;
+}
+
+.wpo-pricing-item {
+    background: #fff;
+    padding: 0 0 40px 0;
+    margin-bottom: 30px;
+    box-shadow: 0px 10px 40px 0px rgba(50, 50, 50, 0.1);
+    text-align: center;
+    transition: all .3s;
+    border-radius: 6px;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.wpo-pricing-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 20px 50px 0px rgba(50, 50, 50, 0.15);
+}
+
+.wpo-pricing-top {
+    background-color: #2a2a2a;
+    /* Dark header */
+    padding: 30px 20px;
+    color: #fff;
+    position: relative;
+}
+
+.wpo-pricing-header {
+    margin-bottom: 15px;
+}
+
+.wpo-pricing-header h3 {
+    font-size: 24px;
+    font-weight: 400; /* Regular weight */
+    color: #fff;
+    margin: 0;
+    font-family: "Cormorant Garamond", serif;
+    letter-spacing: 1px;
+}
+
+.wpo-pricing-price {
+    color: #c0aa83;
+}
+
+.wpo-pricing-price h2 {
+    font-size: 40px;
+    font-weight: 400; /* Regular weight */
+    color: #c0aa83;
+    margin: 0;
+    display: inline-block;
+    font-family: 'Mulish', sans-serif;
+}
+
+.wpo-pricing-price span {
+    font-size: 15px;
+    font-weight: 400;
+    color: #ddd;
+    display: block;
+    margin-top: 5px;
+}
+
+.wpo-pricing-body {
+    padding: 30px 20px;
+    flex-grow: 1;
+}
+
+.wpo-pricing-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wpo-pricing-body ul li {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.wpo-pricing-body ul li:last-child {
+    margin-bottom: 0;
+}
+
+.wpo-pricing-bottom {
+    padding-top: 10px;
+}
+
+.wpo-pricing-btn {
+    display: inline-block;
+    background-color: #c0aa83;
+    color: #fff;
+    padding: 12px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 400; /* Regular weight */
+    transition: all 0.3s;
+    font-family: 'Mulish', sans-serif;
+}
+
+.wpo-pricing-btn:hover {
+    background-color: #2a2a2a;
+    color: #fff;
+}
+
+@media(max-width: 991px) {
+    .wpo-pricing-price h2 {
+        font-size: 32px;
+    }
+}

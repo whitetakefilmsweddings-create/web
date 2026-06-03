@@ -1,0 +1,190 @@
+/*--------------------------------------------------------------
+# wpo-service-section-s2 - New Card Design
+--------------------------------------------------------------*/
+.wpo-service-section-s2 {
+    background: #f9f9f9;
+    /* Light background for contrast */
+}
+
+.wpo-service-section-s2 .wpo-service-item {
+    display: block;
+    text-decoration: none;
+    position: relative;
+    height: 420px;
+    border-radius: 24px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    border: none;
+    padding: 0;
+    background: #fff;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transform: translateZ(0);
+    /* Fix for overflow radius in some browsers */
+}
+
+/* Background Image Layer */
+.wpo-service-item-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    object-fit: cover;
+}
+
+.wpo-service-section-s2 .wpo-service-item:hover .wpo-service-item-bg {
+    transform: scale(1.1);
+}
+
+/* Gradient Overlay */
+.wpo-service-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradient from clear top to dark bottom */
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 30%, rgba(0, 0, 0, 0.6) 60%, rgba(0, 0, 0, 0.95) 100%);
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Content Layer */
+.wpo-service-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 25px;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.wpo-service-content h2 {
+    color: #fff;
+    font-size: 24px;
+    font-weight: 400; /* Regular weight */
+    margin-bottom: 8px;
+    font-family: 'Mulish', sans-serif;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.wpo-service-content h2 a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.wpo-service-content p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-weight: 400;
+    max-width: 90%;
+}
+
+/* Badges / Ratings */
+.wpo-service-tags {
+    margin-bottom: 25px;
+    display: flex;
+    gap: 10px;
+}
+
+.wpo-service-tag {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 13px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wpo-service-tag i {
+    margin-right: 5px;
+    font-size: 12px;
+    color: #FFD700;
+    /* Gold star */
+}
+
+/* Action Button */
+/* Text Link (No Button) */
+.service-link {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    padding-bottom: 2px;
+    transition: all 0.3s ease;
+}
+
+.service-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: 0;
+    left: 0;
+    background-color: #fff;
+    transition: width 0.3s ease;
+}
+
+.service-link:hover {
+    color: #FFD700;
+    /* Gold on hover */
+}
+
+.service-link:hover::after {
+    width: 100%;
+    background-color: #FFD700;
+}
+
+/* Responsive adjustments */
+/* Responsive adjustments for 2-column mobile grid */
+@media (max-width: 767px) {
+    .wpo-service-section-s2 .wpo-service-item {
+        height: 320px;
+        /* Reduced height for mobile */
+        border-radius: 16px;
+    }
+
+    .wpo-service-content {
+        padding: 15px;
+        /* Tighter padding */
+    }
+
+    .wpo-service-content h2 {
+        font-size: 16px;
+        /* Smaller title */
+        margin-bottom: 5px;
+    }
+
+    .wpo-service-content p {
+        font-size: 12px;
+        /* Smaller description */
+        line-height: 1.3;
+        margin-bottom: 10px;
+    }
+
+    /* Hide tags on mobile to save space */
+    .wpo-service-tags {
+        display: none;
+    }
+
+    .service-link {
+        font-size: 13px;
+    }
+}

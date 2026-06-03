@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Find My Photos | Face AI</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css?v=3.21">
+    <!-- Face API -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    <script defer src="script.js?v=3.21"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="ri-camera-lens-fill"></i>
+                <span>FaceFind</span>
+            </div>
+            <div class="header-controls">
+                <button id="theme-toggle" class="icon-btn" title="Toggle Dark Mode">
+                    <i class="ri-moon-line"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Initialization & Loading Overlay -->
+            <div id="loading-overlay" class="loading-overlay">
+                <div class="spinner"></div>
+                <p>Starting AI Engine...</p>
+            </div>
+
+            <!-- Step 1: Selfie (Main View) -->
+            <section class="section glass-panel" id="step-selfie">
+                <div class="section-header">
+                    <h2>Find My Photos</h2>
+                    <p class="section-desc">Take a selfie to instantly find your photos from the event.</p>
+                </div>
+
+                <div class="selfie-controls">
+                    <div class="tabs">
+                        <button class="tab-btn active" data-target="camera">Camera</button>
+                        <button class="tab-btn" data-target="upload">Upload</button>
+                    </div>
+
+                    <!-- Camera View -->
+                    <div id="camera-view" class="input-view active">
+                        <div class="camera-container">
+                            <video id="video-feed" autoplay muted playsinline></video>
+                            <canvas id="video-overlay"></canvas>
+                        </div>
+                        <button id="capture-btn" class="primary-btn">
+                            <i class="ri-camera-fill"></i> Capture Photo
+                        </button>
+                    </div>
+
+                    <!-- Upload View -->
+                    <div id="upload-view" class="input-view">
+                        <div class="file-drop-area" id="selfie-drop-area">
+                            <i class="ri-image-add-line"></i>
+                            <p>Tap to Upload Photo</p>
+                            <input type="file" id="selfie-input" accept="image/*" hidden>
+                        </div>
+                    </div>
+                    <!-- Preview State (Moved inside) -->
+                    <div id="selfie-preview-container" class="hidden">
+                        <img id="selfie-img" src="" alt="Selfie Preview">
+                        <div class="face-check-status" id="face-check-status">
+                            <div class="spinner" style="width: 24px; height: 24px; border-width: 2px; margin: 0 auto;">
+                            </div>
+                        </div>
+
+                        <div id="action-buttons" class="hidden">
+                            <button id="start-search-btn" class="primary-btn">
+                                <i class="ri-search-2-line"></i> Search Photos
+                            </button>
+                            <button id="retake-btn" class="secondary-btn">Retake</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Options (New Step) -->
+                <div id="step-options" class="hidden text-center">
+                    <h3 class="mb-4">Select Search Mode</h3>
+                    <div class="modes-grid">
+                        <button class="mode-card" onclick="selectMode('fast')">
+                            <i class="ri-rocket-2-fill icon-large"></i>
+                            <h4>Fast Search</h4>
+                            <p>Quick scan. Good for clear faces.</p>
+                        </button>
+                        <button class="mode-card" onclick="selectMode('accurate')">
+                            <i class="ri-focus-3-line icon-large"></i>
+                            <h4>High Accuracy</h4>
+                            <p>Slower, but finds more matches.</p>
+                        </button>
+                    </div>
+                    <button class="secondary-btn mt-4" onclick="resetSelfie()">Back</button>
+                </div>
+            </section>
+
+            <!-- Hidden Inputs for Logic (Populated by URL) -->
+            <div class="hidden">
+                <input type="text" id="gdrive-folder">
+                <input type="password" id="gdrive-api-key" value="AIzaSyAxoP_13cWEwsr0jzH4Tj51yWPe7f-SNEQ">
+                <button id="fetch-gdrive-btn">Fetch</button>
+                <div id="gallery-stats"></div>
+                <!-- Settings defaults -->
+                <input type="range" id="threshold-slider" value="0.5">
+                <input type="checkbox" id="fast-mode">
+            </div>
+
+            <!-- Step 3: Results (Overlays or Replaces Selfie) -->
+            <section class="section hidden" id="step-results">
+                <div class="section-header"
+                    style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 1.2rem; margin: 0;">Matches Found <span id="match-count-badge"
+                                class="badge">0</span></h2>
+                        <small style="opacity: 0.6;">Total Gallery: <span id="total-gallery-count">0</span>
+                            photos</small>
+                    </div>
+                    <button class="icon-btn" onclick="location.reload()">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+
+                <!-- Live Scanner -->
+                <div id="scanner-container" class="scanner-container hidden"
+                    style="display:flex; justify-content:center; align-items:center; background:transparent; box-shadow:none;">
+                    <dotlottie-player src="../assets/Robot-Bot%203D.lottie" background="transparent" speed="1"
+                        style="width: 300px; height: 300px;" loop autoplay></dotlottie-player>
+                </div>
+
+                <div id="progress-area" class="progress-area" style="margin-bottom: 20px;">
+                    <div style="display:flex; justify-content:space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                        <span id="progress-text">Initializing...</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div
+                        style="width: 100%; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden;">
+                        <div id="progress-bar"
+                            style="width: 0%; height: 100%; background: var(--success-color); transition: width 0.2s;">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="results-grid" class="results-grid">
+                    <!-- Matches appear here -->
+                </div>
+
+                <button id="download-all-btn" class="primary-btn hidden" style="margin-top: 20px;">
+                    <i class="ri-download-cloud-2-line"></i> Download All Matches
+                </button>
+            </section>
+
+        </main>
+
+        <footer>
+            <p>&copy; WhiteTake Films Face AI</p>
+        </footer>
+    </div>
+    <div id="debug-console" class="hidden"
+        style="position:fixed; bottom:0; left:0; right:0; height:150px; background:rgba(0,0,0,0.8); color:#0f0; font-family:monospace; font-size:10px; overflow-y:auto; z-index:9999; padding:10px;">
+        <div style="position:sticky; top:0; background:rgba(0,0,0,0.9); border-bottom:1px solid #333; padding:2px;">
+            Debug Log <button onclick="this.parentElement.parentElement.classList.add('hidden')"
+                style="float:right;">X</button></div>
+        <div id="debug-log-content"></div>
+    </div>
+    <button onclick="document.getElementById('debug-console').classList.remove('hidden')"
+        style="position:fixed; bottom:10px; left:10px; z-index:9998; opacity:0.3; font-size:10px;">🐞</button>
+</body>
+
+</html>

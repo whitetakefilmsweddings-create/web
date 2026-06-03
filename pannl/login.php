@@ -1,0 +1,152 @@
+<?php
+// login.php - Admin Login Page
+require_once 'config.php';
+session_start();
+
+$error = '';
+
+if (isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true) {
+    header("Location: index.php");
+    exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    
+    if ($password === ADMIN_PASSWORD) {
+        $_SESSION['admin_logged_in'] = true;
+        header("Location: index.php");
+        exit;
+    } else {
+        $error = 'Invalid admin password. Please try again.';
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - WhiteTake Films</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Mulish', sans-serif;
+            background-color: #000;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .login-card {
+            background-color: #111;
+            padding: 40px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid #222;
+            text-align: center;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1.5px;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+        .logo span {
+            font-weight: 300;
+            color: #cecece;
+        }
+        .title {
+            font-size: 16px;
+            font-weight: 300;
+            color: #888;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-family: 'Mulish', sans-serif;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="password"]:focus {
+            border-color: #666;
+        }
+        .error-message {
+            color: #ff4a4a;
+            font-size: 13px;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #e5e5e5;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo">WhiteTake<span>Films</span></div>
+        <div class="title">Control Panel</div>
+        
+        <?php if (!empty($error)): ?>
+            <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+        
+        <form method="POST" action="login.php">
+            <div class="form-group">
+                <label for="password">Enter Admin Password</label>
+                <input type="password" id="password" name="password" required autofocus>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+</body>
+</html>
