@@ -884,6 +884,13 @@
                                 const imgElement = document.getElementById(elementId);
                                 if (imgElement) {
                                     imgElement.src = res.images[key];
+                                    // If this is the big circle image (intimate_1), update the logo circle background too
+                                    if (key === 'intimate_1') {
+                                        const solidCircle = document.querySelector('.couples-shape-solid');
+                                        if (solidCircle) {
+                                            solidCircle.style.backgroundImage = `url('${res.images[key]}')`;
+                                        }
+                                    }
                                 }
                             }
                         }
