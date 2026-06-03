@@ -173,7 +173,7 @@ async function initDatabases() {
 
     // Insert/Sync Default Admin
     const adminEmail = 'admin@whitetakefilms';
-    const adminPass = process.env.ADMIN_PASSWORD || 'Whitetake@924';
+    const adminPass = 'Whitetake@924';
     const [admins] = await tdsPool.query('SELECT * FROM admins WHERE email = ?', [adminEmail]);
     if (admins.length === 0) {
       await tdsPool.query('INSERT INTO admins (email, password) VALUES (?, ?)', [adminEmail, adminPass]);
