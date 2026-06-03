@@ -171,10 +171,14 @@ async function initDatabases() {
       );
     `);
 
-    // Insert Default Admin
-    const [admins] = await tdsPool.query('SELECT * FROM admins WHERE email = ?', ['admin@whitetake.com']);
+    // Insert/Sync Default Admin
+    const adminEmail = 'admin@whitetake.com';
+    const adminPass = process.env.ADMIN_PASSWORD || 'Noufal@2026';
+    const [admins] = await tdsPool.query('SELECT * FROM admins WHERE email = ?', [adminEmail]);
     if (admins.length === 0) {
-      await tdsPool.query('INSERT INTO admins (email, password) VALUES (?, ?)', ['admin@whitetake.com', 'admin@whitetake.com']);
+      await tdsPool.query('INSERT INTO admins (email, password) VALUES (?, ?)', [adminEmail, adminPass]);
+    } else {
+      await tdsPool.query('UPDATE admins SET password = ? WHERE email = ?', [adminPass, adminEmail]);
     }
 
     // 2. Setup u406992830_panle Schema
