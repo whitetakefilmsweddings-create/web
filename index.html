@@ -941,7 +941,8 @@
                     }
                 });
             }, {
-                threshold: 0.1 // Trigger when 10% visible
+                threshold: 0.15,
+                rootMargin: '0px 0px -120px 0px' // Delay trigger until section is 120px into the viewport
             });
 
             allSections.forEach(section => {
