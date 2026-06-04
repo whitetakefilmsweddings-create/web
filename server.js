@@ -1371,6 +1371,7 @@ app.get('/pannl/api.php', async (req, res) => {
       [results] = await panlePool.query('SELECT section_key, image_path FROM section_images');
     }
 
+    const images = {};
     results.forEach(row => {
       if (row.image_path) {
         if (row.image_path.startsWith('http://') || row.image_path.startsWith('https://') || row.image_path.startsWith('data:')) {
