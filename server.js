@@ -234,7 +234,13 @@ async function initDatabases() {
       ['feed_3', 'https://www.instagram.com/p/C64s4WpvpC3/'],
       ['feed_4', 'https://www.instagram.com/p/C62IexBvIq4/'],
       ['feed_5', 'https://www.instagram.com/p/C6zc9F6PCW5/'],
-      ['feed_6', 'https://www.instagram.com/p/C6w4kPvvbT5/']
+      ['feed_6', 'https://www.instagram.com/p/C6w4kPvvbT5/'],
+      ['yt_1', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      ['yt_2', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      ['yt_3', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      ['yt_4', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      ['yt_5', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      ['yt_6', 'https://www.youtube.com/watch?v=F384n1wXQoY']
     ];
     for (const row of defaultFeeds) {
       await panlePool.query('INSERT IGNORE INTO instagram_feeds (feed_key, post_url) VALUES (?, ?)', row);
@@ -1266,6 +1272,40 @@ app.post('/pannl/update_feed.php', checkPannlAuth, async (req, res) => {
     await panlePool.execute(
       'UPDATE instagram_feeds SET post_url = ? WHERE feed_key = ?',
       [post_url, feed_key]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+app.post('/pannl/add_feed.php', checkPannlAuth, async (req, res) => {
+  const { type, post_url } = req.body;
+  if (!type || !post_url) {
+    return res.json({ success: false, message: 'Missing parameters' });
+  }
+  try {
+    const timestamp = Date.now();
+    const feed_key = type === 'yt' ? `yt_${timestamp}` : `feed_${timestamp}`;
+    await panlePool.execute(
+      'INSERT INTO instagram_feeds (feed_key, post_url) VALUES (?, ?)',
+      [feed_key, post_url]
+    );
+    res.json({ success: true, feed_key });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+app.post('/pannl/delete_feed.php', checkPannlAuth, async (req, res) => {
+  const { feed_key } = req.body;
+  if (!feed_key) {
+    return res.json({ success: false, message: 'Missing parameters' });
+  }
+  try {
+    await panlePool.execute(
+      'DELETE FROM instagram_feeds WHERE feed_key = ?',
+      [feed_key]
     );
     res.json({ success: true });
   } catch (err) {

@@ -136,19 +136,101 @@
         .insta-filter-btn i {
             font-size: 15px;
         }
-        .instagram-embed-wrapper {
-            background: transparent;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+        .instagram-card {
+            position: relative;
             width: 100%;
+            aspect-ratio: 4 / 5;
+            background-color: #000;
+            border-radius: 12px;
             overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
         }
-        .instagram-embed-wrapper iframe,
-        .instagram-embed-wrapper blockquote {
-            margin: 0 !important;
-            width: 100% !important;
+        .instagram-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .instagram-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .instagram-card:hover img {
+            transform: scale(1.05);
+        }
+        .insta-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .instagram-card:hover .insta-overlay {
+            opacity: 1;
+        }
+        .insta-overlay i {
+            color: #ffffff;
+            font-size: 55px;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
+        }
+        .instagram-card:hover .insta-overlay i {
+            transform: scale(1.1);
+        }
+
+        /* Instagram Modal Styles */
+        .insta-modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+        .insta-modal-content {
+            position: relative;
+            background-color: transparent;
+            margin: auto;
+            padding: 0;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            animation: zoomIn 0.3s ease;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .close-insta-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #ffffff;
+            font-size: 40px;
+            font-weight: 300;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 100000;
+        }
+        .close-insta-modal:hover {
+            color: #e1306c;
         }
 
         @media (max-width: 991px) {
@@ -789,8 +871,8 @@
             <div class="row">
                 <div class="wpo-section-title">
                     <div class="insta-badge-container">
-                        <a href="https://www.instagram.com/dreamwed_stories.co/" target="_blank" class="insta-badge">
-                            <i class="fa fa-instagram"></i> @dreamwed_stories.co
+                        <a href="https://www.instagram.com/whitetake_films/" target="_blank" class="insta-badge">
+                            <i class="fa fa-instagram"></i> @whitetake_films
                         </a>
                     </div>
                     <h2>From our feed</h2>
@@ -800,8 +882,8 @@
                             <div class="insta-filter-btn active" data-filter="photos">
                                 <i class="fa fa-instagram"></i> Photos
                             </div>
-                            <div class="insta-filter-btn" data-filter="reels">
-                                <i class="fa fa-video-camera"></i> Cinematic Reels
+                            <div class="insta-filter-btn" data-filter="youtube">
+                                <i class="fa fa-youtube-play"></i> YouTube Videos
                             </div>
                         </div>
                     </div>
@@ -1033,6 +1115,14 @@
         <img class="modal-content" id="img01">
     </div>
 
+    <!-- Instagram Popup Modal -->
+    <div id="instaModal" class="insta-modal">
+        <span class="close-insta-modal">&times;</span>
+        <div class="insta-modal-content" id="instaModalContent">
+            <!-- Iframe will be injected here dynamically -->
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // --- 1. Lightbox & Thumbnail Logic ---
@@ -1151,18 +1241,108 @@
                         }
                     }
 
-                    // Dynamically load Instagram feeds
+                    // Helper to extract shortcode from Instagram
+                    function getInstagramShortcode(urlOrEmbed) {
+                        if (!urlOrEmbed) return null;
+                        let url = urlOrEmbed.trim();
+                        if (url.includes('<blockquote') || url.includes('<iframe')) {
+                            const match = url.match(/data-instgrm-permalink="([^"]+)"/) || url.match(/href="([^"]+)"/);
+                            if (match) {
+                                url = match[1];
+                            }
+                        }
+                        const cleanUrl = url.split('?')[0];
+                        const parts = cleanUrl.split('/');
+                        for (let i = 0; i < parts.length; i++) {
+                            if ((parts[i] === 'p' || parts[i] === 'reel' || parts[i] === 'tv') && parts[i+1]) {
+                                return parts[i+1];
+                            }
+                        }
+                        return null;
+                    }
+
+                    // Helper to extract YouTube Video ID
+                    function getYoutubeVideoId(url) {
+                        if (!url) return null;
+                        let videoId = null;
+                        const cleanUrl = url.trim();
+                        if (cleanUrl.includes('youtube.com/watch')) {
+                            const match = cleanUrl.match(/[?&]v=([^&#]+)/);
+                            if (match) videoId = match[1];
+                        } else if (cleanUrl.includes('youtu.be/')) {
+                            const parts = cleanUrl.split('/');
+                            videoId = parts[parts.length - 1].split('?')[0];
+                        } else if (cleanUrl.includes('youtube.com/embed/')) {
+                            const parts = cleanUrl.split('/');
+                            videoId = parts[parts.length - 1].split('?')[0];
+                        } else if (cleanUrl.includes('youtube.com/shorts/')) {
+                            const parts = cleanUrl.split('/');
+                            videoId = parts[parts.length - 1].split('?')[0];
+                        }
+                        return videoId;
+                    }
+
+                    // Dynamically load feeds
                     if (res.success && res.feeds && res.feeds.length > 0) {
                         const gridContainer = document.getElementById('instagram-grid');
                         const allFeeds = res.feeds;
                         let autoScrollInterval;
                         let interactionTimeout;
 
+                        // Expose popup function globally
+                        window.openMediaPopup = function(id, type) {
+                            const modal = document.getElementById('instaModal');
+                            const content = document.getElementById('instaModalContent');
+                            if (!modal || !content) return;
+
+                            if (type === 'youtube') {
+                                content.innerHTML = `
+                                    <iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" 
+                                            width="100%" 
+                                            height="315" 
+                                            frameborder="0" 
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                            allowfullscreen
+                                            style="border-radius: 12px; background: #000; border: none; display: block; margin: 0 auto; aspect-ratio: 16 / 9; height: auto;">
+                                    </iframe>
+                                `;
+                            } else {
+                                content.innerHTML = `
+                                    <iframe src="https://www.instagram.com/p/${id}/embed/" 
+                                            width="100%" 
+                                            height="500" 
+                                            frameborder="0" 
+                                            scrolling="no" 
+                                            allowtransparency="true" 
+                                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                                            style="border-radius: 12px; background: #000; border: none; display: block; margin: 0 auto;">
+                                    </iframe>
+                                `;
+                            }
+                            modal.style.display = 'flex';
+                        };
+
+                        window.closeInstaPopup = function() {
+                            const modal = document.getElementById('instaModal');
+                            const content = document.getElementById('instaModalContent');
+                            if (modal) modal.style.display = 'none';
+                            if (content) content.innerHTML = '';
+                        };
+
+                        // Modal close click handler
+                        const modalEl = document.getElementById('instaModal');
+                        if (modalEl) {
+                            modalEl.addEventListener('click', function(e) {
+                                if (e.target === modalEl || e.target.classList.contains('close-insta-modal')) {
+                                    window.closeInstaPopup();
+                                }
+                            });
+                        }
+
                         function renderFeeds(filter) {
                             if (!gridContainer) return;
-                            gridContainer.innerHTML = ''; // Clear previous content
+                            gridContainer.innerHTML = ''; 
 
-                            // Clear any active auto-scroll intervals
                             if (autoScrollInterval) {
                                 clearInterval(autoScrollInterval);
                                 autoScrollInterval = null;
@@ -1172,13 +1352,13 @@
                                 interactionTimeout = null;
                             }
 
-                            // Filter feeds (Reels vs Posts)
+                            // Filter feeds (YouTube vs Instagram Photos) using key prefix
                             const filteredFeeds = allFeeds.filter(feed => {
-                                const isReel = feed.post_url.includes('/reel/') || feed.post_url.includes('/tv/') || feed.post_url.includes('instagram-media-reel');
-                                if (filter === 'reels') {
-                                    return isReel;
+                                const isYtKey = feed.feed_key.startsWith('yt_');
+                                if (filter === 'youtube') {
+                                    return isYtKey;
                                 } else {
-                                    return !isReel;
+                                    return !isYtKey;
                                 }
                             });
 
@@ -1188,38 +1368,35 @@
                             }
 
                             filteredFeeds.forEach(feed => {
-                                let htmlContent = feed.post_url;
-                                if (htmlContent) {
-                                    if (!htmlContent.includes('<blockquote') && !htmlContent.includes('<iframe')) {
-                                        let cleanUrl = htmlContent.trim().split('?')[0];
-                                        if (cleanUrl.endsWith('/')) {
-                                            cleanUrl = cleanUrl.slice(0, -1);
-                                        }
-                                        htmlContent = `<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${cleanUrl}/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; width: 100%;"></blockquote>`;
-                                    }
+                                const isYt = feed.feed_key.startsWith('yt_');
+                                let mediaId = null;
+                                let coverUrl = '';
+                                let iconClass = '';
+
+                                if (isYt) {
+                                    mediaId = getYoutubeVideoId(feed.post_url);
+                                    coverUrl = mediaId ? `https://img.youtube.com/vi/${mediaId}/hqdefault.jpg` : '';
+                                    iconClass = 'fa fa-play-circle';
                                 } else {
-                                    htmlContent = '';
+                                    mediaId = getInstagramShortcode(feed.post_url);
+                                    coverUrl = mediaId ? `https://www.instagram.com/p/${mediaId}/media/?size=l` : '';
+                                    iconClass = 'fa fa-instagram';
                                 }
+
+                                if (!mediaId) return;
 
                                 const feedCol = document.createElement('div');
                                 feedCol.className = 'col-lg-4 col-md-6 col-12';
                                 feedCol.innerHTML = `
-                                    <div class="instagram-embed-wrapper">
-                                        ${htmlContent}
+                                    <div class="instagram-card" onclick="window.openMediaPopup('${mediaId}', '${isYt ? 'youtube' : 'instagram'}')">
+                                        <img src="${coverUrl}" alt="Media Cover">
+                                        <div class="insta-overlay">
+                                            <i class="${iconClass}"></i>
+                                        </div>
                                     </div>
                                 `;
                                 gridContainer.appendChild(feedCol);
                             });
-
-                            // Process the newly added embeds to render them
-                            if (window.instgrm && window.instgrm.Embeds) {
-                                window.instgrm.Embeds.process();
-                            } else {
-                                const script = document.createElement('script');
-                                script.async = true;
-                                script.src = "//www.instagram.com/embed.js";
-                                document.body.appendChild(script);
-                            }
 
                             // Mobile Auto-Scroll with Touch Detection
                             setTimeout(() => {
@@ -1234,7 +1411,7 @@
                                             autoScrollInterval = setInterval(() => {
                                                 if (isUserInteracting) return;
                                                 if (gridContainer.scrollLeft + gridContainer.offsetWidth >= gridContainer.scrollWidth - 30) {
-                                                    gridContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Loop back
+                                                    gridContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); 
                                                 } else {
                                                     gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
                                                 }
