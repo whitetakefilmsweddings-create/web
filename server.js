@@ -187,7 +187,7 @@ async function initDatabases() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         page_name VARCHAR(50) NOT NULL,
         section_key VARCHAR(50) NOT NULL UNIQUE,
-        image_path VARCHAR(255) NOT NULL,
+        image_path LONGTEXT NOT NULL,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
@@ -212,6 +212,12 @@ async function initDatabases() {
     }
     // Clean up deprecated home page sections no longer in use
     await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
+    // Run schema migration to change image_path column to LONGTEXT if it's currently VARCHAR(255)
+    try {
+      await panlePool.query('ALTER TABLE section_images MODIFY COLUMN image_path LONGTEXT NOT NULL');
+    } catch (migrateErr) {
+      console.log('Database migration info:', migrateErr.message);
+    }
     // 3. Setup Instagram feeds table
     await panlePool.query(`
       CREATE TABLE IF NOT EXISTS instagram_feeds (
@@ -1323,27 +1329,23 @@ app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req
   }
 
   const tempPath = req.file.path;
-  const uploadDir = path.join(__dirname, 'pannl/uploads');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-
-  const filename = `img_${sectionKey}_${Date.now()}.jpg`;
-  const savePath = path.join(uploadDir, filename);
-  const dbPath = `pannl/uploads/${filename}`;
 
   try {
-    // Sharp center crop resize to 1080 x 1350
-    await sharp(tempPath)
+    // Sharp center crop resize to 1080 x 1350 and convert to buffer
+    const buffer = await sharp(tempPath)
       .resize(1080, 1350, {
         fit: 'cover',
         position: 'center'
       })
       .jpeg({ quality: 90 })
-      .toFile(savePath);
+      .toBuffer();
 
     // Clean up multer temp file
     fs.unlinkSync(tempPath);
+
+    // Convert cropped buffer to base64 data URI
+    const base64Data = buffer.toString('base64');
+    const dbPath = `data:image/jpeg;base64,${base64Data}`;
 
     // Update DB
     await panlePool.execute(
@@ -1369,10 +1371,9 @@ app.get('/pannl/api.php', async (req, res) => {
       [results] = await panlePool.query('SELECT section_key, image_path FROM section_images');
     }
 
-    const images = {};
     results.forEach(row => {
       if (row.image_path) {
-        if (row.image_path.startsWith('http://') || row.image_path.startsWith('https://')) {
+        if (row.image_path.startsWith('http://') || row.image_path.startsWith('https://') || row.image_path.startsWith('data:')) {
           images[row.section_key] = row.image_path;
         } else {
           let relativePath = row.image_path;

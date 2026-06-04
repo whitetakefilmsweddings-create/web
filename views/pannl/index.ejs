@@ -263,17 +263,18 @@
             <li class="menu-item active">
                 <a href="#home">Home Page</a>
             </li>
-            <li class="menu-item">
-                <a href="#instagram-feed" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-brands fa-instagram" style="font-size: 14px;"></i> Instagram Feed
+            <!-- Submenu Items Grouped Under Home Page -->
+            <li class="menu-item submenu-item" style="padding-left: 20px;">
+                <a href="#instagram-feed" style="display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 12px;">
+                    <i class="fa-brands fa-instagram" style="font-size: 13px;"></i> Instagram Feed
                 </a>
             </li>
-            <li class="menu-item">
-                <a href="#youtube-feed" style="display: flex; align-items: center; gap: 8px;">
-                    <i class="fa-brands fa-youtube" style="font-size: 14px; color: #ff0000;"></i> YouTube Feed
+            <li class="menu-item submenu-item" style="padding-left: 20px;">
+                <a href="#youtube-feed" style="display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 12px;">
+                    <i class="fa-brands fa-youtube" style="font-size: 13px; color: #ff0000;"></i> YouTube Feed
                 </a>
             </li>
-            <li class="menu-item">
+            <li class="menu-item" style="margin-top: 15px;">
                 <a href="/pannl/Image_admin" style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-images" style="font-size: 14px;"></i> All Page Images
                 </a>
@@ -302,12 +303,15 @@
                     const label = labels[img.section_key] || img.section_key;
                     
                     let preview_src = img.image_path;
-                    if (!preview_src.match(/^https?:\/\//)) {
+                    if (!preview_src.match(/^https?:\/\//) && !preview_src.startsWith('data:')) {
                         preview_src = '/' + preview_src;
                     }
                 %>
                     <div class="section-card" id="card-<%= img.section_key %>">
-                        <div class="section-card-title"><%= label %></div>
+                        <div class="section-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span><%= label %></span>
+                            <span style="background: #222; color: #c5a880; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #333; text-transform: none;"><%= img.section_key %></span>
+                        </div>
                         
                         <div class="img-preview">
                             <img src="<%= preview_src %>" alt="Preview" id="preview-img-<%= img.section_key %>">
@@ -644,6 +648,20 @@
                 alert('Server error deleting slot.');
             });
         }
+
+        // Active class sidebar menu toggler
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuItems = document.querySelectorAll('.menu-list .menu-item');
+            menuItems.forEach(item => {
+                const link = item.querySelector('a');
+                if (link && link.getAttribute('href').startsWith('#')) {
+                    link.addEventListener('click', () => {
+                        menuItems.forEach(i => i.classList.remove('active'));
+                        item.classList.add('active');
+                    });
+                }
+            });
+        });
     </script>
 </body>
 </html>
