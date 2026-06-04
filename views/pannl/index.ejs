@@ -354,13 +354,13 @@
                         </div>
                         
                         <div style="background-color: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; font-size: 13px; color: #888;">
-                            <div style="margin-bottom: 5px; font-weight: 600; color: #aaa;">Current URL:</div>
-                            <div id="url-text-<%= feed.feed_key %>" style="word-break: break-all; font-family: monospace;"><%= feed.post_url %></div>
+                            <div style="margin-bottom: 5px; font-weight: 600; color: #aaa;">Current Link / Embed Code:</div>
+                            <div id="url-text-<%= feed.feed_key %>" style="word-break: break-all; font-family: monospace; max-height: 80px; overflow-y: auto;"><%= feed.post_url %></div>
                         </div>
 
                         <form class="feed-update-form" data-key="<%= feed.feed_key %>" style="display: flex; flex-direction: column; gap: 10px;">
-                            <input type="url" name="post_url" value="<%= feed.post_url %>" placeholder="Instagram URL" required 
-                                   style="background: #000; border: 1px solid #333; color: #fff; padding: 10px 12px; border-radius: 8px; font-family: inherit; font-size: 14px;">
+                            <textarea name="post_url" placeholder="Paste Instagram Link or Embed HTML Code" required rows="3"
+                                      style="background: #000; border: 1px solid #333; color: #fff; padding: 10px 12px; border-radius: 8px; font-family: inherit; font-size: 13px; resize: vertical;"><%= feed.post_url %></textarea>
                             
                             <div class="upload-status" id="feed-status-<%= feed.feed_key %>" style="font-size: 12px; text-align: center;"></div>
                             
@@ -442,9 +442,8 @@
         document.querySelectorAll('.feed-update-form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
-                
                 const key = this.getAttribute('data-key');
-                const postUrl = this.querySelector('input[name="post_url"]').value;
+                const postUrl = this.querySelector('[name="post_url"]').value;
                 const statusDiv = document.getElementById('feed-status-' + key);
                 const urlTextDiv = document.getElementById('url-text-' + key);
                 

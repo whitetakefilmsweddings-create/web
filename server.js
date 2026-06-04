@@ -212,17 +212,22 @@ async function initDatabases() {
     }
     // Clean up deprecated home page sections no longer in use
     await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
-
     // 3. Setup Instagram feeds table
     await panlePool.query(`
       CREATE TABLE IF NOT EXISTS instagram_feeds (
         id INT AUTO_INCREMENT PRIMARY KEY,
         feed_key VARCHAR(50) NOT NULL UNIQUE,
-        post_url VARCHAR(500) NOT NULL,
+        post_url TEXT NOT NULL,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
-
+    
+    // Ensure existing table structure is migrated to TEXT
+    try {
+      await panlePool.query('ALTER TABLE instagram_feeds MODIFY COLUMN post_url TEXT NOT NULL');
+    } catch (e) {
+      // Ignore error if it's already updated or fails due to other reasons
+    }
     const defaultFeeds = [
       ['feed_1', 'https://www.instagram.com/p/C69mP3-v4Oa/'],
       ['feed_2', 'https://www.instagram.com/p/C67R0C0vhDk/'],
