@@ -91,10 +91,10 @@
                 display: none;
             }
             #instagram-grid .col-lg-4 {
-                flex: 0 0 85%;
-                max-width: 85%;
+                flex: 0 0 100%;
+                max-width: 100%;
                 scroll-snap-align: center;
-                margin-right: 15px;
+                margin-right: 0;
             }
         }
 
@@ -1107,7 +1107,7 @@
                                 if (window.innerWidth <= 991) {
                                     const firstItem = gridContainer.querySelector('.col-lg-4');
                                     if (firstItem) {
-                                        const itemWidth = firstItem.offsetWidth + 15; // Width + margin
+                                        const itemWidth = firstItem.offsetWidth;
                                         let autoScrollInterval;
                                         let isUserInteracting = false;
                                         let interactionTimeout;
