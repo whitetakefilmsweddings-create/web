@@ -218,6 +218,20 @@
             from { transform: scale(0.95); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
         }
+        .instagram-embed-wrapper {
+            background: transparent;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            overflow: hidden;
+        }
+        .instagram-embed-wrapper iframe,
+        .instagram-embed-wrapper blockquote {
+            margin: 0 !important;
+            width: 100% !important;
+        }
         .close-insta-modal {
             position: absolute;
             top: 20px;
@@ -1369,34 +1383,54 @@
 
                             filteredFeeds.forEach(feed => {
                                 const isYt = feed.feed_key.startsWith('yt_');
-                                let mediaId = null;
-                                let coverUrl = '';
-                                let iconClass = '';
-
-                                if (isYt) {
-                                    mediaId = getYoutubeVideoId(feed.post_url);
-                                    coverUrl = mediaId ? `https://img.youtube.com/vi/${mediaId}/hqdefault.jpg` : '';
-                                    iconClass = 'fa fa-play-circle';
-                                } else {
-                                    mediaId = getInstagramShortcode(feed.post_url);
-                                    coverUrl = mediaId ? `https://www.instagram.com/p/${mediaId}/media/?size=l` : '';
-                                    iconClass = 'fa fa-instagram';
-                                }
-
-                                if (!mediaId) return;
-
                                 const feedCol = document.createElement('div');
                                 feedCol.className = 'col-lg-4 col-md-6 col-12';
-                                feedCol.innerHTML = `
-                                    <div class="instagram-card" onclick="window.openMediaPopup('${mediaId}', '${isYt ? 'youtube' : 'instagram'}')">
-                                        <img src="${coverUrl}" alt="Media Cover">
-                                        <div class="insta-overlay">
-                                            <i class="${iconClass}"></i>
+
+                                if (isYt) {
+                                    const mediaId = getYoutubeVideoId(feed.post_url);
+                                    if (!mediaId) return;
+                                    const coverUrl = `https://img.youtube.com/vi/${mediaId}/hqdefault.jpg`;
+                                    feedCol.innerHTML = `
+                                        <div class="instagram-card" onclick="window.openMediaPopup('${mediaId}', 'youtube')">
+                                            <img src="${coverUrl}" alt="YouTube Cover">
+                                            <div class="insta-overlay">
+                                                <i class="fa fa-play-circle"></i>
+                                            </div>
                                         </div>
-                                    </div>
-                                `;
+                                    `;
+                                } else {
+                                    let htmlContent = feed.post_url;
+                                    if (htmlContent) {
+                                        if (!htmlContent.includes('<blockquote') && !htmlContent.includes('<iframe')) {
+                                            let cleanUrl = htmlContent.trim().split('?')[0];
+                                            if (cleanUrl.endsWith('/')) {
+                                                cleanUrl = cleanUrl.slice(0, -1);
+                                            }
+                                            htmlContent = `<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${cleanUrl}/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; width: 100%;"></blockquote>`;
+                                        }
+                                    } else {
+                                        htmlContent = '';
+                                    }
+                                    feedCol.innerHTML = `
+                                        <div class="instagram-embed-wrapper">
+                                            ${htmlContent}
+                                        </div>
+                                    `;
+                                }
                                 gridContainer.appendChild(feedCol);
                             });
+
+                            // Process the newly added Instagram embeds to render them
+                            if (filter === 'photos') {
+                                if (window.instgrm && window.instgrm.Embeds) {
+                                    window.instgrm.Embeds.process();
+                                } else {
+                                    const script = document.createElement('script');
+                                    script.async = true;
+                                    script.src = "//www.instagram.com/embed.js";
+                                    document.body.appendChild(script);
+                                }
+                            }
 
                             // Mobile Auto-Scroll with Touch Detection
                             setTimeout(() => {
