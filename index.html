@@ -47,6 +47,7 @@
         }
 
         /* Instagram Feed Section Styling */
+        /* Instagram Feed Section Styling */
         .instagram-feed-section {
             background-color: #ffffff;
             padding-top: 80px;
@@ -57,10 +58,83 @@
             border-bottom: 1px solid #eaeaea;
         }
         .instagram-feed-section .wpo-section-title h2 {
+            font-size: 64px;
+            line-height: 1.1;
+            margin-bottom: 20px;
             color: #000000;
+            font-family: "Cormorant Garamond", serif;
+            font-weight: 300;
+            padding-bottom: 0;
+            margin-top: 10px;
         }
-        .instagram-feed-section .wpo-section-title span {
-            color: #c0aa83;
+        .instagram-feed-section .wpo-section-title h2::after,
+        .instagram-feed-section .wpo-section-title h2::before {
+            display: none !important;
+        }
+        .insta-badge-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+        .insta-badge {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: #ffffff !important;
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(225, 48, 108, 0.35);
+            transition: transform 0.3s ease;
+        }
+        .insta-badge:hover {
+            transform: scale(1.05);
+        }
+        .insta-badge i {
+            font-size: 18px;
+        }
+        .insta-subtitle {
+            font-size: 18px;
+            color: #666666;
+            max-width: 650px;
+            margin: 0 auto 30px auto;
+            line-height: 1.6;
+            font-family: "Cormorant Garamond", serif;
+        }
+        .insta-filter-toggle-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .insta-filter-toggle {
+            background: #f3f3f3;
+            border-radius: 50px;
+            padding: 6px;
+            display: flex;
+            gap: 5px;
+            border: 1px solid #e0e0e0;
+        }
+        .insta-filter-btn {
+            padding: 10px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555555;
+        }
+        .insta-filter-btn.active {
+            background: #ffffff;
+            color: #000000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .insta-filter-btn i {
+            font-size: 15px;
         }
         .instagram-embed-wrapper {
             background: transparent;
@@ -95,6 +169,9 @@
                 max-width: 100%;
                 scroll-snap-align: center;
                 margin-right: 0;
+            }
+            .instagram-feed-section .wpo-section-title h2 {
+                font-size: 40px !important;
             }
         }
 
@@ -711,11 +788,23 @@
         <div class="container">
             <div class="row">
                 <div class="wpo-section-title">
-                    <div class="section-title-img">
-                        <img src="assets/images/section-title.png" alt="" loading="lazy">
+                    <div class="insta-badge-container">
+                        <a href="https://www.instagram.com/dreamwed_stories.co/" target="_blank" class="insta-badge">
+                            <i class="fa fa-instagram"></i> @dreamwed_stories.co
+                        </a>
                     </div>
-                    <span>@dreamwedstories</span>
-                    <h2>From Our Feed</h2>
+                    <h2>From our feed</h2>
+                    <p class="insta-subtitle">Real moments, real couples. Follow us on Instagram for daily inspiration from weddings across Kerala.</p>
+                    <div class="insta-filter-toggle-container">
+                        <div class="insta-filter-toggle">
+                            <div class="insta-filter-btn active" data-filter="photos">
+                                <i class="fa fa-instagram"></i> Photos
+                            </div>
+                            <div class="insta-filter-btn" data-filter="reels">
+                                <i class="fa fa-video-camera"></i> Cinematic Reels
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row" id="instagram-grid">
@@ -1065,13 +1154,43 @@
                     // Dynamically load Instagram feeds
                     if (res.success && res.feeds && res.feeds.length > 0) {
                         const gridContainer = document.getElementById('instagram-grid');
-                        if (gridContainer) {
+                        const allFeeds = res.feeds;
+                        let autoScrollInterval;
+                        let interactionTimeout;
+
+                        function renderFeeds(filter) {
+                            if (!gridContainer) return;
                             gridContainer.innerHTML = ''; // Clear previous content
-                            res.feeds.forEach(feed => {
+
+                            // Clear any active auto-scroll intervals
+                            if (autoScrollInterval) {
+                                clearInterval(autoScrollInterval);
+                                autoScrollInterval = null;
+                            }
+                            if (interactionTimeout) {
+                                clearTimeout(interactionTimeout);
+                                interactionTimeout = null;
+                            }
+
+                            // Filter feeds (Reels vs Posts)
+                            const filteredFeeds = allFeeds.filter(feed => {
+                                const isReel = feed.post_url.includes('/reel/') || feed.post_url.includes('/tv/') || feed.post_url.includes('instagram-media-reel');
+                                if (filter === 'reels') {
+                                    return isReel;
+                                } else {
+                                    return !isReel;
+                                }
+                            });
+
+                            if (filteredFeeds.length === 0) {
+                                gridContainer.innerHTML = '<div class="col-12 text-center" style="color: #888; padding: 40px 0; font-family: \'Cormorant Garamond\', serif; font-size: 20px;">No items found in this category.</div>';
+                                return;
+                            }
+
+                            filteredFeeds.forEach(feed => {
                                 let htmlContent = feed.post_url;
                                 if (htmlContent) {
                                     if (!htmlContent.includes('<blockquote') && !htmlContent.includes('<iframe')) {
-                                        // If it's just a URL, construct the standard blockquote embed code
                                         let cleanUrl = htmlContent.trim().split('?')[0];
                                         if (cleanUrl.endsWith('/')) {
                                             cleanUrl = cleanUrl.slice(0, -1);
@@ -1102,15 +1221,13 @@
                                 document.body.appendChild(script);
                             }
 
-                            // Mobile Auto-Scroll with Touch Detection (1.5s delay, 5s touch pause hold)
+                            // Mobile Auto-Scroll with Touch Detection
                             setTimeout(() => {
                                 if (window.innerWidth <= 991) {
                                     const firstItem = gridContainer.querySelector('.col-lg-4');
                                     if (firstItem) {
                                         const itemWidth = firstItem.offsetWidth;
-                                        let autoScrollInterval;
                                         let isUserInteracting = false;
-                                        let interactionTimeout;
 
                                         function startAutoScroll() {
                                             if (autoScrollInterval) clearInterval(autoScrollInterval);
@@ -1132,7 +1249,6 @@
                                             }
                                             if (interactionTimeout) clearTimeout(interactionTimeout);
                                             
-                                            // Pause auto-scroll, check again 5 seconds after touch interaction stops
                                             interactionTimeout = setTimeout(() => {
                                                 isUserInteracting = false;
                                                 startAutoScroll();
@@ -1148,6 +1264,19 @@
                                 }
                             }, 3000);
                         }
+
+                        // Filter button click logic
+                        document.querySelectorAll('.insta-filter-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                document.querySelectorAll('.insta-filter-btn').forEach(b => b.classList.remove('active'));
+                                this.classList.add('active');
+                                const filter = this.getAttribute('data-filter');
+                                renderFeeds(filter);
+                            });
+                        });
+
+                        // Initial render (Photos)
+                        renderFeeds('photos');
                     }
                 })
                 .catch(err => console.error('Error fetching admin section images:', err));
