@@ -1105,19 +1105,48 @@
                                 document.body.appendChild(script);
                             }
 
-                            // Mobile Auto-Scroll for Instagram Feed (1s auto-scroll delay)
+                            // Mobile Auto-Scroll with Touch Detection (1.5s delay, 5s touch pause hold)
                             setTimeout(() => {
                                 if (window.innerWidth <= 991) {
                                     const firstItem = gridContainer.querySelector('.col-lg-4');
                                     if (firstItem) {
                                         const itemWidth = firstItem.offsetWidth + 15; // Width + margin
-                                        setInterval(() => {
-                                            if (gridContainer.scrollLeft + gridContainer.offsetWidth >= gridContainer.scrollWidth - 30) {
-                                                gridContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Loop back
-                                            } else {
-                                                gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
+                                        let autoScrollInterval;
+                                        let isUserInteracting = false;
+                                        let interactionTimeout;
+
+                                        function startAutoScroll() {
+                                            if (autoScrollInterval) clearInterval(autoScrollInterval);
+                                            autoScrollInterval = setInterval(() => {
+                                                if (isUserInteracting) return;
+                                                if (gridContainer.scrollLeft + gridContainer.offsetWidth >= gridContainer.scrollWidth - 30) {
+                                                    gridContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Loop back
+                                                } else {
+                                                    gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
+                                                }
+                                            }, 1500);
+                                        }
+
+                                        function handleUserInteraction() {
+                                            isUserInteracting = true;
+                                            if (autoScrollInterval) {
+                                                clearInterval(autoScrollInterval);
+                                                autoScrollInterval = null;
                                             }
-                                        }, 1500);
+                                            if (interactionTimeout) clearTimeout(interactionTimeout);
+                                            
+                                            // Pause auto-scroll, check again 5 seconds after touch interaction stops
+                                            interactionTimeout = setTimeout(() => {
+                                                isUserInteracting = false;
+                                                startAutoScroll();
+                                            }, 5000);
+                                        }
+
+                                        gridContainer.addEventListener('touchstart', handleUserInteraction, { passive: true });
+                                        gridContainer.addEventListener('touchmove', handleUserInteraction, { passive: true });
+                                        gridContainer.addEventListener('touchend', handleUserInteraction, { passive: true });
+
+                                        startAutoScroll();
                                     }
                                 }
                             }, 3000);
