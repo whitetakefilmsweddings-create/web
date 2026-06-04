@@ -83,7 +83,7 @@
     color: #c0aa83;
     margin: 0;
     display: inline-block;
-    font-family: 'Mulish', sans-serif;
+    font-family: "Cormorant Garamond", serif;
 }
 
 .wpo-pricing-price span {
@@ -129,7 +129,7 @@
     text-decoration: none;
     font-weight: 400; /* Regular weight */
     transition: all 0.3s;
-    font-family: 'Mulish', sans-serif;
+    font-family: "Cormorant Garamond", serif;
 }
 
 .wpo-pricing-btn:hover {
