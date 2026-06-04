@@ -1389,14 +1389,14 @@
                                 return;
                             }
 
-                            filteredFeeds.forEach(feed => {
+                            function createFeedCard(feed) {
                                 const isYt = feed.feed_key.startsWith('yt_');
                                 const feedCol = document.createElement('div');
                                 feedCol.className = 'col-lg-4 col-md-6 col-12';
 
                                 if (isYt) {
                                     const mediaId = getYoutubeVideoId(feed.post_url);
-                                    if (!mediaId) return;
+                                    if (!mediaId) return null;
                                     const coverUrl = `https://img.youtube.com/vi/${mediaId}/hqdefault.jpg`;
                                     feedCol.innerHTML = `
                                         <div class="instagram-card" onclick="window.openMediaPopup('${mediaId}', 'youtube')">
@@ -1425,8 +1425,22 @@
                                         </div>
                                     `;
                                 }
-                                gridContainer.appendChild(feedCol);
+                                return feedCol;
+                            }
+
+                            filteredFeeds.forEach(feed => {
+                                const card = createFeedCard(feed);
+                                if (card) gridContainer.appendChild(card);
                             });
+
+                            // Append clone of first item to the end for seamless looping on mobile
+                            if (filteredFeeds.length > 1) {
+                                const cloneCard = createFeedCard(filteredFeeds[0]);
+                                if (cloneCard) {
+                                    cloneCard.classList.add('insta-clone');
+                                    gridContainer.appendChild(cloneCard);
+                                }
+                            }
 
                             // Process the newly added Instagram embeds to render them
                             if (filter === 'photos') {
@@ -1443,20 +1457,36 @@
                             // Mobile Auto-Scroll with Touch Detection
                             setTimeout(() => {
                                 if (window.innerWidth <= 991) {
-                                    const firstItem = gridContainer.querySelector('.col-lg-4');
+                                    const firstItem = gridContainer.querySelector('.col-lg-4:not(.insta-clone)');
                                     if (firstItem) {
                                         const itemWidth = firstItem.offsetWidth;
                                         let isUserInteracting = false;
+                                        let isJumping = false;
+
+                                        // Seamless looping scroll listener
+                                        gridContainer.addEventListener('scroll', () => {
+                                            if (isJumping) return;
+                                            // The clone is positioned at filteredFeeds.length * itemWidth
+                                            const clonePosition = filteredFeeds.length * itemWidth;
+                                            
+                                            if (Math.abs(gridContainer.scrollLeft - clonePosition) < 5) {
+                                                isJumping = true;
+                                                gridContainer.style.scrollBehavior = 'auto';
+                                                gridContainer.style.scrollSnapType = 'none';
+                                                gridContainer.scrollLeft = 0;
+                                                // force reflow
+                                                void gridContainer.offsetWidth;
+                                                gridContainer.style.scrollBehavior = '';
+                                                gridContainer.style.scrollSnapType = '';
+                                                setTimeout(() => { isJumping = false; }, 50);
+                                            }
+                                        }, { passive: true });
 
                                         function startAutoScroll() {
                                             if (autoScrollInterval) clearInterval(autoScrollInterval);
                                             autoScrollInterval = setInterval(() => {
-                                                if (isUserInteracting) return;
-                                                if (gridContainer.scrollLeft + gridContainer.offsetWidth >= gridContainer.scrollWidth - 30) {
-                                                    gridContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); 
-                                                } else {
-                                                    gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
-                                                }
+                                                if (isUserInteracting || isJumping) return;
+                                                gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
                                             }, 3000);
                                         }
 
