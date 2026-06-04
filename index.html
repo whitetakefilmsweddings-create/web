@@ -71,6 +71,27 @@
             width: 100%;
         }
 
+        @media (max-width: 991px) {
+            #instagram-grid {
+                display: flex;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scroll-snap-type: x mandatory;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 15px;
+            }
+            #instagram-grid::-webkit-scrollbar {
+                display: none;
+            }
+            #instagram-grid .col-lg-4 {
+                flex: 0 0 85%;
+                max-width: 85%;
+                scroll-snap-align: center;
+                margin-right: 15px;
+            }
+        }
+
         /* Toggleable Dropdown Header Styles */
         .wpo-site-header .navigation {
             transition: transform 0.4s ease, opacity 0.4s ease;
@@ -1074,6 +1095,23 @@
                                 script.src = "//www.instagram.com/embed.js";
                                 document.body.appendChild(script);
                             }
+
+                            // Mobile Auto-Scroll for Instagram Feed (1s auto-scroll delay)
+                            setTimeout(() => {
+                                if (window.innerWidth <= 991) {
+                                    const firstItem = gridContainer.querySelector('.col-lg-4');
+                                    if (firstItem) {
+                                        const itemWidth = firstItem.offsetWidth + 15; // Width + margin
+                                        setInterval(() => {
+                                            if (gridContainer.scrollLeft + gridContainer.offsetWidth >= gridContainer.scrollWidth - 30) {
+                                                gridContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Loop back
+                                            } else {
+                                                gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
+                                            }
+                                        }, 1000);
+                                    }
+                                }
+                            }, 3000);
                         }
                     }
                 })
