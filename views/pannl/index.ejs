@@ -32,6 +32,13 @@
             flex-direction: column;
             padding: 30px 20px;
             flex-shrink: 0;
+            z-index: 1000;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
         }
         .logo {
             font-size: 24px;
@@ -39,12 +46,20 @@
             text-transform: uppercase;
             letter-spacing: -1.5px;
             color: #fff;
-            margin-bottom: 40px;
             text-align: center;
+            flex-grow: 1;
         }
         .logo span {
             font-weight: 300;
             color: #aaa;
+        }
+        .sidebar-close {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
         }
         .menu-title {
             font-size: 11px;
@@ -251,12 +266,117 @@
             letter-spacing: 0.5px;
             margin-top: -5px;
         }
+
+        /* Mobile Header */
+        .mobile-header {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #000;
+            padding: 15px 20px;
+            border-bottom: 1px solid #1a1a1a;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .mobile-header .logo {
+            font-size: 20px;
+            margin-bottom: 0;
+            text-align: right;
+            flex-grow: 0;
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 998;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 991px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow: initial;
+            }
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -280px;
+                width: 280px;
+                height: 100vh;
+                transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 5px 0 25px rgba(0,0,0,0.5);
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .sidebar.active ~ .sidebar-overlay {
+                display: block;
+            }
+            .sidebar-close {
+                display: block;
+            }
+            .mobile-header {
+                display: flex;
+            }
+            .content-area {
+                padding: 20px;
+                overflow-y: initial;
+            }
+            .page-header {
+                margin-bottom: 25px;
+            }
+            .page-header h1 {
+                font-size: 26px;
+            }
+            .sections-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .sections-container {
+                grid-template-columns: 1fr;
+            }
+            .page-header h1 {
+                font-size: 22px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="logo">WhiteTake<span>Films</span></div>
+    </div>
+
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="logo">WhiteTake<span>Films</span></div>
+        <div class="logo-container">
+            <div class="logo">WhiteTake<span>Films</span></div>
+            <button class="sidebar-close" onclick="toggleSidebar()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
         
         <div class="menu-title">Select Page</div>
         <ul class="menu-list">
@@ -283,6 +403,7 @@
         
         <a href="/pannl/logout.php" class="logout-btn">Sign Out</a>
     </div>
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
     
     <!-- Content Area -->
     <div class="content-area">
@@ -649,6 +770,11 @@
             });
         }
 
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
         // Active class sidebar menu toggler
         document.addEventListener('DOMContentLoaded', () => {
             const menuItems = document.querySelectorAll('.menu-list .menu-item');
@@ -658,6 +784,11 @@
                     link.addEventListener('click', () => {
                         menuItems.forEach(i => i.classList.remove('active'));
                         item.classList.add('active');
+                        // Close sidebar on mobile after clicking item
+                        const sidebar = document.querySelector('.sidebar');
+                        if (sidebar.classList.contains('active')) {
+                            sidebar.classList.remove('active');
+                        }
                     });
                 }
             });
