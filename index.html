@@ -46,6 +46,100 @@
             display: none !important;
         }
 
+        /* Instagram Feed Section Styling */
+        .instagram-feed-section {
+            background-color: #0c0c0c;
+            padding-bottom: 90px;
+            position: relative;
+            z-index: 1;
+        }
+        .instagram-card {
+            background: rgba(17, 17, 17, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            height: 480px;
+            display: flex;
+            flex-direction: column;
+        }
+        .instagram-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 16px;
+            padding: 1.5px;
+            background: linear-gradient(135deg, rgba(225, 48, 108, 0.5), rgba(253, 29, 29, 0.3), rgba(245, 96, 64, 0.1), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0.6;
+            transition: opacity 0.4s ease;
+        }
+        .instagram-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(225, 48, 108, 0.15);
+            border-color: rgba(225, 48, 108, 0.3);
+        }
+        .instagram-card:hover::before {
+            opacity: 1;
+        }
+        .instagram-iframe-container {
+            width: 100%;
+            height: 100%;
+            border: none;
+            overflow: hidden;
+            background: #000;
+            border-radius: 15px;
+        }
+        .instagram-iframe-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .instagram-card-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 10px;
+            z-index: 2;
+        }
+        .instagram-card-header img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid #e1306c;
+            padding: 1px;
+        }
+        .instagram-card-header .user-info h5 {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.2px;
+        }
+        .instagram-card-header .user-info span {
+            font-size: 10px;
+            color: #888;
+        }
+        .instagram-card-header .insta-icon {
+            margin-left: auto;
+            color: #e1306c;
+            font-size: 18px;
+        }
+
         /* Toggleable Dropdown Header Styles */
         .wpo-site-header .navigation {
             transition: transform 0.4s ease, opacity 0.4s ease;
@@ -654,6 +748,25 @@
     </div>
     <!-- wpo-testimonial-area end -->
 
+    <!-- start instagram-feed-section -->
+    <section class="instagram-feed-section section-padding" id="insta-feed">
+        <div class="container">
+            <div class="row">
+                <div class="wpo-section-title">
+                    <div class="section-title-img">
+                        <img src="assets/images/section-title.png" alt="" loading="lazy">
+                    </div>
+                    <span>@dreamwedstories</span>
+                    <h2>From Our Feed</h2>
+                </div>
+            </div>
+            <div class="row" id="instagram-grid">
+                <!-- 6 Instagram feed cards will be loaded here dynamically -->
+            </div>
+        </div>
+    </section>
+    <!-- end instagram-feed-section -->
+
     <!-- start wpo-pricing-section -->
     <section class="wpo-pricing-section section-padding">
         <div class="container">
@@ -988,6 +1101,45 @@
                             if (solidCircle) {
                                 solidCircle.style.backgroundImage = `url('${res.images['intimate_1']}')`;
                             }
+                        }
+                    }
+
+                    // Dynamically load Instagram feeds
+                    if (res.success && res.feeds && res.feeds.length > 0) {
+                        const gridContainer = document.getElementById('instagram-grid');
+                        if (gridContainer) {
+                            gridContainer.innerHTML = ''; // Clear previous content
+                            res.feeds.forEach(feed => {
+                                let embedUrl = feed.post_url;
+                                if (embedUrl) {
+                                    let cleanUrl = embedUrl.split('?')[0];
+                                    if (cleanUrl.endsWith('/')) {
+                                        cleanUrl = cleanUrl.slice(0, -1);
+                                    }
+                                    embedUrl = cleanUrl + '/embed';
+                                } else {
+                                    embedUrl = '';
+                                }
+
+                                const feedCol = document.createElement('div');
+                                feedCol.className = 'col-lg-4 col-md-6 col-12';
+                                feedCol.innerHTML = `
+                                    <div class="instagram-card">
+                                        <div class="instagram-card-header">
+                                            <img src="assets/images/logo-new.png" alt="Dream Wed Stories">
+                                            <div class="user-info">
+                                                <h5>dreamwedstories.co.in</h5>
+                                                <span>From Our Feed</span>
+                                            </div>
+                                            <i class="fa fa-instagram insta-icon"></i>
+                                        </div>
+                                        <div class="instagram-iframe-container">
+                                            <iframe src="${embedUrl}" scrolling="no" allowtransparency="true" allow="encrypted-media"></iframe>
+                                        </div>
+                                    </div>
+                                `;
+                                gridContainer.appendChild(feedCol);
+                            });
                         }
                     }
                 })

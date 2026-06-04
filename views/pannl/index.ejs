@@ -264,6 +264,11 @@
                 <a href="#home">Home Page</a>
             </li>
             <li class="menu-item">
+                <a href="#instagram-feed" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-instagram" style="font-size: 14px;"></i> Instagram Feed
+                </a>
+            </li>
+            <li class="menu-item">
                 <a href="/pannl/Image_admin" style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-images" style="font-size: 14px;"></i> All Page Images
                 </a>
@@ -318,6 +323,48 @@
                             <div class="upload-status" id="status-<%= img.section_key %>"></div>
                             
                             <button type="submit" class="upload-btn">Upload & Crop</button>
+                        </form>
+                    </div>
+                <% }) %>
+            <% } %>
+        </div>
+
+        <!-- Instagram Feed Editor Section -->
+        <div class="page-header" id="instagram-feed" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+            <h1>Instagram Feed Editor</h1>
+            <p>Manage the 3x2 grid of Instagram posts/reels. Enter standard Instagram post or reel URLs (e.g. <code>https://www.instagram.com/p/C69mP3-v4Oa/</code>).</p>
+        </div>
+
+        <div class="sections-container" style="margin-bottom: 60px;">
+            <% if (typeof feeds !== 'undefined' && feeds) { %>
+                <% feeds.forEach(function(feed, index) { 
+                    const feedLabels = {
+                        'feed_1': 'Feed Slot 1 (Row 1, Col 1)',
+                        'feed_2': 'Feed Slot 2 (Row 1, Col 2)',
+                        'feed_3': 'Feed Slot 3 (Row 1, Col 3)',
+                        'feed_4': 'Feed Slot 4 (Row 2, Col 1)',
+                        'feed_5': 'Feed Slot 5 (Row 2, Col 2)',
+                        'feed_6': 'Feed Slot 6 (Row 2, Col 3)'
+                    };
+                    const label = feedLabels[feed.feed_key] || feed.feed_key;
+                %>
+                    <div class="section-card" id="feed-card-<%= feed.feed_key %>" style="gap: 15px;">
+                        <div class="section-card-title" style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-brands fa-instagram" style="color: #e1306c;"></i> <%= label %>
+                        </div>
+                        
+                        <div style="background-color: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; font-size: 13px; color: #888;">
+                            <div style="margin-bottom: 5px; font-weight: 600; color: #aaa;">Current URL:</div>
+                            <div id="url-text-<%= feed.feed_key %>" style="word-break: break-all; font-family: monospace;"><%= feed.post_url %></div>
+                        </div>
+
+                        <form class="feed-update-form" data-key="<%= feed.feed_key %>" style="display: flex; flex-direction: column; gap: 10px;">
+                            <input type="url" name="post_url" value="<%= feed.post_url %>" placeholder="Instagram URL" required 
+                                   style="background: #000; border: 1px solid #333; color: #fff; padding: 10px 12px; border-radius: 8px; font-family: inherit; font-size: 14px;">
+                            
+                            <div class="upload-status" id="feed-status-<%= feed.feed_key %>" style="font-size: 12px; text-align: center;"></div>
+                            
+                            <button type="submit" class="upload-btn" style="background: #e1306c; color: #fff;">Save Link</button>
                         </form>
                     </div>
                 <% }) %>
@@ -389,6 +436,45 @@
                 };
                 
                 xhr.send(formData);
+            });
+        });
+
+        document.querySelectorAll('.feed-update-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const key = this.getAttribute('data-key');
+                const postUrl = this.querySelector('input[name="post_url"]').value;
+                const statusDiv = document.getElementById('feed-status-' + key);
+                const urlTextDiv = document.getElementById('url-text-' + key);
+                
+                statusDiv.className = 'upload-status';
+                statusDiv.style.color = '#aaa';
+                statusDiv.innerText = 'Saving...';
+                
+                fetch('/pannl/update_feed.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ feed_key: key, post_url: postUrl })
+                })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.success) {
+                        statusDiv.style.color = '#4aff4a';
+                        statusDiv.innerText = 'Saved successfully!';
+                        urlTextDiv.innerText = postUrl;
+                        setTimeout(() => { statusDiv.innerText = ''; }, 3000);
+                    } else {
+                        statusDiv.style.color = '#ff4a4a';
+                        statusDiv.innerText = 'Error: ' + res.message;
+                    }
+                })
+                .catch(err => {
+                    statusDiv.style.color = '#ff4a4a';
+                    statusDiv.innerText = 'Failed to save. Server error.';
+                });
             });
         });
     </script>

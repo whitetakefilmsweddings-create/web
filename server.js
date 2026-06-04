@@ -213,6 +213,28 @@ async function initDatabases() {
     // Clean up deprecated home page sections no longer in use
     await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
 
+    // 3. Setup Instagram feeds table
+    await panlePool.query(`
+      CREATE TABLE IF NOT EXISTS instagram_feeds (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        feed_key VARCHAR(50) NOT NULL UNIQUE,
+        post_url VARCHAR(500) NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    const defaultFeeds = [
+      ['feed_1', 'https://www.instagram.com/p/C69mP3-v4Oa/'],
+      ['feed_2', 'https://www.instagram.com/p/C67R0C0vhDk/'],
+      ['feed_3', 'https://www.instagram.com/p/C64s4WpvpC3/'],
+      ['feed_4', 'https://www.instagram.com/p/C62IexBvIq4/'],
+      ['feed_5', 'https://www.instagram.com/p/C6zc9F6PCW5/'],
+      ['feed_6', 'https://www.instagram.com/p/C6w4kPvvbT5/']
+    ];
+    for (const row of defaultFeeds) {
+      await panlePool.query('INSERT IGNORE INTO instagram_feeds (feed_key, post_url) VALUES (?, ?)', row);
+    }
+
     console.log('Databases initialized and updated.');
   } catch (err) {
     console.error('Error during database initialization/migrations:', err);
@@ -1222,9 +1244,27 @@ app.get('/pannl/index.php', checkPannlAuth, async (req, res) => {
       grouped_images[img.page_name].push(img);
     });
 
-    res.render('pannl/index', { grouped_images });
+    const [feeds] = await panlePool.query('SELECT * FROM instagram_feeds ORDER BY id ASC');
+
+    res.render('pannl/index', { grouped_images, feeds });
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+app.post('/pannl/update_feed.php', checkPannlAuth, async (req, res) => {
+  const { feed_key, post_url } = req.body;
+  if (!feed_key || !post_url) {
+    return res.json({ success: false, message: 'Missing parameters' });
+  }
+  try {
+    await panlePool.execute(
+      'UPDATE instagram_feeds SET post_url = ? WHERE feed_key = ?',
+      [post_url, feed_key]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
   }
 });
 
@@ -1302,7 +1342,13 @@ app.get('/pannl/api.php', async (req, res) => {
       }
     });
 
-    res.json({ success: true, page, images });
+    let feeds = [];
+    if (!page || page === 'home') {
+      const [feedRows] = await panlePool.query('SELECT feed_key, post_url FROM instagram_feeds ORDER BY id ASC');
+      feeds = feedRows;
+    }
+
+    res.json({ success: true, page, images, feeds });
   } catch (err) {
     res.json({ success: false, message: `Database error: ${err.message}` });
   }
