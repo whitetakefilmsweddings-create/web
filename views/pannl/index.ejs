@@ -419,7 +419,7 @@
         
         <div class="sections-container">
             <% if (grouped_images && grouped_images['home']) { %>
-                <% grouped_images['home'].forEach(function(img) { 
+                <% grouped_images['home'].filter(img => !img.section_key.startsWith('favorite_')).forEach(function(img) { 
                     const labels = {
                         'intimate_1': 'Behind the Lens Card 1 (Krishna & Connor)',
                         'intimate_2': 'Behind the Lens Card 2 (Sai & Aishwarya)',
@@ -464,13 +464,14 @@
             <% } %>
         </div>
 
-        <!-- ── Our Favorite Moments — 30-slot Gallery Manager ── -->
+        <!-- ── Our Favorite Moments — Modal Gallery Manager ── -->
         <div class="page-header" id="favorite-moments" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
             <h1>Our Favorite Moments</h1>
-            <p>Upload up to 30 square (1080 × 1080 px) gallery images for the animated marquee on the home page. Max file size: 10 MB per image.</p>
+            <p>Manage up to 30 square gallery images (1080 × 1080 px). Click any slot to upload or manage. Max 10 MB per image.</p>
         </div>
 
-        <div id="fav-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; margin-bottom: 60px;">
+        <!-- Slot Grid -->
+        <div id="fav-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 60px;">
             <% if (grouped_images && grouped_images['home']) {
                 const favImages = grouped_images['home'].filter(img => img.section_key.startsWith('favorite_'));
                 favImages.forEach(function(img) {
@@ -481,39 +482,71 @@
                     const slotNum = img.section_key.replace('favorite_', '');
                     const isFilled = preview_src && preview_src.length > 1;
             %>
-                <div class="fav-slot-card" id="fav-card-<%= img.section_key %>" style="background: #111; border: 1px solid #1c1c1c; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1;">
-                    <!-- Filled state -->
+                <div class="fav-thumb"
+                     id="fav-thumb-<%= img.section_key %>"
+                     onclick="openFavModal('<%= img.section_key %>', '<%= slotNum %>', <%= isFilled ? 'true' : 'false' %>)"
+                     style="aspect-ratio:1/1; border-radius:10px; overflow:hidden; position:relative; cursor:pointer; background:#111; border:1px solid #1c1c1c; transition:border-color 0.2s;">
                     <% if (isFilled) { %>
-                        <img src="<%= preview_src %>" alt="Slot <%= slotNum %>" id="fav-preview-<%= img.section_key %>" style="width:100%; height:100%; object-fit:cover; display:block;">
-                        <div class="fav-slot-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.25s;">
-                            <label for="fav-input-<%= img.section_key %>" style="background:#fff;color:#000;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Replace</label>
-                            <button onclick="handleFavDelete('<%= img.section_key %>')" style="background:rgba(255,74,74,0.9);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Delete</button>
-                            <span style="position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;">#<%= slotNum %></span>
+                        <img src="<%= preview_src %>" id="fav-thumb-img-<%= img.section_key %>" alt="Slot <%= slotNum %>" style="width:100%;height:100%;object-fit:cover;display:block;">
+                        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:6px 6px 5px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:10px;font-weight:700;color:#fff;">#<%= slotNum %></span>
+                            <i class="fa fa-check-circle" style="font-size:11px;color:#4aff4a;"></i>
                         </div>
-                        <input type="file" id="fav-input-<%= img.section_key %>" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '<%= img.section_key %>')">
                     <% } else { %>
-                    <!-- Empty state -->
-                        <label for="fav-input-<%= img.section_key %>" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer;color:#555;gap:6px;">
-                            <i class="fa fa-plus-circle" style="font-size:30px;color:#333;"></i>
-                            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Slot #<%= slotNum %></span>
-                        </label>
-                        <input type="file" id="fav-input-<%= img.section_key %>" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '<%= img.section_key %>')">
-                        <img src="" alt="" id="fav-preview-<%= img.section_key %>" style="display:none;width:100%;height:100%;object-fit:cover;">
-                    <% } %>
-
-                    <!-- Upload progress overlay -->
-                    <div class="fav-progress-overlay" id="fav-progress-<%= img.section_key %>" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-                        <div style="width:70%;height:3px;background:#333;border-radius:3px;overflow:hidden;">
-                            <div id="fav-bar-<%= img.section_key %>" style="width:0%;height:100%;background:#fff;transition:width 0.3s;"></div>
+                        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#444;">
+                            <i class="fa fa-plus" style="font-size:20px;"></i>
+                            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">#<%= slotNum %></span>
                         </div>
-                        <span id="fav-status-<%= img.section_key %>" style="font-size:11px;color:#aaa;">Uploading…</span>
-                    </div>
+                    <% } %>
                 </div>
             <% }); } %>
         </div>
 
+        <!-- Upload Modal -->
+        <div id="fav-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:20px;" onclick="closeFavModal(event)">
+            <div style="background:#111;border:1px solid #222;border-radius:20px;width:100%;max-width:420px;padding:30px;position:relative;" onclick="event.stopPropagation()">
+                <!-- Close -->
+                <button onclick="closeFavModal()" style="position:absolute;top:15px;right:15px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
+
+                <div id="fav-modal-title" style="font-size:16px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Slot #1</div>
+                <div style="font-size:12px;color:#555;margin-bottom:20px;">1080 × 1080 px · Max 10 MB</div>
+
+                <!-- Image preview -->
+                <div id="fav-modal-preview-wrap" style="width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#000;border:1px solid #222;margin-bottom:20px;position:relative;">
+                    <img id="fav-modal-img" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:none;">
+                    <div id="fav-modal-empty-icon" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:#333;">
+                        <i class="fa fa-image" style="font-size:48px;"></i>
+                        <span style="font-size:13px;color:#555;">No image uploaded yet</span>
+                    </div>
+                    <!-- Progress overlay -->
+                    <div id="fav-modal-progress" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.8);flex-direction:column;align-items:center;justify-content:center;gap:14px;border-radius:12px;">
+                        <div style="width:70%;height:4px;background:#333;border-radius:4px;overflow:hidden;">
+                            <div id="fav-modal-bar" style="width:0%;height:100%;background:#fff;transition:width 0.2s;border-radius:4px;"></div>
+                        </div>
+                        <span id="fav-modal-status" style="font-size:13px;color:#aaa;">Uploading…</span>
+                    </div>
+                </div>
+
+                <!-- Hidden file input -->
+                <input type="file" id="fav-modal-file-input" accept="image/*" style="display:none;" onchange="handleFavModalUpload(this)">
+
+                <!-- Action buttons -->
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <button id="fav-modal-upload-btn" onclick="document.getElementById('fav-modal-file-input').click()"
+                            style="width:100%;padding:14px;background:#fff;color:#000;border:none;border-radius:10px;font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;">
+                        <i class="fa fa-upload" style="margin-right:8px;"></i>
+                        <span id="fav-modal-upload-label">Upload Image</span>
+                    </button>
+                    <button id="fav-modal-delete-btn" onclick="handleFavModalDelete()"
+                            style="display:none;width:100%;padding:14px;background:transparent;color:#ff4a4a;border:1px solid #ff4a4a;border-radius:10px;font-size:14px;font-weight:900;text-transform:uppercase;letter-spacing:0.5px;cursor:pointer;">
+                        <i class="fa fa-trash" style="margin-right:8px;"></i> Remove Image
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <style>
-            .fav-slot-card:hover .fav-slot-overlay { opacity: 1 !important; }
+            .fav-thumb:hover { border-color: #444 !important; }
         </style>
 
         <!-- Instagram Feed Editor Section -->
@@ -650,29 +683,89 @@
     </div>
     
     <script>
-        // ── Favorite Moments Upload Handler ──
-        function handleFavUpload(input, key) {
-            if (!input.files || !input.files[0]) return;
+        // ── Favorite Moments Modal State ──
+        let _favCurrentKey   = null;
+        let _favCurrentSlot  = null;
+        let _favCurrentFilled = false;
+
+        function openFavModal(key, slotNum, isFilled) {
+            _favCurrentKey    = key;
+            _favCurrentSlot   = slotNum;
+            _favCurrentFilled = isFilled;
+
+            // Update modal title
+            document.getElementById('fav-modal-title').textContent = 'Slot #' + slotNum;
+
+            // Show/hide image
+            const img       = document.getElementById('fav-modal-img');
+            const emptyIcon = document.getElementById('fav-modal-empty-icon');
+            const delBtn    = document.getElementById('fav-modal-delete-btn');
+            const upLabel   = document.getElementById('fav-modal-upload-label');
+
+            if (isFilled) {
+                const thumbImg = document.getElementById('fav-thumb-img-' + key);
+                img.src = thumbImg ? thumbImg.src : '';
+                img.style.display = 'block';
+                emptyIcon.style.display = 'none';
+                delBtn.style.display = 'block';
+                upLabel.textContent = 'Replace Image';
+            } else {
+                img.src = '';
+                img.style.display = 'none';
+                emptyIcon.style.display = 'flex';
+                delBtn.style.display = 'none';
+                upLabel.textContent = 'Upload Image';
+            }
+
+            // Reset progress
+            document.getElementById('fav-modal-progress').style.display = 'none';
+            document.getElementById('fav-modal-bar').style.width = '0%';
+
+            // Reset file input
+            document.getElementById('fav-modal-file-input').value = '';
+
+            // Show modal
+            const modal = document.getElementById('fav-modal');
+            modal.style.display = 'flex';
+        }
+
+        function closeFavModal(e) {
+            if (e && e.target !== document.getElementById('fav-modal')) return;
+            document.getElementById('fav-modal').style.display = 'none';
+            _favCurrentKey = null;
+        }
+
+        // Close button calls this directly
+        document.querySelector && document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('fav-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                    _favCurrentKey = null;
+                }
+            });
+        });
+
+        function handleFavModalUpload(input) {
+            if (!_favCurrentKey || !input.files || !input.files[0]) return;
             const file = input.files[0];
 
-            // 10 MB limit (client-side pre-check)
             if (file.size > 10 * 1024 * 1024) {
                 alert('This image exceeds the 10 MB size limit. Please choose a smaller file.');
                 input.value = '';
                 return;
             }
 
-            const progressOverlay = document.getElementById('fav-progress-' + key);
-            const bar             = document.getElementById('fav-bar-' + key);
-            const statusSpan      = document.getElementById('fav-status-' + key);
+            const progress   = document.getElementById('fav-modal-progress');
+            const bar        = document.getElementById('fav-modal-bar');
+            const status     = document.getElementById('fav-modal-status');
 
-            progressOverlay.style.display = 'flex';
+            progress.style.display = 'flex';
             bar.style.width = '0%';
-            statusSpan.textContent = 'Uploading…';
+            status.textContent = 'Uploading…';
 
             const formData = new FormData();
             formData.append('image', file);
-            formData.append('section_key', key);
+            formData.append('section_key', _favCurrentKey);
 
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/pannl/upload.php', true);
@@ -685,28 +778,35 @@
 
             xhr.onreadystatechange = function() {
                 if (xhr.readyState !== XMLHttpRequest.DONE) return;
-                progressOverlay.style.display = 'none';
+                progress.style.display = 'none';
                 try {
                     const res = JSON.parse(xhr.responseText);
                     if (res.success) {
-                        // Update card to filled state
-                        const card = document.getElementById('fav-card-' + key);
-                        const slotNum = key.replace('favorite_', '');
-                        card.innerHTML = `
-                            <img src="${res.path}?t=${Date.now()}" alt="Slot ${slotNum}" id="fav-preview-${key}" style="width:100%;height:100%;object-fit:cover;display:block;">
-                            <div class="fav-slot-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.25s;">
-                                <label for="fav-input-${key}" style="background:#fff;color:#000;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Replace</label>
-                                <button onclick="handleFavDelete('${key}')" style="background:rgba(255,74,74,0.9);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Delete</button>
-                                <span style="position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;">#${slotNum}</span>
-                            </div>
-                            <input type="file" id="fav-input-${key}" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '${key}')">
-                            <div class="fav-progress-overlay" id="fav-progress-${key}" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-                                <div style="width:70%;height:3px;background:#333;border-radius:3px;overflow:hidden;">
-                                    <div id="fav-bar-${key}" style="width:0%;height:100%;background:#fff;transition:width 0.3s;"></div>
+                        const key     = _favCurrentKey;
+                        const slotNum = _favCurrentSlot;
+                        const src     = res.path + '?t=' + Date.now();
+
+                        // Update modal image
+                        const img = document.getElementById('fav-modal-img');
+                        img.src = src;
+                        img.style.display = 'block';
+                        document.getElementById('fav-modal-empty-icon').style.display = 'none';
+                        document.getElementById('fav-modal-delete-btn').style.display = 'block';
+                        document.getElementById('fav-modal-upload-label').textContent = 'Replace Image';
+
+                        // Update thumbnail in grid
+                        const thumb = document.getElementById('fav-thumb-' + key);
+                        if (thumb) {
+                            thumb.setAttribute('onclick', `openFavModal('${key}', '${slotNum}', true)`);
+                            thumb.innerHTML = `
+                                <img src="${src}" id="fav-thumb-img-${key}" alt="Slot ${slotNum}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:6px 6px 5px;display:flex;justify-content:space-between;align-items:center;">
+                                    <span style="font-size:10px;font-weight:700;color:#fff;">#${slotNum}</span>
+                                    <i class="fa fa-check-circle" style="font-size:11px;color:#4aff4a;"></i>
                                 </div>
-                                <span id="fav-status-${key}" style="font-size:11px;color:#aaa;">Uploading…</span>
-                            </div>
-                        `;
+                            `;
+                        }
+                        _favCurrentFilled = true;
                     } else {
                         alert('Upload error: ' + (res.message || 'Unknown error'));
                     }
@@ -715,13 +815,15 @@
                 }
                 input.value = '';
             };
-
             xhr.send(formData);
         }
 
-        // ── Favorite Moments Delete Handler ──
-        function handleFavDelete(key) {
-            if (!confirm('Remove this image from the gallery? This cannot be undone.')) return;
+        function handleFavModalDelete() {
+            if (!_favCurrentKey) return;
+            if (!confirm('Remove this image? This cannot be undone.')) return;
+
+            const key     = _favCurrentKey;
+            const slotNum = _favCurrentSlot;
 
             fetch('/pannl/delete_image.php', {
                 method: 'POST',
@@ -731,21 +833,26 @@
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
-                    const card     = document.getElementById('fav-card-' + key);
-                    const slotNum  = key.replace('favorite_', '');
-                    card.innerHTML = `
-                        <label for="fav-input-${key}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer;color:#555;gap:6px;">
-                            <i class="fa fa-plus-circle" style="font-size:30px;color:#333;"></i>
-                            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Slot #${slotNum}</span>
-                        </label>
-                        <input type="file" id="fav-input-${key}" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '${key}')">
-                        <div class="fav-progress-overlay" id="fav-progress-${key}" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;gap:10px;">
-                            <div style="width:70%;height:3px;background:#333;border-radius:3px;overflow:hidden;">
-                                <div id="fav-bar-${key}" style="width:0%;height:100%;background:#fff;transition:width 0.3s;"></div>
+                    // Reset modal to empty state
+                    document.getElementById('fav-modal-img').style.display = 'none';
+                    document.getElementById('fav-modal-empty-icon').style.display = 'flex';
+                    document.getElementById('fav-modal-delete-btn').style.display = 'none';
+                    document.getElementById('fav-modal-upload-label').textContent = 'Upload Image';
+
+                    // Update thumbnail
+                    const thumb = document.getElementById('fav-thumb-' + key);
+                    if (thumb) {
+                        thumb.setAttribute('onclick', `openFavModal('${key}', '${slotNum}', false)`);
+                        thumb.innerHTML = `
+                            <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#444;">
+                                <i class="fa fa-plus" style="font-size:20px;"></i>
+                                <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">#${slotNum}</span>
                             </div>
-                            <span id="fav-status-${key}" style="font-size:11px;color:#aaa;">Uploading…</span>
-                        </div>
-                    `;
+                        `;
+                    }
+                    _favCurrentFilled = false;
+                    // Close modal after short delay
+                    setTimeout(() => { document.getElementById('fav-modal').style.display = 'none'; }, 400);
                 } else {
                     alert('Delete failed: ' + (res.message || 'Unknown error'));
                 }
