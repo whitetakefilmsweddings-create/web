@@ -394,6 +394,11 @@
                     <i class="fa-brands fa-youtube" style="font-size: 13px; color: #ff0000;"></i> YouTube Feed
                 </a>
             </li>
+            <li class="menu-item submenu-item" style="padding-left: 20px;">
+                <a href="#favorite-moments" style="display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 8px 12px;">
+                    <i class="fa-solid fa-heart" style="font-size: 13px; color: #e1306c;"></i> Favorite Moments
+                </a>
+            </li>
             <li class="menu-item" style="margin-top: 15px;">
                 <a href="/pannl/Image_admin" style="display: flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-images" style="font-size: 14px;"></i> All Page Images
@@ -459,8 +464,60 @@
             <% } %>
         </div>
 
+        <!-- ── Our Favorite Moments — 30-slot Gallery Manager ── -->
+        <div class="page-header" id="favorite-moments" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+            <h1>Our Favorite Moments</h1>
+            <p>Upload up to 30 square (1080 × 1080 px) gallery images for the animated marquee on the home page. Max file size: 10 MB per image.</p>
+        </div>
+
+        <div id="fav-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; margin-bottom: 60px;">
+            <% if (grouped_images && grouped_images['home']) {
+                const favImages = grouped_images['home'].filter(img => img.section_key.startsWith('favorite_'));
+                favImages.forEach(function(img) {
+                    let preview_src = img.image_path;
+                    if (preview_src && !preview_src.match(/^https?:\/\//) && !preview_src.startsWith('data:')) {
+                        preview_src = '/' + preview_src;
+                    }
+                    const slotNum = img.section_key.replace('favorite_', '');
+                    const isFilled = preview_src && preview_src.length > 1;
+            %>
+                <div class="fav-slot-card" id="fav-card-<%= img.section_key %>" style="background: #111; border: 1px solid #1c1c1c; border-radius: 12px; overflow: hidden; position: relative; aspect-ratio: 1 / 1;">
+                    <!-- Filled state -->
+                    <% if (isFilled) { %>
+                        <img src="<%= preview_src %>" alt="Slot <%= slotNum %>" id="fav-preview-<%= img.section_key %>" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        <div class="fav-slot-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.25s;">
+                            <label for="fav-input-<%= img.section_key %>" style="background:#fff;color:#000;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Replace</label>
+                            <button onclick="handleFavDelete('<%= img.section_key %>')" style="background:rgba(255,74,74,0.9);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Delete</button>
+                            <span style="position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;">#<%= slotNum %></span>
+                        </div>
+                        <input type="file" id="fav-input-<%= img.section_key %>" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '<%= img.section_key %>')">
+                    <% } else { %>
+                    <!-- Empty state -->
+                        <label for="fav-input-<%= img.section_key %>" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer;color:#555;gap:6px;">
+                            <i class="fa fa-plus-circle" style="font-size:30px;color:#333;"></i>
+                            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Slot #<%= slotNum %></span>
+                        </label>
+                        <input type="file" id="fav-input-<%= img.section_key %>" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '<%= img.section_key %>')">
+                        <img src="" alt="" id="fav-preview-<%= img.section_key %>" style="display:none;width:100%;height:100%;object-fit:cover;">
+                    <% } %>
+
+                    <!-- Upload progress overlay -->
+                    <div class="fav-progress-overlay" id="fav-progress-<%= img.section_key %>" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+                        <div style="width:70%;height:3px;background:#333;border-radius:3px;overflow:hidden;">
+                            <div id="fav-bar-<%= img.section_key %>" style="width:0%;height:100%;background:#fff;transition:width 0.3s;"></div>
+                        </div>
+                        <span id="fav-status-<%= img.section_key %>" style="font-size:11px;color:#aaa;">Uploading…</span>
+                    </div>
+                </div>
+            <% }); } %>
+        </div>
+
+        <style>
+            .fav-slot-card:hover .fav-slot-overlay { opacity: 1 !important; }
+        </style>
+
         <!-- Instagram Feed Editor Section -->
-        <div class="page-header" id="instagram-feed" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+        <div class="page-header" id="instagram-feed" style="margin-top: 0px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
             <h1>Instagram Feed Editor (Photos)</h1>
             <p>Manage the 3x2 grid of Instagram post photos. Enter standard Instagram post URLs or Blockquote Embed codes.</p>
         </div>
@@ -593,6 +650,109 @@
     </div>
     
     <script>
+        // ── Favorite Moments Upload Handler ──
+        function handleFavUpload(input, key) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+
+            // 10 MB limit (client-side pre-check)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('This image exceeds the 10 MB size limit. Please choose a smaller file.');
+                input.value = '';
+                return;
+            }
+
+            const progressOverlay = document.getElementById('fav-progress-' + key);
+            const bar             = document.getElementById('fav-bar-' + key);
+            const statusSpan      = document.getElementById('fav-status-' + key);
+
+            progressOverlay.style.display = 'flex';
+            bar.style.width = '0%';
+            statusSpan.textContent = 'Uploading…';
+
+            const formData = new FormData();
+            formData.append('image', file);
+            formData.append('section_key', key);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/pannl/upload.php', true);
+
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+                }
+            });
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState !== XMLHttpRequest.DONE) return;
+                progressOverlay.style.display = 'none';
+                try {
+                    const res = JSON.parse(xhr.responseText);
+                    if (res.success) {
+                        // Update card to filled state
+                        const card = document.getElementById('fav-card-' + key);
+                        const slotNum = key.replace('favorite_', '');
+                        card.innerHTML = `
+                            <img src="${res.path}?t=${Date.now()}" alt="Slot ${slotNum}" id="fav-preview-${key}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            <div class="fav-slot-overlay" style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;opacity:0;transition:opacity 0.25s;">
+                                <label for="fav-input-${key}" style="background:#fff;color:#000;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Replace</label>
+                                <button onclick="handleFavDelete('${key}')" style="background:rgba(255,74,74,0.9);color:#fff;border:none;padding:8px 14px;border-radius:6px;font-size:12px;font-weight:900;text-transform:uppercase;cursor:pointer;letter-spacing:0.5px;">Delete</button>
+                                <span style="position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:600;">#${slotNum}</span>
+                            </div>
+                            <input type="file" id="fav-input-${key}" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '${key}')">
+                            <div class="fav-progress-overlay" id="fav-progress-${key}" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+                                <div style="width:70%;height:3px;background:#333;border-radius:3px;overflow:hidden;">
+                                    <div id="fav-bar-${key}" style="width:0%;height:100%;background:#fff;transition:width 0.3s;"></div>
+                                </div>
+                                <span id="fav-status-${key}" style="font-size:11px;color:#aaa;">Uploading…</span>
+                            </div>
+                        `;
+                    } else {
+                        alert('Upload error: ' + (res.message || 'Unknown error'));
+                    }
+                } catch(err) {
+                    alert('Server error during upload.');
+                }
+                input.value = '';
+            };
+
+            xhr.send(formData);
+        }
+
+        // ── Favorite Moments Delete Handler ──
+        function handleFavDelete(key) {
+            if (!confirm('Remove this image from the gallery? This cannot be undone.')) return;
+
+            fetch('/pannl/delete_image.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ section_key: key })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    const card     = document.getElementById('fav-card-' + key);
+                    const slotNum  = key.replace('favorite_', '');
+                    card.innerHTML = `
+                        <label for="fav-input-${key}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;cursor:pointer;color:#555;gap:6px;">
+                            <i class="fa fa-plus-circle" style="font-size:30px;color:#333;"></i>
+                            <span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Slot #${slotNum}</span>
+                        </label>
+                        <input type="file" id="fav-input-${key}" accept="image/*" style="display:none;" onchange="handleFavUpload(this, '${key}')">
+                        <div class="fav-progress-overlay" id="fav-progress-${key}" style="display:none;position:absolute;inset:0;background:rgba(0,0,0,0.7);flex-direction:column;align-items:center;justify-content:center;gap:10px;">
+                            <div style="width:70%;height:3px;background:#333;border-radius:3px;overflow:hidden;">
+                                <div id="fav-bar-${key}" style="width:0%;height:100%;background:#fff;transition:width 0.3s;"></div>
+                            </div>
+                            <span id="fav-status-${key}" style="font-size:11px;color:#aaa;">Uploading…</span>
+                        </div>
+                    `;
+                } else {
+                    alert('Delete failed: ' + (res.message || 'Unknown error'));
+                }
+            })
+            .catch(() => alert('Server error during delete.'));
+        }
+
         function handleFileSelect(input, key) {
             const label = document.getElementById('file-label-' + key);
             if (input.files && input.files[0]) {

@@ -568,6 +568,20 @@
     </section>
     <!-- end of wpo-about-section -->
 
+    <!-- start our-favorite-moments-section -->
+    <section class="fav-moments-section" id="favorite-moments">
+        <div class="fav-moments-header">
+            <div class="section-badge">Our Gallery</div>
+            <h2>Our Favorite Moments</h2>
+        </div>
+
+        <!-- 4 Marquee Ribbon Rows — populated by JS -->
+        <div class="fav-marquee-rows" id="fav-marquee-rows">
+            <!-- Rows injected by script below -->
+        </div>
+    </section>
+    <!-- end our-favorite-moments-section -->
+
     <!-- start instagram-feed-section -->
     <section class="instagram-feed-section section-padding" id="insta-feed">
         <div class="container">
@@ -1298,6 +1312,68 @@
                                 solidCircle.style.backgroundImage = `url('${res.images['intimate_1']}')`;
                             }
                         }
+
+                        // ── Build "Our Favorite Moments" 4-row marquee ──
+                        (function buildFavMarquee(images) {
+                            const container = document.getElementById('fav-marquee-rows');
+                            if (!container) return;
+
+                            // Collect all favorite image srcs (1-30)
+                            const allSrcs = [];
+                            for (let i = 1; i <= 30; i++) {
+                                const src = images['favorite_' + i];
+                                // Only include uploaded (non-empty) images
+                                if (src && src.length > 0) {
+                                    allSrcs.push(src);
+                                }
+                            }
+
+                            // Build 4 rows; distribute images evenly across rows
+                            const NUM_ROWS = 4;
+                            const MIN_TILES = 8; // minimum tiles per row for seamless loop
+
+                            for (let r = 0; r < NUM_ROWS; r++) {
+                                // Slice images for this row (round-robin distribution)
+                                let rowSrcs = allSrcs.filter((_, idx) => idx % NUM_ROWS === r);
+
+                                // If no images at all, fill with empty placeholders
+                                if (allSrcs.length === 0) {
+                                    rowSrcs = new Array(MIN_TILES).fill('');
+                                }
+
+                                // Pad row to at least MIN_TILES tiles for seamless loop
+                                while (rowSrcs.length < MIN_TILES) {
+                                    rowSrcs = rowSrcs.concat(rowSrcs).slice(0, Math.max(rowSrcs.length * 2, MIN_TILES));
+                                }
+
+                                // Duplicate the track for seamless CSS-only loop
+                                const trackItems = [...rowSrcs, ...rowSrcs];
+
+                                const rowEl = document.createElement('div');
+                                rowEl.className = 'fav-marquee-row';
+
+                                const trackEl = document.createElement('div');
+                                trackEl.className = 'fav-marquee-track';
+
+                                trackItems.forEach(src => {
+                                    const tile = document.createElement('div');
+                                    if (src && src.length > 0) {
+                                        tile.className = 'fav-img-tile';
+                                        const img = document.createElement('img');
+                                        img.src = src;
+                                        img.alt = 'Favorite moment';
+                                        img.loading = 'lazy';
+                                        tile.appendChild(img);
+                                    } else {
+                                        tile.className = 'fav-img-tile empty';
+                                    }
+                                    trackEl.appendChild(tile);
+                                });
+
+                                rowEl.appendChild(trackEl);
+                                container.appendChild(rowEl);
+                            }
+                        })(res.images);
                     }
 
                     // Helper to extract shortcode from Instagram

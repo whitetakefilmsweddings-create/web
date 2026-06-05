@@ -210,6 +210,10 @@ async function initDatabases() {
     for (const row of defaults) {
       await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
     }
+    // Initialize 30 placeholder records for Our Favorite Moments gallery
+    for (let i = 1; i <= 30; i++) {
+      await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', ['home', `favorite_${i}`, '']);
+    }
     // Clean up deprecated home page sections no longer in use
     await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
     // Run schema migration to change image_path column to LONGTEXT if it's currently VARCHAR(255)
@@ -1319,7 +1323,24 @@ app.post('/pannl/delete_feed.php', checkPannlAuth, async (req, res) => {
   }
 });
 
-app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req, res) => {
+app.post('/pannl/delete_image.php', checkPannlAuth, async (req, res) => {
+  const { section_key } = req.body;
+  if (!section_key) {
+    return res.json({ success: false, message: 'Missing section key' });
+  }
+  try {
+    // Clear image_path for this slot in the database
+    await panlePool.execute(
+      'UPDATE section_images SET image_path = "" WHERE section_key = ?',
+      [section_key]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req, res) =>>,StartLine:1324,TargetContent: {
   const sectionKey = req.body.section_key;
   if (!sectionKey) {
     return res.json({ success: false, message: 'Missing section key' });
@@ -1330,10 +1351,21 @@ app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req
 
   const tempPath = req.file.path;
 
+  // Validate size limit (10MB)
+  const sizeLimit = 10 * 1024 * 1024;
+  if (req.file.size > sizeLimit) {
+    if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+    return res.json({ success: false, message: 'Image exceeds the 10MB size limit.' });
+  }
+
+  const isFavorite = sectionKey.startsWith('favorite_');
+  const targetWidth = 1080;
+  const targetHeight = isFavorite ? 1080 : 1350;
+
   try {
-    // Sharp center crop resize to 1080 x 1350 and convert to buffer
+    // Sharp center crop resize based on section format and convert to buffer
     const buffer = await sharp(tempPath)
-      .resize(1080, 1350, {
+      .resize(targetWidth, targetHeight, {
         fit: 'cover',
         position: 'center'
       })
