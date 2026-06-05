@@ -111,9 +111,9 @@
 @media (min-width: 992px) {
     .wpo-site-header {
         position: fixed !important;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 20px !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         width: 92% !important;
         max-width: 1250px;
         background: rgba(15, 15, 15, 0.45) !important;
