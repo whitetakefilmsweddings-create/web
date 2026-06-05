@@ -39,8 +39,57 @@
     <link href="assets/css/custom-service.css" rel="stylesheet">
     <link href="assets/css/pricing.css" rel="stylesheet">
     <link href="assets/css/about-gallery.css" rel="stylesheet">
+    <link href="assets/css/hero-video.css" rel="stylesheet">
     
     <style>
+        /* Immediate critical style for preloader */
+        body.loading {
+            overflow: hidden !important;
+        }
+        body.loading .wpo-site-header {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: #ffffff;
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+        }
+        #preloader.fade-out {
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+        .preloader-logo img {
+            width: 140px;
+            height: auto;
+            animation: preloader-pulse 1.8s ease-in-out infinite;
+            display: block;
+        }
+        @keyframes preloader-pulse {
+            0% {
+                transform: scale(0.96);
+                opacity: 0.85;
+            }
+            50% {
+                transform: scale(1.04);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0.96);
+                opacity: 0.85;
+            }
+        }
+
         /* CSS to hide cloned sticky header completely */
         .sticky-header {
             display: none !important;
@@ -414,16 +463,13 @@
     </header>
     <!-- end of header -->
     <!-- start of hero -->
-    <link href="assets/css/hero-video.css" rel="stylesheet">
     <section class="static-hero-video wpo-hero-style-3">
         <div class="video-bg">
             <!-- Landscape video for desktop -->
-            <video class="desktop-video" autoplay muted loop playsinline>
-                <source src="assets/Vedio/website.mp4" type="video/mp4">
+            <video class="desktop-video" muted loop playsinline data-src="assets/Vedio/website.mp4">
             </video>
             <!-- Portrait video for mobile -->
-            <video class="mobile-video" autoplay muted loop playsinline>
-                <source src="assets/Vedio/website_1 (1).mp4" type="video/mp4">
+            <video class="mobile-video" muted loop playsinline data-src="assets/Vedio/website_1 (1).mp4">
             </video>
         </div>
 
@@ -1585,28 +1631,41 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Pre-buffer and play videos immediately while loading
             const heroSection = document.querySelector('.static-hero-video');
-            const videos = heroSection ? heroSection.querySelectorAll('video') : [];
-            
-            videos.forEach(video => {
-                // Force play to buffer the video during the preloader time
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        heroSection.classList.add('playing');
-                    }).catch(error => {
-                        console.log("Video auto-play initiated but was interrupted or paused: ", error);
-                    });
+            if (heroSection) {
+                // Dynamically load only the appropriate video based on device width to save bandwidth and load faster
+                const isMobile = window.innerWidth <= 991;
+                const activeVideo = isMobile ? heroSection.querySelector('.mobile-video') : heroSection.querySelector('.desktop-video');
+                const inactiveVideo = isMobile ? heroSection.querySelector('.desktop-video') : heroSection.querySelector('.mobile-video');
+                
+                // Remove the inactive video to prevent any browser preload trigger
+                if (inactiveVideo) {
+                    inactiveVideo.remove();
                 }
                 
-                video.addEventListener('playing', function() {
-                    heroSection.classList.add('playing');
-                });
-                video.addEventListener('play', function() {
-                    heroSection.classList.add('playing');
-                });
-            });
+                if (activeVideo) {
+                    const src = activeVideo.getAttribute('data-src');
+                    if (src) {
+                        activeVideo.src = src;
+                        activeVideo.load();
+                        const playPromise = activeVideo.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                heroSection.classList.add('playing');
+                            }).catch(error => {
+                                console.log("Video auto-play initiated but was interrupted or paused: ", error);
+                            });
+                        }
+                    }
+                    
+                    activeVideo.addEventListener('playing', function() {
+                        heroSection.classList.add('playing');
+                    });
+                    activeVideo.addEventListener('play', function() {
+                        heroSection.classList.add('playing');
+                    });
+                }
+            }
 
             // Set preloader timeout to exactly 2 seconds (2000ms)
             setTimeout(function() {
