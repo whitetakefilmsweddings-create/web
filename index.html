@@ -1577,6 +1577,20 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('.wpo-site-header');
+                if (header) {
+                    if (window.scrollY > 50) {
+                        header.classList.add('header-scrolled');
+                    } else {
+                        header.classList.remove('header-scrolled');
+                    }
+                }
+            });
+        });
+    </script>
 
     <a href="https://wa.me/1234567890" class="whatsapp-float" target="_blank">
         <i class="fa fa-whatsapp"></i>

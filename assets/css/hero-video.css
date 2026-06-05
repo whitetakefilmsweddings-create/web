@@ -68,9 +68,9 @@
     margin: 0 auto;
     padding: 0 15px;
     position: absolute;
-    bottom: 22%; /* Pushed text slightly higher to avoid fog and fix alignment */
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%) !important;
     width: 100%;
 }
 
@@ -121,6 +121,12 @@
         padding: 5px 30px !important;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease !important;
         box-shadow: none !important;
+    }
+
+    .wpo-site-header.header-scrolled {
+        transform: translate(-50%, -150%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 
     /* Override hidden class behavior to account for the translateX translation */
@@ -225,7 +231,9 @@
 
 @media (max-width: 991px) {
     .static-hero-video .slide-content {
-        bottom: 12%;
+        bottom: auto !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
     }
     .static-hero-video .slide-title h2 {
         font-size: 38px;
@@ -245,6 +253,13 @@
         padding: 20px 20px !important;
         z-index: 10000;
         box-shadow: none !important;
+        transition: transform 0.4s ease, opacity 0.4s ease !important;
+    }
+
+    .wpo-site-header.header-scrolled {
+        transform: translateY(-120%) !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
 
     /* Force the bootstrap row to act as a direct flex container */
