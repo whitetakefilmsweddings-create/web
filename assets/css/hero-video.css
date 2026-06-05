@@ -471,3 +471,56 @@
     border: none !important;
     height: 0 !important;
 }
+
+/* Premium Preloader Styles */
+body.loading {
+    overflow: hidden !important;
+}
+
+body.loading .wpo-site-header {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.5s;
+}
+
+#preloader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.preloader-logo img {
+    width: 140px;
+    height: auto;
+    animation: preloader-pulse 1.8s ease-in-out infinite;
+    display: block;
+}
+
+@keyframes preloader-pulse {
+    0% {
+        transform: scale(0.96);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scale(1.04);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.96);
+        opacity: 0.85;
+    }
+}

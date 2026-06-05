@@ -323,7 +323,14 @@
 
 </head>
 
-<body>
+<body class="loading">
+
+    <!-- Premium Preloader -->
+    <div id="preloader">
+        <div class="preloader-logo">
+            <img src="assets/images/logo-black.png" alt="WhiteTake Films Loader Logo">
+        </div>
+    </div>
 
     <!-- start page-wrapper -->
     <div class="page-wrapper">
@@ -471,18 +478,18 @@
                      <!-- Image 1 (Large Circle) -->
                       <!-- Left collage images (staggered entrance) -->
                       <div class="couples-img u-image-circle couples-img-1">
-                          <img src="" id="intimate-img-1" alt="Krishna and Connor">
+                          <img src="" id="intimate-img-1" alt="Krishna and Connor" loading="lazy">
                       </div>
  
                       <!-- Image 2 (Medium Circle with Border) -->
                       <div class="couples-img u-image-circle couples-img-2">
-                          <img src="" id="intimate-img-2" alt="Sai and Aishwarya">
+                          <img src="" id="intimate-img-2" alt="Sai and Aishwarya" loading="lazy">
                       </div>
  
                         <div class="couples-shape-solid" style="border-radius:50%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;">
                              <!-- Dark glass backdrop overlay with 3px blur (darkness reduced to 40%) -->
                              <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.40);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);"></div>
-                             <img src="assets/images/logo-new.png" alt="White Take Films logo" class="solid-logo" style="width:125px;max-width:85%;height:auto;position:relative;z-index:2;" />
+                             <img src="assets/images/logo-new.png" alt="White Take Films logo" class="solid-logo" style="width:125px;max-width:85%;height:auto;position:relative;z-index:2;" loading="lazy" />
                      </div>
                   </div>
  
@@ -824,7 +831,7 @@
                 <div class="testimonial-slider owl-carousel">
                     <div class="wpo-testimonial-item">
                         <div class="wpo-testimonial-img">
-                            <img src="assets/images/testimonial/img-1.jpg" alt="">
+                            <img src="assets/images/testimonial/img-1.jpg" alt="" loading="lazy">
                         </div>
                         <div class="wpo-testimonial-content">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -836,7 +843,7 @@
                     </div>
                     <div class="wpo-testimonial-item">
                         <div class="wpo-testimonial-img">
-                            <img src="assets/images/testimonial/img-2.jpg" alt="">
+                            <img src="assets/images/testimonial/img-2.jpg" alt="" loading="lazy">
                         </div>
                         <div class="wpo-testimonial-content">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -848,7 +855,7 @@
                     </div>
                     <div class="wpo-testimonial-item">
                         <div class="wpo-testimonial-img">
-                            <img src="assets/images/testimonial/img-3.jpg" alt="">
+                            <img src="assets/images/testimonial/img-3.jpg" alt="" loading="lazy">
                         </div>
                         <div class="wpo-testimonial-content">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -860,7 +867,7 @@
                     </div>
                     <div class="wpo-testimonial-item">
                         <div class="wpo-testimonial-img">
-                            <img src="assets/images/testimonial/img-1.jpg" alt="">
+                            <img src="assets/images/testimonial/img-1.jpg" alt="" loading="lazy">
                         </div>
                         <div class="wpo-testimonial-content">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -872,7 +879,7 @@
                     </div>
                     <div class="wpo-testimonial-item">
                         <div class="wpo-testimonial-img">
-                            <img src="assets/images/testimonial/img-2.jpg" alt="">
+                            <img src="assets/images/testimonial/img-2.jpg" alt="" loading="lazy">
                         </div>
                         <div class="wpo-testimonial-content">
                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -1578,6 +1585,38 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Pre-buffer and play videos immediately while loading
+            const heroSection = document.querySelector('.static-hero-video');
+            const videos = heroSection ? heroSection.querySelectorAll('video') : [];
+            
+            videos.forEach(video => {
+                // Force play to buffer the video during the preloader time
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        heroSection.classList.add('playing');
+                    }).catch(error => {
+                        console.log("Video auto-play initiated but was interrupted or paused: ", error);
+                    });
+                }
+                
+                video.addEventListener('playing', function() {
+                    heroSection.classList.add('playing');
+                });
+                video.addEventListener('play', function() {
+                    heroSection.classList.add('playing');
+                });
+            });
+
+            // Set preloader timeout to exactly 2 seconds (2000ms)
+            setTimeout(function() {
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.classList.add('fade-out');
+                }
+                document.body.classList.remove('loading');
+            }, 2000);
+
             window.addEventListener('scroll', function() {
                 const header = document.querySelector('.wpo-site-header');
                 if (header) {
@@ -1588,23 +1627,6 @@
                     }
                 }
             });
-
-            // Trigger text animation after video starts playing
-            const heroSection = document.querySelector('.static-hero-video');
-            if (heroSection) {
-                const videos = heroSection.querySelectorAll('video');
-                videos.forEach(video => {
-                    if (!video.paused) {
-                        heroSection.classList.add('playing');
-                    }
-                    video.addEventListener('playing', function() {
-                        heroSection.classList.add('playing');
-                    });
-                    video.addEventListener('play', function() {
-                        heroSection.classList.add('playing');
-                    });
-                });
-            }
         });
     </script>
 
