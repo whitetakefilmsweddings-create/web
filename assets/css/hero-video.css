@@ -213,6 +213,11 @@
     white-space: nowrap !important;
 }
 
+.wpo-site-header .logo img,
+.wpo-site-header .navbar-brand.logo img {
+    mix-blend-mode: screen !important;
+}
+
 @media (max-width: 1199px) {
     .static-hero-video .slide-title h2 {
         font-size: 65px;
