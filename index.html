@@ -1588,6 +1588,23 @@
                     }
                 }
             });
+
+            // Trigger text animation after video starts playing
+            const heroSection = document.querySelector('.static-hero-video');
+            if (heroSection) {
+                const videos = heroSection.querySelectorAll('video');
+                videos.forEach(video => {
+                    if (!video.paused) {
+                        heroSection.classList.add('playing');
+                    }
+                    video.addEventListener('playing', function() {
+                        heroSection.classList.add('playing');
+                    });
+                    video.addEventListener('play', function() {
+                        heroSection.classList.add('playing');
+                    });
+                });
+            }
         });
     </script>
 

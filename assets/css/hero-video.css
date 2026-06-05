@@ -86,7 +86,12 @@
     text-shadow: none !important; /* Removed shadow to make font appear thinner */
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
-    animation: fadeInUp 2.8s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+    
+    /* Start state before animation triggers */
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(15px);
+    transition: none;
 }
 
 .static-hero-video .slide-title-sub span {
@@ -98,6 +103,21 @@
     text-transform: uppercase;
     letter-spacing: 5px;
     font-weight: 400;
+    
+    /* Start state before animation triggers */
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+    transition: none;
+}
+
+/* Run animation only after the video starts playing */
+.static-hero-video.playing .slide-title h2 {
+    animation: fadeInUp 3s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+}
+
+.static-hero-video.playing .slide-title-sub span {
+    animation: fadeInUpSub 3s cubic-bezier(0.2, 1, 0.2, 1) forwards;
 }
 
 .static-hero-video .slide-title-sub span i img {
@@ -223,6 +243,19 @@
         opacity: 0;
         transform: translateY(40px);
         filter: blur(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes fadeInUpSub {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(8px);
     }
     to {
         opacity: 1;
