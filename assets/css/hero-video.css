@@ -406,3 +406,31 @@
         letter-spacing: 2px;
     }
 }
+
+/* Bulletproof removal of all header horizontal lines, borders, and decorations across all viewports */
+.wpo-site-header,
+.wpo-site-header *,
+.wpo-header-style-2,
+.wpo-header-style-2 *,
+.navigation,
+.navigation * {
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.wpo-site-header::before,
+.wpo-site-header::after,
+.wpo-header-style-2::before,
+.wpo-header-style-2::after,
+.navigation::before,
+.navigation::after,
+.wpo-site-header .navigation::before,
+.wpo-site-header .navigation::after,
+.wpo-header-style-2 .navigation::before,
+.wpo-header-style-2 .navigation::after {
+    display: none !important;
+    content: none !important;
+    background: transparent !important;
+    border: none !important;
+    height: 0 !important;
+}
