@@ -396,12 +396,14 @@
 
 @media (max-width: 575px) {
     .static-hero-video .slide-content {
-        bottom: 15%;
+        bottom: auto !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
     }
     .static-hero-video .slide-title h2 {
-        font-size: 26px;
-        line-height: 1.2;
-        letter-spacing: 1px;
+        font-size: 22px; /* Adjusted to guarantee two-line layout fits perfectly */
+        line-height: 1.4;
+        letter-spacing: 2px;
     }
     .static-hero-video .slide-title-sub span {
         font-size: 11px;
