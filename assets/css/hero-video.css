@@ -86,7 +86,7 @@
     text-shadow: none !important; /* Removed shadow to make font appear thinner */
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
-    animation: fadeInUp 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeInUp 2.8s cubic-bezier(0.2, 1, 0.2, 1) forwards;
 }
 
 .static-hero-video .slide-title-sub span {
