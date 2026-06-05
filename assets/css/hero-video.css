@@ -565,7 +565,7 @@ body.loading .wpo-site-header {
 .fav-marquee-rows {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 0;
 }
 
 .fav-marquee-row {
@@ -578,7 +578,7 @@ body.loading .wpo-site-header {
 
 .fav-marquee-track {
     display: flex;
-    gap: 12px;
+    gap: 0;
     will-change: transform;
     flex-shrink: 0;
 }
@@ -594,9 +594,7 @@ body.loading .wpo-site-header {
 /* Each image tile */
 .fav-img-tile {
     flex-shrink: 0;
-    width: 220px;
-    height: 220px;
-    border-radius: 12px;
+    border-radius: 0;
     overflow: hidden;
     position: relative;
     background: #f0ede8;
