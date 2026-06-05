@@ -196,6 +196,29 @@
     }
 }
 
+/* Brand Text and Logo Row Alignment */
+.wpo-site-header .navbar-brand.logo {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    text-decoration: none !important;
+}
+
+.wpo-site-header .navbar-brand.logo .brand-text {
+    font-family: 'Outfit', 'Montserrat', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 20px !important;
+    color: #ffffff !important;
+    letter-spacing: 0.5px !important;
+    white-space: nowrap !important;
+}
+
+@media (max-width: 1199px) {
+    .static-hero-video .slide-title h2 {
+        font-size: 65px;
+    }
+}
+
 @media (max-width: 991px) {
     .static-hero-video .slide-content {
         bottom: 12%;
@@ -204,8 +227,102 @@
         font-size: 50px;
         letter-spacing: -1px;
     }
+    
+    /* Mobile Glassmorphic Header Container */
     .wpo-site-header {
-        background: rgba(15, 15, 15, 0.9) !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        background: rgba(15, 15, 15, 0.75) !important;
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        padding: 12px 20px !important;
+        z-index: 10000;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    /* Force the bootstrap row to act as a direct flex container */
+    .wpo-site-header .container-fluid .row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* Logo & Brand text on the left (Order 1) */
+    .wpo-site-header .container-fluid .row > div:nth-child(2) {
+        order: 1 !important;
+        flex: 1 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        display: flex !important;
+        justify-content: flex-start !important;
+    }
+
+    /* Hamburger menu button on the right (Order 2) */
+    .wpo-site-header .container-fluid .row > div:nth-child(1) {
+        order: 2 !important;
+        flex: 0 0 auto !important;
+        padding: 0 !important;
+        max-width: none !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    /* Hide/minify navigation wrapper block (Order 3) */
+    .wpo-site-header .container-fluid .row > div:nth-child(3) {
+        order: 3 !important;
+        flex: 0 0 auto !important;
+        padding: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: visible !important;
+    }
+
+    /* Premium mobile hamburger button styling */
+    .wpo-site-header .mobail-menu button {
+        background: transparent !important;
+        border: none !important;
+        width: 28px !important;
+        height: 20px !important;
+        padding: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: flex-end !important;
+    }
+
+    .wpo-site-header .mobail-menu button span {
+        background-color: #ffffff !important;
+        width: 28px !important;
+        height: 2px !important;
+        margin: 0 !important;
+        border-radius: 2px !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .wpo-site-header .mobail-menu button span:nth-child(2) {
+        width: 20px !important;
+    }
+
+    .wpo-site-header .mobail-menu button span:nth-child(3) {
+        width: 25px !important;
+    }
+
+    /* Brand text size on mobile */
+    .wpo-site-header .navbar-brand.logo .brand-text {
+        font-size: 18px !important;
+        font-weight: 500 !important;
+        display: inline-block !important;
+    }
+
+    .wpo-site-header .navbar-brand.logo img {
+        max-height: 30px !important;
     }
 }
 
