@@ -1340,7 +1340,7 @@ app.post('/pannl/delete_image.php', checkPannlAuth, async (req, res) => {
   }
 });
 
-app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req, res) =>>,StartLine:1324,TargetContent: {
+app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req, res) => {
   const sectionKey = req.body.section_key;
   if (!sectionKey) {
     return res.json({ success: false, message: 'Missing section key' });
