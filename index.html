@@ -1336,9 +1336,13 @@
                                 // Slice images for this row (round-robin distribution)
                                 let rowSrcs = allSrcs.filter((_, idx) => idx % NUM_ROWS === r);
 
-                                // If no images at all, fill with empty placeholders
-                                if (allSrcs.length === 0) {
-                                    rowSrcs = new Array(MIN_TILES).fill('');
+                                // If rowSrcs is empty but we have some images, or if no images at all, fill or reuse
+                                if (rowSrcs.length === 0) {
+                                    if (allSrcs.length > 0) {
+                                        rowSrcs = [...allSrcs];
+                                    } else {
+                                        rowSrcs = new Array(MIN_TILES).fill('');
+                                    }
                                 }
 
                                 // Pad row to at least MIN_TILES tiles for seamless loop
