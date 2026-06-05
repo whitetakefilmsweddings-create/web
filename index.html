@@ -95,6 +95,18 @@
             display: none !important;
         }
 
+        /* Force couples title on a single line for desktop and tablet, wrapping on mobile */
+        .couples-title {
+            font-size: clamp(24px, 3.2vw, 40px) !important;
+            white-space: nowrap !important;
+        }
+        @media (max-width: 767px) {
+            .couples-title {
+                white-space: normal !important;
+                font-size: 24px !important;
+            }
+        }
+
         /* Instagram Feed Section Styling */
         /* Instagram Feed Section Styling */
         .instagram-feed-section {
