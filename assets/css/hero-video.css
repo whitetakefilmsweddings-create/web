@@ -228,19 +228,19 @@
         letter-spacing: -1px;
     }
     
-    /* Mobile Glassmorphic Header Container */
+    /* Mobile Completely Transparent Header */
     .wpo-site-header {
-        position: fixed !important;
+        position: absolute !important;
         top: 0 !important;
         left: 0 !important;
         width: 100% !important;
-        background: rgba(15, 15, 15, 0.75) !important;
-        backdrop-filter: blur(15px) !important;
-        -webkit-backdrop-filter: blur(15px) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-        padding: 12px 20px !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+        padding: 20px 20px !important;
         z-index: 10000;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        box-shadow: none !important;
     }
 
     /* Force the bootstrap row to act as a direct flex container */
@@ -254,8 +254,8 @@
         margin: 0 !important;
     }
 
-    /* Logo & Brand text on the left (Order 1) */
-    .wpo-site-header .container-fluid .row > div:nth-child(2) {
+    /* Column 1: Hamburger Menu (Left) - Order 1 */
+    .wpo-site-header .container-fluid .row > div:nth-child(1) {
         order: 1 !important;
         flex: 1 !important;
         padding: 0 !important;
@@ -264,37 +264,65 @@
         justify-content: flex-start !important;
     }
 
-    /* Hamburger menu button on the right (Order 2) */
-    .wpo-site-header .container-fluid .row > div:nth-child(1) {
+    /* Column 2: Logo (Center) - Order 2 */
+    .wpo-site-header .container-fluid .row > div:nth-child(2) {
         order: 2 !important;
-        flex: 0 0 auto !important;
+        flex: 1 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    /* Column 3: Instagram Icon / Nav Overlay Wrapper (Right) - Order 3 */
+    .wpo-site-header .container-fluid .row > div:nth-child(3) {
+        order: 3 !important;
+        flex: 1 !important;
         padding: 0 !important;
         max-width: none !important;
         display: flex !important;
         justify-content: flex-end !important;
+        align-items: center !important;
     }
 
-    /* Hide/minify navigation wrapper block (Order 3) */
-    .wpo-site-header .container-fluid .row > div:nth-child(3) {
-        order: 3 !important;
-        flex: 0 0 auto !important;
-        padding: 0 !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: visible !important;
+    /* Ensure navigation overlay itself doesn't collapse layout */
+    .wpo-site-header #navbar {
+        width: 300px !important;
     }
 
-    /* Premium mobile hamburger button styling */
+    /* Hide brand text on mobile so only logo image is visible and centered */
+    .wpo-site-header .navbar-brand.logo .brand-text {
+        display: none !important;
+    }
+
+    .wpo-site-header .navbar-brand.logo img {
+        max-height: 35px !important;
+    }
+
+    /* Show mobile Instagram icon on the right */
+    .wpo-site-header .mobile-social-icons {
+        display: block !important;
+        margin: 0 !important;
+    }
+
+    .wpo-site-header .mobile-social-icons a i {
+        color: #ffffff !important;
+        font-size: 24px !important;
+        line-height: 1 !important;
+        display: inline-block !important;
+    }
+
+    /* Burger Menu Button (Left aligned) */
     .wpo-site-header .mobail-menu button {
         background: transparent !important;
         border: none !important;
         width: 28px !important;
-        height: 20px !important;
+        height: 18px !important;
         padding: 0 !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        align-items: flex-end !important;
+        align-items: flex-start !important;
     }
 
     .wpo-site-header .mobail-menu button span {
@@ -312,17 +340,6 @@
 
     .wpo-site-header .mobail-menu button span:nth-child(3) {
         width: 25px !important;
-    }
-
-    /* Brand text size on mobile */
-    .wpo-site-header .navbar-brand.logo .brand-text {
-        font-size: 18px !important;
-        font-weight: 500 !important;
-        display: inline-block !important;
-    }
-
-    .wpo-site-header .navbar-brand.logo img {
-        max-height: 30px !important;
     }
 }
 

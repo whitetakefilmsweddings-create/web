@@ -407,27 +407,6 @@
         </div>
     </header>
     <!-- end of header -->
-    
-    <!-- Dropdown Arrow Trigger -->
-    <div class="header-dropdown-trigger" id="dropdownTrigger" title="Toggle Navigation Menu">
-        <i class="fa fa-chevron-up"></i>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const header = document.querySelector('.wpo-site-header');
-            const trigger = document.getElementById('dropdownTrigger');
-            
-            if (header && trigger) {
-                // Initialize state: header is hidden on start, click to drop down
-                header.classList.add('header-hidden');
-                
-                trigger.addEventListener('click', function() {
-                    header.classList.toggle('header-hidden');
-                });
-            }
-        });
-    </script>
     <!-- start of hero -->
     <link href="assets/css/hero-video.css" rel="stylesheet">
     <section class="static-hero-video wpo-hero-style-3">
