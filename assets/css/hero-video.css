@@ -113,11 +113,11 @@
 
 /* Run animation only after the video starts playing */
 .static-hero-video.playing .slide-title h2 {
-    animation: fadeInUp 3s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+    animation: fadeInUp 2s cubic-bezier(0.2, 1, 0.2, 1) forwards;
 }
 
 .static-hero-video.playing .slide-title-sub span {
-    animation: fadeInUpSub 3s cubic-bezier(0.2, 1, 0.2, 1) forwards;
+    animation: fadeInUpSub 2s cubic-bezier(0.2, 1, 0.2, 1) forwards;
 }
 
 .static-hero-video .slide-title-sub span i img {
