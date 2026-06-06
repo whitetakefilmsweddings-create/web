@@ -619,7 +619,7 @@ body.loading .wpo-site-header {
     }
 }
 
-/* Tight 3-column square gallery slider on Homepage */
+/* Tight 3-row square gallery slider on Homepage */
 .fav-moments-slider {
     margin: 0 !important;
     padding: 0 !important;
@@ -632,7 +632,7 @@ body.loading .wpo-site-header {
     margin: 0 !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 2px !important;
+    gap: 0px !important; /* No gap */
 }
 
 .fav-moments-slider .fav-img-tile {
@@ -662,4 +662,11 @@ body.loading .wpo-site-header {
 /* Make slide transition extremely smooth and continuous-looking */
 .fav-moments-slider .owl-stage {
     transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important; /* Extremely smooth easeOutQuart */
+}
+
+/* Force hide all owl controls / buttons */
+#fav-moments-slider .owl-nav,
+#fav-moments-slider .owl-dots,
+#fav-moments-slider .owl-controls {
+    display: none !important;
 }

@@ -1456,13 +1456,13 @@
                                 sliderContainer.appendChild(itemDiv);
                             }
 
-                            // Initialize Owl Carousel with exactly 3 items across all sizes with extremely smooth sliding animation
+                            // Initialize Owl Carousel with extremely smooth sliding animation, no gaps, and smaller size on desktop
                             $('#fav-moments-slider').owlCarousel({
                                 loop: true,
                                 autoplay: true,
                                 autoplayTimeout: 3000,
                                 smartSpeed: 1500, // Very smooth transition
-                                margin: 2, // Tight 2px gap
+                                margin: 0, // No gap
                                 nav: false,
                                 dots: false,
                                 responsive: {
@@ -1473,10 +1473,10 @@
                                         items: 3
                                     },
                                     768: {
-                                        items: 3
+                                        items: 4
                                     },
                                     992: {
-                                        items: 3
+                                        items: 5 // Smaller images on desktop (5 columns)
                                     }
                                 }
                             });
