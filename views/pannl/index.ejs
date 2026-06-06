@@ -419,7 +419,7 @@
         
         <div class="sections-container">
             <% if (grouped_images && grouped_images['home']) { %>
-                <% grouped_images['home'].filter(img => !img.section_key.startsWith('favorite_')).forEach(function(img) { 
+                <% grouped_images['home'].filter(img => !img.section_key.startsWith('favorite_') && !img.section_key.startsWith('story_')).forEach(function(img) { 
                     const labels = {
                         'intimate_1': 'Behind the Lens Card 1 (Krishna & Connor)',
                         'intimate_2': 'Behind the Lens Card 2 (Sai & Aishwarya)',
@@ -488,6 +488,102 @@
                         </div>
                     <% } %>
                 <% }) %>
+            <% } %>
+        </div>
+
+        <!-- ── Featured Stories Editor Section ── -->
+        <div class="page-header" id="featured-stories" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+            <h1>Featured Stories (Intimate Weddings)</h1>
+            <p>Edit the images, names, taglines, description, and link for the 10 featured stories at the bottom of the home page.</p>
+        </div>
+
+        <div class="sections-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px;">
+            <% 
+                for (let i = 1; i <= 10; i++) {
+                    const imgObj = grouped_images['home'].find(img => img.section_key === `story_img_${i}`) || { image_path: '' };
+                    const nameObj = grouped_images['home'].find(img => img.section_key === `story_names_${i}`) || { image_path: '' };
+                    const subObj = grouped_images['home'].find(img => img.section_key === `story_subtitle_${i}`) || { image_path: '' };
+                    const descObj = grouped_images['home'].find(img => img.section_key === `story_desc_${i}`) || { image_path: '' };
+                    const linkObj = grouped_images['home'].find(img => img.section_key === `story_link_${i}`) || { image_path: '' };
+
+                    let preview_src = imgObj.image_path;
+                    if (preview_src && !preview_src.match(/^https?:\/\//) && !preview_src.startsWith('data:')) {
+                        preview_src = '/' + preview_src;
+                    } else if (!preview_src) {
+                        preview_src = 'pic/Your Love, Our Passion/pic' + i + '.webp';
+                    }
+            %>
+                <div class="section-card" style="background: #111; border: 1px solid #222; border-radius: 12px; padding: 20px;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>Story Card #<%= i %></span>
+                        <span style="font-size: 11px; background: #222; color: #c5a880; padding: 2px 8px; border-radius: 8px;">Story <%= i %></span>
+                    </h3>
+
+                    <!-- Image Upload -->
+                    <div class="img-preview" style="height: 180px; margin-bottom: 12px; border-radius: 8px; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center;">
+                        <img src="<%= preview_src %>" alt="Preview" id="preview-img-story_img_<%= i %>" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="size-info" style="font-size: 11px; color: #888; margin-bottom: 10px;">Output: 1080 x 1080 px (Square)</div>
+
+                    <form class="upload-form" data-key="story_img_<%= i %>" style="margin-bottom: 20px;">
+                        <div class="file-input-wrapper">
+                            <span class="file-input-label" id="file-label-story_img_<%= i %>">Choose Story Image</span>
+                            <input type="file" name="image" accept="image/*" required onchange="handleFileSelect(this, 'story_img_<%= i %>')">
+                        </div>
+                        <div class="progress-bar-container" id="progress-container-story_img_<%= i %>" style="display:none;">
+                            <div class="progress-bar" id="progress-bar-story_img_<%= i %>"></div>
+                        </div>
+                        <div class="upload-status" id="status-story_img_<%= i %>"></div>
+                        <button type="submit" class="upload-btn">Upload Image</button>
+                    </form>
+
+                    <!-- Text Fields Form -->
+                    <div style="border-top: 1px solid #222; padding-top: 15px;">
+                        <h4 style="font-size: 13px; color: #aaa; margin-bottom: 12px;">Card Details</h4>
+
+                        <!-- Names -->
+                        <form class="text-update-form" data-key="story_names_<%= i %>" style="margin-bottom: 12px;">
+                            <label style="font-size: 11px; color: #777; display: block; margin-bottom: 4px;">Couple Names (e.g. ANEENA & GARY)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" name="text_value" value="<%= nameObj.image_path %>" required 
+                                       style="flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px;">
+                                <button type="submit" class="upload-btn" style="margin: 0; padding: 6px 12px; font-size: 11px; width: auto;">Save</button>
+                            </div>
+                            <div class="upload-status" id="text-status-story_names_<%= i %>" style="font-size: 10px; margin-top: 2px;"></div>
+                        </form>
+
+                        <!-- Tagline -->
+                        <form class="text-update-form" data-key="story_subtitle_<%= i %>" style="margin-bottom: 12px;">
+                            <label style="font-size: 11px; color: #777; display: block; margin-bottom: 4px;">Tagline / Subtitle</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" name="text_value" value="<%= subObj.image_path %>" required 
+                                       style="flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px;">
+                                <button type="submit" class="upload-btn" style="margin: 0; padding: 6px 12px; font-size: 11px; width: auto;">Save</button>
+                            </div>
+                            <div class="upload-status" id="text-status-story_subtitle_<%= i %>" style="font-size: 10px; margin-top: 2px;"></div>
+                        </form>
+
+                        <!-- Link -->
+                        <form class="text-update-form" data-key="story_link_<%= i %>" style="margin-bottom: 12px;">
+                            <label style="font-size: 11px; color: #777; display: block; margin-bottom: 4px;">Read More Link URL (e.g. /gallery.html or #)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" name="text_value" value="<%= linkObj.image_path %>" required 
+                                       style="flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px;">
+                                <button type="submit" class="upload-btn" style="margin: 0; padding: 6px 12px; font-size: 11px; width: auto;">Save</button>
+                            </div>
+                            <div class="upload-status" id="text-status-story_link_<%= i %>" style="font-size: 10px; margin-top: 2px;"></div>
+                        </form>
+
+                        <!-- Description -->
+                        <form class="text-update-form" data-key="story_desc_<%= i %>">
+                            <label style="font-size: 11px; color: #777; display: block; margin-bottom: 4px;">Story Description</label>
+                            <textarea name="text_value" required rows="4" 
+                                      style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 12px; resize: vertical; line-height: 1.4; margin-bottom: 6px;"><%= descObj.image_path %></textarea>
+                            <button type="submit" class="upload-btn" style="margin: 0; width: 100%; font-size: 12px;">Save Description</button>
+                            <div class="upload-status" id="text-status-story_desc_<%= i %>" style="font-size: 10px; margin-top: 2px;"></div>
+                        </form>
+                    </div>
+                </div>
             <% } %>
         </div>
 

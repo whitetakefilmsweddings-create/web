@@ -207,7 +207,67 @@ async function initDatabases() {
       ['gallery', 'gallery_title_bg', 'assets/images/slider/s3.jpg'],
       ['contact', 'contact_title_bg', 'assets/images/slider/s3.jpg'],
       ['home', 'feature_image', 'assets/images/slider/s3.jpg'],
-      ['home', 'feature_video', 'https://www.youtube.com/watch?v=F384n1wXQoY']
+      ['home', 'feature_video', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      // Story Card 1
+      ['home', 'story_img_1', 'pic/Your Love, Our Passion/pic1.webp'],
+      ['home', 'story_names_1', 'ANEENA & GARY'],
+      ['home', 'story_subtitle_1', 'Blooms and Belonging: A Timeless Romance'],
+      ['home', 'story_desc_1', "Some love stories don't need grand declarations to be understood: they are felt in the very air surrounding a couple. With Aneena and Gary, the connection they share radiates a simple kind..."],
+      ['home', 'story_link_1', '#'],
+      // Story Card 2
+      ['home', 'story_img_2', 'pic/Your Love, Our Passion/pic2.webp'],
+      ['home', 'story_names_2', 'JOSEPH & NAINA'],
+      ['home', 'story_subtitle_2', 'A Tapestry of Emerald and Earth'],
+      ['home', 'story_desc_2', "Some love stories don't just unfold; they breathe with the landscape that surrounds them. For Joseph and Naina, their union felt less like a planned ceremony and more like a natural progre..."],
+      ['home', 'story_link_2', '#'],
+      // Story Card 3
+      ['home', 'story_img_3', 'pic/Your Love, Our Passion/pic3.webp'],
+      ['home', 'story_names_3', 'NIRANJANA & NIRANJ'],
+      ['home', 'story_subtitle_3', 'After you entered my life I never looked back'],
+      ['home', 'story_desc_3', "December was in full swing when the families of Niranj and Niranjana came together for their d-day in the vibrant city of Kochi. The couple was made for each other, as exemplified by the similar..."],
+      ['home', 'story_link_3', '#'],
+      // Story Card 4
+      ['home', 'story_img_4', 'pic/Your Love, Our Passion/pic4.webp'],
+      ['home', 'story_names_4', 'SHERLIN & LINAKAR'],
+      ['home', 'story_subtitle_4', 'When you find your secret keeper for eternity'],
+      ['home', 'story_desc_4', "Sherlin and Linakar exchanged their wedding vows amidst the awe-inspiring ambience at Fort Kochi Church. Through our lens, we captured their transition from two different people to one. It was a..."],
+      ['home', 'story_link_4', '#'],
+      // Story Card 5
+      ['home', 'story_img_5', ''],
+      ['home', 'story_names_5', ''],
+      ['home', 'story_subtitle_5', ''],
+      ['home', 'story_desc_5', ''],
+      ['home', 'story_link_5', '#'],
+      // Story Card 6
+      ['home', 'story_img_6', ''],
+      ['home', 'story_names_6', ''],
+      ['home', 'story_subtitle_6', ''],
+      ['home', 'story_desc_6', ''],
+      ['home', 'story_link_6', '#'],
+      // Story Card 7
+      ['home', 'story_img_7', ''],
+      ['home', 'story_names_7', ''],
+      ['home', 'story_subtitle_7', ''],
+      ['home', 'story_desc_7', ''],
+      ['home', 'story_link_7', '#'],
+      // Story Card 8
+      ['home', 'story_img_8', ''],
+      ['home', 'story_names_8', ''],
+      ['home', 'story_subtitle_8', ''],
+      ['home', 'story_desc_8', ''],
+      ['home', 'story_link_8', '#'],
+      // Story Card 9
+      ['home', 'story_img_9', ''],
+      ['home', 'story_names_9', ''],
+      ['home', 'story_subtitle_9', ''],
+      ['home', 'story_desc_9', ''],
+      ['home', 'story_link_9', '#'],
+      // Story Card 10
+      ['home', 'story_img_10', ''],
+      ['home', 'story_names_10', ''],
+      ['home', 'story_subtitle_10', ''],
+      ['home', 'story_desc_10', ''],
+      ['home', 'story_link_10', '#']
     ];
     for (const row of defaults) {
       await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
@@ -1376,7 +1436,7 @@ app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req
     return res.json({ success: false, message: 'Image exceeds the 10MB size limit.' });
   }
 
-  const isFavorite = sectionKey.startsWith('favorite_');
+  const isFavorite = sectionKey.startsWith('favorite_') || sectionKey.startsWith('story_img_');
   const targetWidth = 1080;
   const targetHeight = isFavorite ? 1080 : 1350;
 
@@ -1432,7 +1492,11 @@ app.get('/pannl/api.php', async (req, res) => {
             relativePath = relativePath.slice(1);
           }
           const absolutePath = path.join(__dirname, relativePath);
-          if (fs.existsSync(absolutePath)) {
+          if (fs.existsSync(absolutePath) || 
+              row.section_key.startsWith('story_names_') || 
+              row.section_key.startsWith('story_subtitle_') || 
+              row.section_key.startsWith('story_desc_') || 
+              row.section_key.startsWith('story_link_')) {
             images[row.section_key] = row.image_path;
           }
         }
