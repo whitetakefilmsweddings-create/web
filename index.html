@@ -191,7 +191,7 @@
         .instagram-card {
             position: relative;
             width: 100%;
-            aspect-ratio: 4 / 5;
+            aspect-ratio: 1 / 1;
             background-color: #000;
             border-radius: 12px;
             overflow: hidden;
@@ -1682,7 +1682,7 @@
                                             if (cleanUrl.endsWith('/')) {
                                                 cleanUrl = cleanUrl.slice(0, -1);
                                             }
-                                            htmlContent = `<blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="${cleanUrl}/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; width: 100%;"></blockquote>`;
+                                            htmlContent = `<blockquote class="instagram-media" data-instgrm-permalink="${cleanUrl}/" data-instgrm-version="14" style="background:#FFF; border:0; border-radius:12px; box-shadow:0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15); margin: 1px; width: 100%;"></blockquote>`;
                                         }
                                     } else {
                                         htmlContent = '';
