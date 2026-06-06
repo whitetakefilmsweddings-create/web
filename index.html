@@ -1407,7 +1407,7 @@
                             }
                         }
 
-                        // ── Build "Our Favorite Moments" 3-column slider ──
+                        // ── Build "Our Favorite Moments" 3-column, 3-row slider ──
                         (function buildFavSlider(images) {
                             const sliderContainer = document.getElementById('fav-moments-slider');
                             if (!sliderContainer) return;
@@ -1421,31 +1421,40 @@
                                 }
                             }
 
-                            // If no images, use placeholders (9 placeholder slots to match 3 columns)
+                            // If no images, use placeholders (9 placeholder slots to match 3 columns x 3 rows)
                             if (allSrcs.length === 0) {
                                 for (let i = 0; i < 9; i++) {
                                     allSrcs.push('');
                                 }
                             }
 
-                            allSrcs.forEach(src => {
+                            // Ensure total images is a multiple of 3 (so every column has exactly 3 rows)
+                            while (allSrcs.length % 3 !== 0) {
+                                allSrcs.push('');
+                            }
+
+                            // Group images into columns of 3 rows each
+                            for (let i = 0; i < allSrcs.length; i += 3) {
+                                const chunk = allSrcs.slice(i, i + 3);
                                 const itemDiv = document.createElement('div');
                                 itemDiv.className = 'item';
 
-                                const tile = document.createElement('div');
-                                if (src && src.length > 0) {
-                                    tile.className = 'fav-img-tile';
-                                    const img = document.createElement('img');
-                                    img.src = src;
-                                    img.alt = 'Favorite moment';
-                                    img.loading = 'lazy';
-                                    tile.appendChild(img);
-                                } else {
-                                    tile.className = 'fav-img-tile empty';
-                                }
-                                itemDiv.appendChild(tile);
+                                chunk.forEach(src => {
+                                    const tile = document.createElement('div');
+                                    if (src && src.length > 0) {
+                                        tile.className = 'fav-img-tile';
+                                        const img = document.createElement('img');
+                                        img.src = src;
+                                        img.alt = 'Favorite moment';
+                                        img.loading = 'lazy';
+                                        tile.appendChild(img);
+                                    } else {
+                                        tile.className = 'fav-img-tile empty';
+                                    }
+                                    itemDiv.appendChild(tile);
+                                });
                                 sliderContainer.appendChild(itemDiv);
-                            });
+                            }
 
                             // Initialize Owl Carousel with exactly 3 items across all sizes with extremely smooth sliding animation
                             $('#fav-moments-slider').owlCarousel({

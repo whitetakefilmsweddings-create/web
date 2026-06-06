@@ -630,6 +630,9 @@ body.loading .wpo-site-header {
 .fav-moments-slider .item {
     padding: 0 !important;
     margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
 }
 
 .fav-moments-slider .fav-img-tile {
