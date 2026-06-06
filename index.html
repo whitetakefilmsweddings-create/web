@@ -906,35 +906,8 @@
                 </div>
             </div>
             <div class="wpo-blog-items">
-                <div class="row" id="blog-grid">
-                    <div class="col col-lg-3 col-md-6 col-6">
-                        <div class="wpo-blog-item">
-                            <div class="wpo-blog-img">
-                                <img src="pic/Your Love, Our Passion/pic1.webp" alt="" loading="lazy">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col col-lg-3 col-md-6 col-6">
-                        <div class="wpo-blog-item">
-                            <div class="wpo-blog-img">
-                                <img src="pic/Your Love, Our Passion/pic2.webp" alt="" loading="lazy">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col col-lg-3 col-md-6 col-6">
-                        <div class="wpo-blog-item">
-                            <div class="wpo-blog-img">
-                                <img src="pic/Your Love, Our Passion/pic3.webp" alt="" loading="lazy">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col col-lg-3 col-md-6 col-6">
-                        <div class="wpo-blog-item">
-                            <div class="wpo-blog-img">
-                                <img src="pic/Your Love, Our Passion/pic4.webp" alt="" loading="lazy">
-                            </div>
-                        </div>
-                    </div>
+                <div class="blog-slider owl-carousel" id="blog-grid">
+                    <!-- Dynamic slider items loaded by JS -->
                 </div>
             </div>
 
@@ -1384,8 +1357,8 @@
                                     }
                                 }
 
-                                const colDiv = document.createElement('div');
-                                colDiv.className = 'col col-lg-3 col-md-6 col-6';
+                                const itemDiv = document.createElement('div');
+                                itemDiv.className = 'item';
 
                                 let contentHtml = '';
                                 if (names || subtitle || desc) {
@@ -1399,8 +1372,8 @@
                                     `;
                                 }
 
-                                colDiv.innerHTML = `
-                                    <div class="wpo-blog-item" style="margin-bottom: 30px; display: flex; flex-direction: column; height: 100%;">
+                                itemDiv.innerHTML = `
+                                    <div class="wpo-blog-item" style="margin-bottom: 10px; display: flex; flex-direction: column; height: 100%;">
                                         <div class="wpo-blog-img" style="overflow: hidden; border-radius: 12px; aspect-ratio: 1/1; position: relative;">
                                             <a href="${link}">
                                                 <img src="${imgSrc}" alt="${subtitle || names || ''}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
@@ -1409,8 +1382,38 @@
                                         ${contentHtml}
                                     </div>
                                 `;
-                                blogGrid.appendChild(colDiv);
+                                blogGrid.appendChild(itemDiv);
                             }
+
+                            // Initialize Owl Carousel with autoplay and 4s delay
+                            const itemsCount = blogGrid.children.length;
+                            $(blogGrid).owlCarousel({
+                                loop: itemsCount > 4,
+                                autoplay: true,
+                                autoplayTimeout: 4000, // 4 seconds delay
+                                smartSpeed: 1000,
+                                margin: 30,
+                                nav: false,
+                                dots: true,
+                                responsive: {
+                                    0: {
+                                        items: 1,
+                                        loop: itemsCount > 1
+                                    },
+                                    576: {
+                                        items: 2,
+                                        loop: itemsCount > 2
+                                    },
+                                    992: {
+                                        items: 3,
+                                        loop: itemsCount > 3
+                                    },
+                                    1200: {
+                                        items: 4,
+                                        loop: itemsCount > 4
+                                    }
+                                }
+                            });
                         }
 
                         // Helper to extract YouTube video ID and build embed URL
