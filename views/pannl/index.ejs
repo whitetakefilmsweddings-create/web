@@ -424,7 +424,9 @@
                         'intimate_1': 'Behind the Lens Card 1 (Krishna & Connor)',
                         'intimate_2': 'Behind the Lens Card 2 (Sai & Aishwarya)',
                         'intimate_3': 'Behind the Lens Card 3 (Reshma & Rajiv)',
-                        'intimate_logo_bg': 'Logo Circle Background'
+                        'intimate_logo_bg': 'Logo Circle Background',
+                        'feature_image': 'Features Section Card Image',
+                        'feature_video': 'Features Section YouTube Video Link'
                     };
                     const label = labels[img.section_key] || img.section_key;
                     
@@ -433,33 +435,58 @@
                         preview_src = '/' + preview_src;
                     }
                 %>
-                    <div class="section-card" id="card-<%= img.section_key %>">
-                        <div class="section-card-title" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span><%= label %></span>
-                            <span style="background: #222; color: #c5a880; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #333; text-transform: none;"><%= img.section_key %></span>
-                        </div>
-                        
-                        <div class="img-preview">
-                            <img src="<%= preview_src %>" alt="Preview" id="preview-img-<%= img.section_key %>">
-                        </div>
-                        
-                        <div class="size-info">Output Size: 1080 x 1350 px</div>
-                        
-                        <form class="upload-form" data-key="<%= img.section_key %>">
-                            <div class="file-input-wrapper">
-                                <span class="file-input-label" id="file-label-<%= img.section_key %>">Choose Image</span>
-                                <input type="file" name="image" accept="image/*" required onchange="handleFileSelect(this, '<%= img.section_key %>')">
+                    <% if (img.section_key === 'feature_video') { %>
+                        <!-- Text Link Editor for Feature Video -->
+                        <div class="section-card" id="card-<%= img.section_key %>">
+                            <div class="section-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><%= label %></span>
+                                <span style="background: #222; color: #c5a880; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #333; text-transform: none;"><%= img.section_key %></span>
                             </div>
                             
-                            <div class="progress-bar-container" id="progress-container-<%= img.section_key %>">
-                                <div class="progress-bar" id="progress-bar-<%= img.section_key %>"></div>
+                            <div style="background-color: #050505; border: 1px solid #222; border-radius: 8px; padding: 12px; font-size: 13px; color: #888;">
+                                <div style="margin-bottom: 5px; font-weight: 600; color: #aaa;">Current Link:</div>
+                                <div id="url-text-<%= img.section_key %>" style="word-break: break-all; font-family: monospace; max-height: 80px; overflow-y: auto;"><%= img.image_path %></div>
+                            </div>
+
+                            <form class="text-update-form" data-key="<%= img.section_key %>" style="display: flex; flex-direction: column; gap: 10px;">
+                                <textarea name="text_value" placeholder="Paste YouTube Video Link" required rows="3"
+                                          style="background: #000; border: 1px solid #333; color: #fff; padding: 10px 12px; border-radius: 8px; font-family: inherit; font-size: 13px; resize: vertical;"><%= img.image_path %></textarea>
+                                
+                                <div class="upload-status" id="text-status-<%= img.section_key %>" style="font-size: 12px; text-align: center;"></div>
+                                
+                                <button type="submit" class="upload-btn" style="background: #ff0000; color: #fff;">Save Link</button>
+                            </form>
+                        </div>
+                    <% } else { %>
+                        <!-- Standard Image Card -->
+                        <div class="section-card" id="card-<%= img.section_key %>">
+                            <div class="section-card-title" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><%= label %></span>
+                                <span style="background: #222; color: #c5a880; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #333; text-transform: none;"><%= img.section_key %></span>
                             </div>
                             
-                            <div class="upload-status" id="status-<%= img.section_key %>"></div>
+                            <div class="img-preview">
+                                <img src="<%= preview_src %>" alt="Preview" id="preview-img-<%= img.section_key %>">
+                            </div>
                             
-                            <button type="submit" class="upload-btn">Upload & Crop</button>
-                        </form>
-                    </div>
+                            <div class="size-info">Output Size: 1080 x 1350 px</div>
+                            
+                            <form class="upload-form" data-key="<%= img.section_key %>">
+                                <div class="file-input-wrapper">
+                                    <span class="file-input-label" id="file-label-<%= img.section_key %>">Choose Image</span>
+                                    <input type="file" name="image" accept="image/*" required onchange="handleFileSelect(this, '<%= img.section_key %>')">
+                                </div>
+                                
+                                <div class="progress-bar-container" id="progress-container-<%= img.section_key %>">
+                                    <div class="progress-bar" id="progress-bar-<%= img.section_key %>"></div>
+                                </div>
+                                
+                                <div class="upload-status" id="status-<%= img.section_key %>"></div>
+                                
+                                <button type="submit" class="upload-btn">Upload & Crop</button>
+                            </form>
+                        </div>
+                    <% } %>
                 <% }) %>
             <% } %>
         </div>
@@ -950,6 +977,44 @@
                         statusDiv.style.color = '#4aff4a';
                         statusDiv.innerText = 'Saved successfully!';
                         urlTextDiv.innerText = postUrl;
+                        setTimeout(() => { statusDiv.innerText = ''; }, 3000);
+                    } else {
+                        statusDiv.style.color = '#ff4a4a';
+                        statusDiv.innerText = 'Error: ' + res.message;
+                    }
+                })
+                .catch(err => {
+                    statusDiv.style.color = '#ff4a4a';
+                    statusDiv.innerText = 'Failed to save. Server error.';
+                });
+            });
+        });
+
+        document.querySelectorAll('.text-update-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const key = this.getAttribute('data-key');
+                const textVal = this.querySelector('[name="text_value"]').value;
+                const statusDiv = document.getElementById('text-status-' + key);
+                const urlTextDiv = document.getElementById('url-text-' + key);
+                
+                statusDiv.className = 'upload-status';
+                statusDiv.style.color = '#aaa';
+                statusDiv.innerText = 'Saving...';
+                
+                fetch('/pannl/update_section_text.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ section_key: key, text_value: textVal })
+                })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.success) {
+                        statusDiv.style.color = '#4aff4a';
+                        statusDiv.innerText = 'Saved successfully!';
+                        urlTextDiv.innerText = textVal;
                         setTimeout(() => { statusDiv.innerText = ''; }, 3000);
                     } else {
                         statusDiv.style.color = '#ff4a4a';

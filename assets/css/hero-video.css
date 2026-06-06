@@ -526,7 +526,7 @@ body.loading .wpo-site-header {
 }
 
 /* =========================================
-   OUR FAVORITE MOMENTS — Marquee Section
+   OUR FAVORITE MOMENTS — Slider Section
    ========================================= */
 
 .fav-moments-section {
@@ -540,67 +540,41 @@ body.loading .wpo-site-header {
     margin-bottom: 50px;
 }
 
-.fav-moments-header .section-badge {
-    display: inline-block;
-    font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: #9d8a6e;
-    margin-bottom: 14px;
+.fav-moments-header .couples-title {
+    font-family: 'Cormorant Garamond', 'Cinzel', serif !important;
+    font-size: clamp(24px, 3.2vw, 40px) !important;
+    font-weight: 300 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 5px !important;
+    color: #000000 !important;
+    margin-bottom: 10px !important;
+    white-space: normal !important;
 }
 
-.fav-moments-header h2 {
-    font-family: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
-    font-size: clamp(36px, 5vw, 60px);
-    font-weight: 400;
-    color: #1a1a1a;
-    line-height: 1.1;
-    letter-spacing: -1px;
-    margin: 0;
+.fav-moments-header .couples-subtitle {
+    font-family: 'Outfit', 'Montserrat', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    color: #666666 !important;
+    text-transform: none !important;
+    letter-spacing: 2px !important;
 }
 
-/* Marquee Wrapper — 4 ribbon rows */
-.fav-marquee-rows {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
+/* Slider and Tiles */
+.fav-moments-slider .item {
+    padding: 5px;
 }
 
-.fav-marquee-row {
-    display: flex;
-    width: 100%;
-    overflow: hidden;
-    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
-}
-
-.fav-marquee-track {
-    display: flex;
-    gap: 0;
-    will-change: transform;
-    flex-shrink: 0;
-}
-
-/* Row direction alternates */
-.fav-marquee-row:nth-child(even) .fav-marquee-track {
-    animation: marquee-rtl 80s linear infinite;
-}
-.fav-marquee-row:nth-child(odd) .fav-marquee-track {
-    animation: marquee-ltr 80s linear infinite;
-}
-
-/* Each image tile */
 .fav-img-tile {
-    flex-shrink: 0;
-    width: 220px;
-    height: 220px;
-    border-radius: 0;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
     background: #f0ede8;
     cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .fav-img-tile img {
@@ -611,11 +585,16 @@ body.loading .wpo-site-header {
     transition: transform 0.6s ease;
 }
 
-.fav-img-tile:hover img {
-    transform: scale(1.07);
+.fav-img-tile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* Placeholder tile (empty slot) */
+.fav-img-tile:hover img {
+    transform: scale(1.05);
+}
+
+/* Placeholder tile */
 .fav-img-tile.empty {
     background: linear-gradient(135deg, #f5f0ea 0%, #ece6dc 100%);
     display: flex;
@@ -630,46 +609,15 @@ body.loading .wpo-site-header {
     opacity: 0.5;
 }
 
-/* LTR / RTL keyframes */
-@keyframes marquee-ltr {
-    0%   { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-
-@keyframes marquee-rtl {
-    0%   { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
-}
-
-/* Pause on hover */
-.fav-marquee-row:hover .fav-marquee-track {
-    animation-play-state: paused;
-}
-
-/* Mobile: 4 rows, smaller tiles */
+/* Mobile adjustments (maintain exactly 3 columns) */
 @media (max-width: 767px) {
     .fav-moments-section {
         padding: 55px 0 65px;
     }
-
-    .fav-marquee-rows {
-        gap: 8px;
+    .fav-moments-header {
+        margin-bottom: 30px;
     }
-
     .fav-img-tile {
-        width: 155px;
-        height: 155px;
         border-radius: 8px;
-    }
-
-    .fav-marquee-track {
-        gap: 8px;
-    }
-}
-
-@media (min-width: 768px) and (max-width: 1023px) {
-    .fav-img-tile {
-        width: 185px;
-        height: 185px;
     }
 }

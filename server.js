@@ -205,7 +205,9 @@ async function initDatabases() {
       ['drone-coverage', 'drone_coverage_title_bg', 'pic/service/dron.webp'],
       ['albums-prints', 'albums_prints_title_bg', 'pic/service/album.webp'],
       ['gallery', 'gallery_title_bg', 'assets/images/slider/s3.jpg'],
-      ['contact', 'contact_title_bg', 'assets/images/slider/s3.jpg']
+      ['contact', 'contact_title_bg', 'assets/images/slider/s3.jpg'],
+      ['home', 'feature_image', 'assets/images/slider/s3.jpg'],
+      ['home', 'feature_video', 'https://www.youtube.com/watch?v=F384n1wXQoY']
     ];
     for (const row of defaults) {
       await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
@@ -1282,6 +1284,22 @@ app.post('/pannl/update_feed.php', checkPannlAuth, async (req, res) => {
     await panlePool.execute(
       'UPDATE instagram_feeds SET post_url = ? WHERE feed_key = ?',
       [post_url, feed_key]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
+  const { section_key, text_value } = req.body;
+  if (!section_key) {
+    return res.json({ success: false, message: 'Missing parameters' });
+  }
+  try {
+    await panlePool.execute(
+      'UPDATE section_images SET image_path = ? WHERE section_key = ?',
+      [text_value || '', section_key]
     );
     res.json({ success: true });
   } catch (err) {
