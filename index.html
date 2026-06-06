@@ -118,19 +118,10 @@
             border-top: 1px solid #eaeaea;
             border-bottom: 1px solid #eaeaea;
         }
-        .instagram-feed-section .wpo-section-title h2 {
-            font-size: 64px;
-            line-height: 1.1;
+        .instagram-feed-section .couples-title {
+            font-size: clamp(36px, 5vw, 64px) !important;
             margin-bottom: 20px;
-            color: #000000;
-            font-family: "Cormorant Garamond", serif;
-            font-weight: 300;
-            padding-bottom: 0;
-            margin-top: 10px;
-        }
-        .instagram-feed-section .wpo-section-title h2::after,
-        .instagram-feed-section .wpo-section-title h2::before {
-            display: none !important;
+            color: #555555;
         }
         .insta-badge-container {
             display: flex;
@@ -333,7 +324,7 @@
                 scroll-snap-align: center;
                 margin-right: 0;
             }
-            .instagram-feed-section .wpo-section-title h2 {
+            .instagram-feed-section .couples-title {
                 font-size: 40px !important;
             }
         }
@@ -588,14 +579,14 @@
     <section class="instagram-feed-section section-padding" id="insta-feed">
         <div class="container">
             <div class="row">
-                <div class="wpo-section-title">
+                <div style="width: 100%; text-align: center; margin-bottom: 50px;">
                     <div class="insta-badge-container">
                         <a href="https://www.instagram.com/whitetake_films/" target="_blank" class="insta-badge">
                             <i class="fa fa-instagram"></i> @whitetake_films
                         </a>
                     </div>
-                    <h2>From our feed</h2>
-                    <p class="insta-subtitle">Real moments, real couples. Follow us on Instagram for daily inspiration from weddings across Kerala.</p>
+                    <h1 class="couples-title">From Our Feed</h1>
+                    <div class="couples-subtitle">Real moments, real couples. Follow us on Instagram for daily inspiration from weddings across Kerala.</div>
                     <div class="insta-filter-toggle-container">
                         <div class="insta-filter-toggle">
                             <div class="insta-filter-btn active" data-filter="photos">
@@ -620,10 +611,9 @@
     <section class="wpo-service-section-s2 section-padding" id="service">
         <div class="container">
             <div class="row">
-                <div class="wpo-section-title">
-                    <span>OUR SERVICES</span>
-                    <h2>Every frame tells your beautiful wedding story
-                    </h2>
+                <div style="width: 100%; text-align: center; margin-bottom: 50px;">
+                    <h1 class="couples-title">Every Frame Tells Your Beautiful Wedding Story</h1>
+                    <div class="couples-subtitle">Our Services</div>
                 </div>
             </div>
             <div class="wpo-service-wrap">
@@ -752,7 +742,7 @@
                     </div>
                     
                     <div class="feature-left-heading" style="margin-top: 30px;">
-                        <h2 style="font-family: 'Cormorant Garamond', 'Cinzel', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 300; color: #000; line-height: 1.2; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0;">
+                        <h2 style="font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 300; color: #555555; line-height: 1.2; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0; text-transform: uppercase;">
                             Get Your 
                             <span class="avatar-group" style="display: inline-flex; align-items: center; vertical-align: middle;">
                                 <img src="pic/Your Love, Our Passion/pic1.webp" alt="" id="story-avatar-1" style="width: 38px; height: 38px; border-radius: 50%; border: 2px solid #fff; object-fit: cover; margin-right: -12px; z-index: 3;">
@@ -761,7 +751,7 @@
                             </span>
                             Dream Picture
                         </h2>
-                        <p style="font-family: 'Outfit', sans-serif; font-size: 15px; color: #666; margin-top: 15px; line-height: 1.6;">
+                        <p style="font-family: 'Mulish', sans-serif; font-size: 15px; color: #707070; margin-top: 15px; line-height: 1.8;">
                             Your wedding happens once. Relive it instantly with our next-generation technology integration.
                         </p>
                     </div>
@@ -774,8 +764,8 @@
                         <div style="width: 48px; height: 48px; background: #fdf2f4; color: #dc2743; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
                             <i class="fa fa-camera-retro"></i>
                         </div>
-                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #000; margin: 0;">AI-Integrated Live Photo Download</h3>
-                        <p style="font-family: 'Outfit', sans-serif; font-size: 14px; color: #666; line-height: 1.6; margin: 0;">
+                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; color: #555555; margin: 0; text-transform: uppercase;">AI-Integrated Live Photo Download</h3>
+                        <p style="font-family: 'Mulish', sans-serif; font-size: 14px; color: #707070; line-height: 1.8; margin: 0;">
                             Guests can scan a QR code and immediately find and download their photos from the live event using our advanced face recognition algorithm.
                         </p>
                     </div>
@@ -785,8 +775,8 @@
                         <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.1); color: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
                             <i class="fa fa-desktop"></i>
                         </div>
-                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #fff; margin: 0;">Dedicated Digital Selection Portal</h3>
-                        <p style="font-family: 'Outfit', sans-serif; font-size: 14px; color: #ccc; line-height: 1.6; margin: 0;">
+                        <h3 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 300; color: #fff; margin: 0; text-transform: uppercase;">Dedicated Digital Selection Portal</h3>
+                        <p style="font-family: 'Mulish', sans-serif; font-size: 14px; color: #ccc; line-height: 1.8; margin: 0;">
                             A personalized digital workflow makes it easier than ever to filter, choose, and finalize your favorite moments for the luxury wedding album.
                         </p>
                     </div>
@@ -795,15 +785,15 @@
                     <div class="feature-stats-row wpo-fun-fact-grids" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; margin-top: 10px;">
                         <div class="stat-card" style="background: #fcfcfc; border: 1px solid #f0f0f0; border-radius: 16px; padding: 20px 10px;">
                             <h4 style="font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 3.5vw, 36px); font-weight: 300; color: #000; margin: 0;"><span class="odometer" data-count="1200">00</span></h4>
-                            <p style="font-family: 'Outfit', sans-serif; font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1.5px; margin: 5px 0 0 0;">Happy Couples</p>
+                            <p style="font-family: 'Mulish', sans-serif; font-size: 12px; color: #707070; text-transform: uppercase; letter-spacing: 1.5px; margin: 5px 0 0 0;">Happy Couples</p>
                         </div>
                         <div class="stat-card" style="background: #fcfcfc; border: 1px solid #f0f0f0; border-radius: 16px; padding: 20px 10px;">
                             <h4 style="font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 3.5vw, 36px); font-weight: 300; color: #000; margin: 0;"><span class="odometer" data-count="1545">00</span></h4>
-                            <p style="font-family: 'Outfit', sans-serif; font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1.5px; margin: 5px 0 0 0;">Weddings</p>
+                            <p style="font-family: 'Mulish', sans-serif; font-size: 12px; color: #707070; text-transform: uppercase; letter-spacing: 1.5px; margin: 5px 0 0 0;">Weddings</p>
                         </div>
                         <div class="stat-card" style="background: #fcfcfc; border: 1px solid #f0f0f0; border-radius: 16px; padding: 20px 10px;">
                             <h4 style="font-family: 'Cormorant Garamond', serif; font-size: clamp(24px, 3.5vw, 36px); font-weight: 300; color: #000; margin: 0;"><span class="odometer" data-count="265">00</span>+</h4>
-                            <p style="font-family: 'Outfit', sans-serif; font-size: 12px; color: #777; text-transform: uppercase; letter-spacing: 1.5px; margin: 5px 0 0 0;">Locations</p>
+                            <p style="font-family: 'Mulish', sans-serif; font-size: 12px; color: #707070; text-transform: uppercase; letter-spacing: 1.5px; margin: 5px 0 0 0;">Locations</p>
                         </div>
                     </div>
                 </div>
@@ -823,11 +813,9 @@
     <section class="wpo-portfolio-section section-padding" id="gallery">
         <div class="container">
             <div class="row">
-                <div class="wpo-section-title">
-                    <div class="section-title-img">
-                        <img src="assets/images/section-title.png" alt="" loading="lazy">
-                    </div>
-                    <h2>Popular Collections</h2>
+                <div style="width: 100%; text-align: center; margin-bottom: 50px;">
+                    <h1 class="couples-title">Popular Collections</h1>
+                    <div class="couples-subtitle">Our Portfolio</div>
                 </div>
             </div>
             <div class="case-study-area">
@@ -917,11 +905,9 @@
     <div class="wpo-testimonial-area ">
         <div class="container">
             <div class="row">
-                <div class="wpo-section-title">
-                    <div class="section-title-img">
-                        <img src="assets/images/section-title.png" alt="" loading="lazy">
-                    </div>
-                    <h2>What Our Clients Say</h2>
+                <div style="width: 100%; text-align: center; margin-bottom: 50px;">
+                    <h1 class="couples-title">What Our Clients Say</h1>
+                    <div class="couples-subtitle">Testimonials</div>
                 </div>
             </div>
             <div class="wpo-testimonial-wrap">
@@ -998,11 +984,9 @@
     <section class="wpo-pricing-section section-padding">
         <div class="container">
             <div class="row">
-                <div class="wpo-section-title">
-                    <div class="section-title-img">
-                        <img src="" alt="" loading="lazy">
-                    </div>
-                    <h2>Our Wedding Packages</h2>
+                <div style="width: 100%; text-align: center; margin-bottom: 50px;">
+                    <h1 class="couples-title">Our Wedding Packages</h1>
+                    <div class="couples-subtitle">Pricing</div>
                 </div>
             </div>
             <div class="wpo-pricing-wrap">
