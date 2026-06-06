@@ -1433,6 +1433,14 @@
                                 allSrcs.push('');
                             }
 
+                            // If we have fewer than 24 images (8 columns), duplicate them so Owl Carousel has enough items to loop with 5 columns
+                            if (allSrcs.length > 0 && allSrcs.length < 24) {
+                                const original = [...allSrcs];
+                                while (allSrcs.length < 24) {
+                                    allSrcs.push(...original);
+                                }
+                            }
+
                             // Group images into columns of 3 rows each
                             for (let i = 0; i < allSrcs.length; i += 3) {
                                 const chunk = allSrcs.slice(i, i + 3);
