@@ -898,11 +898,9 @@
     <section class="wpo-blog-section section-padding" id="blog">
         <div class="container">
             <div class="row">
-                <div class="wpo-section-title">
-                    <div class="section-title-img">
-                        <img src="assets/images/section-title.png" alt="" loading="lazy">
-                    </div>
-                    <h2>Your Love, Our Passion</h2>
+                <div style="width: 100%; text-align: center; margin-bottom: 50px;">
+                    <h1 class="couples-title">Your Love, Our Passion</h1>
+                    <div class="couples-subtitle">Featured Stories</div>
                 </div>
             </div>
             <div class="wpo-blog-items">
@@ -1363,11 +1361,11 @@
                                  let contentHtml = '';
                                 if (names || subtitle || desc) {
                                     contentHtml = `
-                                        <div class="wpo-blog-content" style="padding-top: 15px;">
-                                            ${names ? `<ul style="list-style: none; display: flex; margin-bottom: 5px; padding-left: 0;"><li style="color: #777777; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0;">${names}</li></ul>` : ''}
-                                            ${subtitle ? `<h2 style="font-size: clamp(18px, 2vw, 22px); line-height: 1.3; margin: 5px 0 10px 0;"><a href="${link}" style="color: #000; font-family: 'Cormorant Garamond', serif; font-weight: 600; transition: color 0.3s;">${subtitle}</a></h2>` : ''}
-                                            ${desc ? `<p style="font-family: 'Outfit', sans-serif; font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; height: auto;">${desc}</p>` : ''}
-                                            <a href="${link}" style="font-family: 'Outfit', sans-serif; font-size: 11px; text-transform: uppercase; font-weight: 600; color: #000; letter-spacing: 1.5px; transition: color 0.3s; display: inline-block; border-bottom: 1px solid #000; padding-bottom: 2px;">Read More</a>
+                                        <div class="wpo-blog-content" style="padding-top: 18px;">
+                                            ${names ? `<div style="font-family: 'Mulish', sans-serif; font-size: 13px; color: #707070; margin-bottom: 8px;">${names}</div>` : ''}
+                                            ${subtitle ? `<h2 style="font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 2.2vw, 26px); font-weight: 300; line-height: 1.2; color: #555555; text-transform: uppercase; margin: 0 0 12px 0;"><a href="${link}" style="color: inherit; transition: color 0.3s;">${subtitle}</a></h2>` : ''}
+                                            ${desc ? `<p style="font-family: 'Mulish', sans-serif; font-size: 14px; color: #707070; line-height: 1.8; margin-bottom: 18px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">${desc}</p>` : ''}
+                                            <a href="${link}" class="couples-btn" style="font-size: 10px; padding: 10px 30px; letter-spacing: 2px;">Read More</a>
                                         </div>
                                     `;
                                 }
