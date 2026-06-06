@@ -621,3 +621,43 @@ body.loading .wpo-site-header {
         border-radius: 8px;
     }
 }
+
+/* Center and style the slider dots, hide default unstyled arrows */
+#fav-moments-slider .owl-nav,
+#fav-moments-slider .owl-controls .owl-nav {
+    display: none !important;
+}
+#fav-moments-slider .owl-dots,
+#fav-moments-slider .owl-controls .owl-dots {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-top: 25px !important;
+    float: none !important;
+    width: 100% !important;
+}
+#fav-moments-slider .owl-dots .owl-dot,
+#fav-moments-slider .owl-controls .owl-dots .owl-dot {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    zoom: 1 !important;
+}
+#fav-moments-slider .owl-dots .owl-dot span,
+#fav-moments-slider .owl-controls .owl-dots .owl-dot span {
+    display: block !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #cccccc !important;
+    margin: 5px 7px !important;
+    transition: background 0.3s, transform 0.3s !important;
+}
+#fav-moments-slider .owl-dots .owl-dot.active span,
+#fav-moments-slider .owl-controls .owl-dots .owl-dot.active span {
+    background: #000000 !important;
+    transform: scale(1.2) !important;
+}
