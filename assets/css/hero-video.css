@@ -619,24 +619,20 @@ body.loading .wpo-site-header {
     }
 }
 
-/* Tight 5-column square gallery grid on Homepage */
-.fav-moments-grid {
-    display: grid !important;
-    grid-template-columns: repeat(5, 1fr) !important;
-    gap: 2px !important;
+/* Tight 4-column square gallery slider on Homepage */
+.fav-moments-slider {
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
+    display: block !important;
 }
 
-.fav-moments-grid .item {
-    width: 100% !important;
+.fav-moments-slider .item {
     padding: 0 !important;
     margin: 0 !important;
-    float: none !important;
 }
 
-.fav-moments-grid .fav-img-tile {
+.fav-moments-slider .fav-img-tile {
     width: 100% !important;
     aspect-ratio: 1 / 1 !important;
     border-radius: 0 !important;
@@ -648,7 +644,7 @@ body.loading .wpo-site-header {
     cursor: pointer;
 }
 
-.fav-moments-grid .fav-img-tile img {
+.fav-moments-slider .fav-img-tile img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
@@ -656,20 +652,11 @@ body.loading .wpo-site-header {
     transition: transform 0.4s ease !important;
 }
 
-.fav-moments-grid .fav-img-tile:hover img {
+.fav-moments-slider .fav-img-tile:hover img {
     transform: scale(1.06) !important;
 }
 
-/* Responsive columns */
-@media (max-width: 991px) {
-    .fav-moments-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-    }
-}
-
-@media (max-width: 575px) {
-    .fav-moments-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 1px !important;
-    }
+/* Make slide transition extremely smooth and continuous-looking */
+.fav-moments-slider .owl-stage {
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important; /* Extremely smooth easeOutQuart */
 }

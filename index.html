@@ -575,9 +575,9 @@
             <div class="couples-subtitle">Our Gallery</div>
         </div>
 
-        <!-- 5-column fluid matrix grid -->
+        <!-- 4-column fluid carousel slider -->
         <div class="fav-moments-fluid" style="width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; overflow: hidden;">
-            <div class="portfolio-grids fav-moments-grid clearfix" id="fav-moments-grid">
+            <div class="fav-moments-slider owl-carousel owl-theme" id="fav-moments-slider">
                 <!-- Items populated by JS -->
             </div>
         </div>
@@ -1407,10 +1407,10 @@
                             }
                         }
 
-                        // ── Build "Our Favorite Moments" 5-column matrix grid ──
-                        (function buildFavGrid(images) {
-                            const gridContainer = document.getElementById('fav-moments-grid');
-                            if (!gridContainer) return;
+                        // ── Build "Our Favorite Moments" 4-column slider ──
+                        (function buildFavSlider(images) {
+                            const sliderContainer = document.getElementById('fav-moments-slider');
+                            if (!sliderContainer) return;
 
                             // Collect all favorite image srcs (1-30)
                             const allSrcs = [];
@@ -1421,9 +1421,9 @@
                                 }
                             }
 
-                            // If no images, use placeholders (10 placeholder slots)
+                            // If no images, use placeholders (12 placeholder slots to match 4 columns)
                             if (allSrcs.length === 0) {
-                                for (let i = 0; i < 10; i++) {
+                                for (let i = 0; i < 12; i++) {
                                     allSrcs.push('');
                                 }
                             }
@@ -1444,7 +1444,32 @@
                                     tile.className = 'fav-img-tile empty';
                                 }
                                 itemDiv.appendChild(tile);
-                                gridContainer.appendChild(itemDiv);
+                                sliderContainer.appendChild(itemDiv);
+                            });
+
+                            // Initialize Owl Carousel with exactly 4 items across all sizes with extremely smooth sliding animation
+                            $('#fav-moments-slider').owlCarousel({
+                                loop: true,
+                                autoplay: true,
+                                autoplayTimeout: 3000,
+                                smartSpeed: 1500, // Very smooth transition
+                                margin: 2, // Tight 2px gap
+                                nav: false,
+                                dots: false,
+                                responsive: {
+                                    0: {
+                                        items: 4
+                                    },
+                                    576: {
+                                        items: 4
+                                    },
+                                    768: {
+                                        items: 4
+                                    },
+                                    992: {
+                                        items: 4
+                                    }
+                                }
                             });
                         })(res.images);
                     }
