@@ -1407,7 +1407,7 @@
                             }
                         }
 
-                        // ── Build "Our Favorite Moments" 4-column slider ──
+                        // ── Build "Our Favorite Moments" 3-column slider ──
                         (function buildFavSlider(images) {
                             const sliderContainer = document.getElementById('fav-moments-slider');
                             if (!sliderContainer) return;
@@ -1421,9 +1421,9 @@
                                 }
                             }
 
-                            // If no images, use placeholders (12 placeholder slots to match 4 columns)
+                            // If no images, use placeholders (9 placeholder slots to match 3 columns)
                             if (allSrcs.length === 0) {
-                                for (let i = 0; i < 12; i++) {
+                                for (let i = 0; i < 9; i++) {
                                     allSrcs.push('');
                                 }
                             }
@@ -1447,7 +1447,7 @@
                                 sliderContainer.appendChild(itemDiv);
                             });
 
-                            // Initialize Owl Carousel with exactly 4 items across all sizes with extremely smooth sliding animation
+                            // Initialize Owl Carousel with exactly 3 items across all sizes with extremely smooth sliding animation
                             $('#fav-moments-slider').owlCarousel({
                                 loop: true,
                                 autoplay: true,
@@ -1458,16 +1458,16 @@
                                 dots: false,
                                 responsive: {
                                     0: {
-                                        items: 4
+                                        items: 3
                                     },
                                     576: {
-                                        items: 4
+                                        items: 3
                                     },
                                     768: {
-                                        items: 4
+                                        items: 3
                                     },
                                     992: {
-                                        items: 4
+                                        items: 3
                                     }
                                 }
                             });
