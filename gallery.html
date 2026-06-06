@@ -173,6 +173,60 @@
             .wpo-portfolio-section .grid .img-holder:hover img {
                 transform: scale(1.1);
             }
+
+            /* Full-width breakout for sortable gallery to achieve edge-to-edge grid layout */
+            .wpo-portfolio-section .sortable-gallery {
+                width: 100vw !important;
+                position: relative !important;
+                left: 50% !important;
+                right: 50% !important;
+                margin-left: -50vw !important;
+                margin-right: -50vw !important;
+                overflow: hidden !important;
+            }
+
+            /* Tight 5-column square gallery grid */
+            .wpo-portfolio-section .portfolio-grids {
+                display: grid !important;
+                grid-template-columns: repeat(5, 1fr) !important;
+                gap: 2px !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            .wpo-portfolio-section .portfolio-grids .grid {
+                width: 100% !important;
+                float: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .wpo-portfolio-section .portfolio-grids .grid .img-holder {
+                width: 100% !important;
+                aspect-ratio: 1 / 1 !important;
+                overflow: hidden !important;
+            }
+            .wpo-portfolio-section .portfolio-grids .grid img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                display: block !important;
+                transition: transform 0.4s ease !important;
+            }
+            .wpo-portfolio-section .portfolio-grids .grid img:hover {
+                transform: scale(1.06) !important;
+            }
+
+            /* Responsive overrides */
+            @media (max-width: 991px) {
+                .wpo-portfolio-section .portfolio-grids {
+                    grid-template-columns: repeat(4, 1fr) !important;
+                }
+            }
+            @media (max-width: 575px) {
+                .wpo-portfolio-section .portfolio-grids {
+                    grid-template-columns: repeat(3, 1fr) !important;
+                    gap: 1px !important;
+                }
+            }
         </style>
         <section class="wpo-page-title"
             style="background-image: url('pic/service/Pre-Wedding%20Shoots.webp'); background-size: cover; background-position: center; position: relative;">
