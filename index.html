@@ -649,11 +649,13 @@
                     font-size: 26px;
                     line-height: 1.2;
                     text-align: left;
-                    width: calc(100% - 40px);
                     z-index: 2;
                     opacity: 1;
                     transition: opacity 0.3s ease;
                     text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+                    writing-mode: vertical-rl;
+                    transform: rotate(180deg);
+                    white-space: nowrap;
                 }
 
                 .accordion-panel.active .accordion-vertical-title {
@@ -735,7 +737,7 @@
                 <!-- Panel 1 -->
                 <div class="accordion-panel active" id="accordion-panel-1" style="background-image: url('pic/service/Wedding%20Photography%20copy.webp');" onmouseenter="activateAccordion(this)">
                     <div class="accordion-num">01</div>
-                    <div class="accordion-vertical-title">Wedding<br>Photography</div>
+                    <div class="accordion-vertical-title">Wedding Photography</div>
                     <div class="accordion-content">
                         <div class="acc-tags"><i class="fa fa-star"></i> 4.9 &nbsp;&bull;&nbsp; Popular</div>
                         <h3 class="acc-title">Wedding Photography</h3>
@@ -746,7 +748,7 @@
                 <!-- Panel 2 -->
                 <div class="accordion-panel" id="accordion-panel-2" style="background-image: url('pic/service/Pre-Wedding%20Shoots.webp');" onmouseenter="activateAccordion(this)">
                     <div class="accordion-num">02</div>
-                    <div class="accordion-vertical-title">Pre-Wedding<br>Shoots</div>
+                    <div class="accordion-vertical-title">Pre-Wedding Shoots</div>
                     <div class="accordion-content">
                         <div class="acc-tags"><i class="fa fa-star"></i> 4.8 &nbsp;&bull;&nbsp; Romantic</div>
                         <h3 class="acc-title">Pre-Wedding Shoots</h3>
@@ -757,7 +759,7 @@
                 <!-- Panel 3 -->
                 <div class="accordion-panel" id="accordion-panel-3" style="background-image: url('pic/service/Engagement%20_Reception.webp');" onmouseenter="activateAccordion(this)">
                     <div class="accordion-num">03</div>
-                    <div class="accordion-vertical-title">Engagement<br>Reception</div>
+                    <div class="accordion-vertical-title">Engagement Reception</div>
                     <div class="accordion-content">
                         <div class="acc-tags"><i class="fa fa-star"></i> 5.0 &nbsp;&bull;&nbsp; Festive</div>
                         <h3 class="acc-title">Engagement / Reception</h3>
@@ -768,7 +770,7 @@
                 <!-- Panel 4 -->
                 <div class="accordion-panel" id="accordion-panel-4" style="background-image: url('pic/service/Cinematic%20Wedding%20Films.webp');" onmouseenter="activateAccordion(this)">
                     <div class="accordion-num">04</div>
-                    <div class="accordion-vertical-title">Cinematic<br>Films</div>
+                    <div class="accordion-vertical-title">Cinematic Films</div>
                     <div class="accordion-content">
                         <div class="acc-tags"><i class="fa fa-star"></i> 4.9 &nbsp;&bull;&nbsp; Cinematic</div>
                         <h3 class="acc-title">Cinematic Wedding Films</h3>
@@ -779,7 +781,7 @@
                 <!-- Panel 5 -->
                 <div class="accordion-panel" id="accordion-panel-5" style="background-image: url('pic/service/dron.webp');" onmouseenter="activateAccordion(this)">
                     <div class="accordion-num">05</div>
-                    <div class="accordion-vertical-title">Drone<br>Coverage</div>
+                    <div class="accordion-vertical-title">Drone Coverage</div>
                     <div class="accordion-content">
                         <div class="acc-tags"><i class="fa fa-star"></i> 4.9 &nbsp;&bull;&nbsp; Epic</div>
                         <h3 class="acc-title">Drone Coverage</h3>
@@ -790,7 +792,7 @@
                 <!-- Panel 6 -->
                 <div class="accordion-panel" id="accordion-panel-6" style="background-image: url('pic/service/album.webp');" onmouseenter="activateAccordion(this)">
                     <div class="accordion-num">06</div>
-                    <div class="accordion-vertical-title">Albums &<br>Prints</div>
+                    <div class="accordion-vertical-title">Albums & Prints</div>
                     <div class="accordion-content">
                         <div class="acc-tags"><i class="fa fa-star"></i> 5.0 &nbsp;&bull;&nbsp; Memories</div>
                         <h3 class="acc-title">Albums & Prints</h3>
