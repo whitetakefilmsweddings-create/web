@@ -2056,15 +2056,40 @@
                                     gridContainer.addEventListener('touchmove', handleUserInteraction, { passive: true });
                                     gridContainer.addEventListener('touchend', handleUserInteraction, { passive: true });
                                     
-                                    // Desktop mouse interaction
-                                    gridContainer.addEventListener('mousedown', handleUserInteraction, { passive: true });
-                                    gridContainer.addEventListener('mousemove', handleUserInteraction, { passive: true });
-                                    gridContainer.addEventListener('mouseup', handleUserInteraction, { passive: true });
-                                    gridContainer.addEventListener('mouseenter', handleUserInteraction, { passive: true });
+                                    // Desktop mouse interaction and drag to scroll
+                                    let isDown = false;
+                                    let startX;
+                                    let scrollLeft;
+
+                                    gridContainer.addEventListener('mousedown', (e) => {
+                                        isDown = true;
+                                        gridContainer.style.cursor = 'grabbing';
+                                        startX = e.pageX - gridContainer.offsetLeft;
+                                        scrollLeft = gridContainer.scrollLeft;
+                                        handleUserInteraction();
+                                    });
                                     gridContainer.addEventListener('mouseleave', () => {
+                                        isDown = false;
+                                        gridContainer.style.cursor = '';
                                         if (interactionTimeout) clearTimeout(interactionTimeout);
                                         isUserInteracting = false;
                                         startAutoScroll();
+                                    });
+                                    gridContainer.addEventListener('mouseup', () => {
+                                        isDown = false;
+                                        gridContainer.style.cursor = '';
+                                        handleUserInteraction();
+                                    });
+                                    gridContainer.addEventListener('mousemove', (e) => {
+                                        if (!isDown) {
+                                            handleUserInteraction();
+                                            return;
+                                        }
+                                        e.preventDefault();
+                                        const x = e.pageX - gridContainer.offsetLeft;
+                                        const walk = (x - startX) * 2; // scroll speed multiplier
+                                        gridContainer.scrollLeft = scrollLeft - walk;
+                                        handleUserInteraction();
                                     });
 
                                     startAutoScroll();
