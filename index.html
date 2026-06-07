@@ -2003,62 +2003,71 @@
                                 }
                             }
 
-                            // Mobile Auto-Scroll with Touch Detection
+                            // Auto-Scroll with Touch & Mouse Detection
                             setTimeout(() => {
-                                if (window.innerWidth <= 991) {
-                                    const firstItem = gridContainer.querySelector('.col-lg-4:not(.insta-clone)');
-                                    if (firstItem) {
-                                        const itemWidth = firstItem.offsetWidth;
-                                        let isUserInteracting = false;
-                                        let isJumping = false;
+                                const firstItem = gridContainer.querySelector('.col-lg-4:not(.insta-clone)');
+                                if (firstItem) {
+                                    const itemWidth = firstItem.offsetWidth;
+                                    let isUserInteracting = false;
+                                    let isJumping = false;
 
-                                        // Seamless looping scroll listener
-                                        gridContainer.addEventListener('scroll', () => {
-                                            if (isJumping) return;
-                                            // The clone is positioned at filteredFeeds.length * itemWidth
-                                            const clonePosition = filteredFeeds.length * itemWidth;
-                                            
-                                            if (Math.abs(gridContainer.scrollLeft - clonePosition) < 5) {
-                                                isJumping = true;
-                                                gridContainer.style.scrollBehavior = 'auto';
-                                                gridContainer.style.scrollSnapType = 'none';
-                                                gridContainer.scrollLeft = 0;
-                                                // force reflow
-                                                void gridContainer.offsetWidth;
-                                                gridContainer.style.scrollBehavior = '';
-                                                gridContainer.style.scrollSnapType = '';
-                                                setTimeout(() => { isJumping = false; }, 50);
-                                            }
-                                        }, { passive: true });
-
-                                        function startAutoScroll() {
-                                            if (autoScrollInterval) clearInterval(autoScrollInterval);
-                                            autoScrollInterval = setInterval(() => {
-                                                if (isUserInteracting || isJumping) return;
-                                                gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
-                                            }, 3000);
+                                    // Seamless looping scroll listener
+                                    gridContainer.addEventListener('scroll', () => {
+                                        if (isJumping) return;
+                                        // The clone is positioned at filteredFeeds.length * itemWidth
+                                        const clonePosition = filteredFeeds.length * itemWidth;
+                                        
+                                        if (Math.abs(gridContainer.scrollLeft - clonePosition) < 5) {
+                                            isJumping = true;
+                                            gridContainer.style.scrollBehavior = 'auto';
+                                            gridContainer.style.scrollSnapType = 'none';
+                                            gridContainer.scrollLeft = 0;
+                                            // force reflow
+                                            void gridContainer.offsetWidth;
+                                            gridContainer.style.scrollBehavior = '';
+                                            gridContainer.style.scrollSnapType = '';
+                                            setTimeout(() => { isJumping = false; }, 50);
                                         }
+                                    }, { passive: true });
 
-                                        function handleUserInteraction() {
-                                            isUserInteracting = true;
-                                            if (autoScrollInterval) {
-                                                clearInterval(autoScrollInterval);
-                                                autoScrollInterval = null;
-                                            }
-                                            if (interactionTimeout) clearTimeout(interactionTimeout);
-                                            
-                                            interactionTimeout = setTimeout(() => {
-                                                isUserInteracting = false;
-                                                startAutoScroll();
-                                            }, 5000);
-                                        }
-
-                                        gridContainer.addEventListener('touchstart', handleUserInteraction, { passive: true });
-                                        gridContainer.addEventListener('touchmove', handleUserInteraction, { passive: true });
-                                        gridContainer.addEventListener('touchend', handleUserInteraction, { passive: true });
-
-                                        startAutoScroll();
+                                    function startAutoScroll() {
+                                        if (autoScrollInterval) clearInterval(autoScrollInterval);
+                                        autoScrollInterval = setInterval(() => {
+                                            if (isUserInteracting || isJumping) return;
+                                            gridContainer.scrollBy({ top: 0, left: itemWidth, behavior: 'smooth' });
+                                        }, 3000);
                                     }
+
+                                    function handleUserInteraction() {
+                                        isUserInteracting = true;
+                                        if (autoScrollInterval) {
+                                            clearInterval(autoScrollInterval);
+                                            autoScrollInterval = null;
+                                        }
+                                        if (interactionTimeout) clearTimeout(interactionTimeout);
+                                        
+                                        interactionTimeout = setTimeout(() => {
+                                            isUserInteracting = false;
+                                            startAutoScroll();
+                                        }, 5000);
+                                    }
+
+                                    gridContainer.addEventListener('touchstart', handleUserInteraction, { passive: true });
+                                    gridContainer.addEventListener('touchmove', handleUserInteraction, { passive: true });
+                                    gridContainer.addEventListener('touchend', handleUserInteraction, { passive: true });
+                                    
+                                    // Desktop mouse interaction
+                                    gridContainer.addEventListener('mousedown', handleUserInteraction, { passive: true });
+                                    gridContainer.addEventListener('mousemove', handleUserInteraction, { passive: true });
+                                    gridContainer.addEventListener('mouseup', handleUserInteraction, { passive: true });
+                                    gridContainer.addEventListener('mouseenter', handleUserInteraction, { passive: true });
+                                    gridContainer.addEventListener('mouseleave', () => {
+                                        if (interactionTimeout) clearTimeout(interactionTimeout);
+                                        isUserInteracting = false;
+                                        startAutoScroll();
+                                    });
+
+                                    startAutoScroll();
                                 }
                             }, 3000);
                         }
