@@ -637,24 +637,25 @@
                     color: #ffffff;
                     display: flex;
                     flex-direction: column;
-                    align-items: flex-start;
+                    align-items: center;
+                    text-align: center;
                 }
 
                 .accordion-vertical-title {
                     position: absolute;
-                    bottom: 30px;
-                    left: 20px;
+                    top: 50%;
+                    left: 50%;
                     color: #ffffff;
                     font-family: 'Cormorant Garamond', serif;
                     font-size: 26px;
                     line-height: 1.2;
-                    text-align: left;
+                    text-align: center;
                     z-index: 2;
                     opacity: 1;
                     transition: opacity 0.3s ease;
                     text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
                     writing-mode: vertical-rl;
-                    transform: rotate(180deg);
+                    transform: translate(-50%, -50%) rotate(180deg);
                     white-space: nowrap;
                 }
 
@@ -674,13 +675,14 @@
                 }
 
                 .acc-tags {
-                    color: #c5a880;
+                    color: #ffffff;
                     font-size: 12px;
                     text-transform: uppercase;
                     letter-spacing: 2px;
                     margin-bottom: 10px;
                     font-weight: 600;
                     font-family: 'Outfit', sans-serif;
+                    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
                 }
 
                 .acc-title {
@@ -702,7 +704,7 @@
                 }
 
                 .acc-link {
-                    color: #c5a880;
+                    color: #ffffff;
                     font-size: 14px;
                     font-family: 'Outfit', sans-serif;
                     text-decoration: none;
@@ -713,6 +715,7 @@
                     align-items: center;
                     gap: 8px;
                     transition: color 0.3s ease;
+                    text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
                 }
                 
                 .acc-link:hover {
@@ -725,12 +728,14 @@
                         height: 800px;
                     }
                     .accordion-vertical-title {
-                        transform: none;
-                        left: 30px;
+                        transform: translateX(-50%);
+                        left: 50%;
                         bottom: 15px;
-                        text-align: left;
+                        top: auto;
+                        text-align: center;
                         writing-mode: horizontal-tb;
                         white-space: normal;
+                        width: 90%;
                     }
                 }
             </style>
