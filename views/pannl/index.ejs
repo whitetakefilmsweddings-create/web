@@ -1110,7 +1110,9 @@
                     if (res.success) {
                         statusDiv.style.color = '#4aff4a';
                         statusDiv.innerText = 'Saved successfully!';
-                        urlTextDiv.innerText = textVal;
+                        if (urlTextDiv) {
+                            urlTextDiv.innerText = textVal;
+                        }
                         setTimeout(() => { statusDiv.innerText = ''; }, 3000);
                     } else {
                         statusDiv.style.color = '#ff4a4a';
