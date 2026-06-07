@@ -1696,6 +1696,8 @@
                                     gridContainer.addEventListener('mousedown', (e) => {
                                         isDown = true;
                                         gridContainer.style.cursor = 'grabbing';
+                                        gridContainer.style.scrollSnapType = 'none';
+                                        gridContainer.style.scrollBehavior = 'auto';
                                         startX = e.pageX - gridContainer.offsetLeft;
                                         scrollLeft = gridContainer.scrollLeft;
                                         handleUserInteraction();
@@ -1703,6 +1705,8 @@
                                     gridContainer.addEventListener('mouseleave', () => {
                                         isDown = false;
                                         gridContainer.style.cursor = '';
+                                        gridContainer.style.scrollSnapType = '';
+                                        gridContainer.style.scrollBehavior = '';
                                         if (interactionTimeout) clearTimeout(interactionTimeout);
                                         isUserInteracting = false;
                                         startAutoScroll();
@@ -1710,6 +1714,8 @@
                                     gridContainer.addEventListener('mouseup', () => {
                                         isDown = false;
                                         gridContainer.style.cursor = '';
+                                        gridContainer.style.scrollSnapType = '';
+                                        gridContainer.style.scrollBehavior = '';
                                         handleUserInteraction();
                                     });
                                     gridContainer.addEventListener('mousemove', (e) => {
