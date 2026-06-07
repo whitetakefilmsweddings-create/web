@@ -314,23 +314,26 @@
             color: #e1306c;
         }
 
+        #instagram-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 15px;
+        }
+        #instagram-grid::-webkit-scrollbar {
+            display: none;
+        }
+        #instagram-grid .col-lg-4 {
+            scroll-snap-align: center;
+        }
+
         @media (max-width: 991px) {
-            #instagram-grid {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                scroll-snap-type: x mandatory;
-                scroll-behavior: smooth;
-                -webkit-overflow-scrolling: touch;
-                padding-bottom: 15px;
-            }
-            #instagram-grid::-webkit-scrollbar {
-                display: none;
-            }
             #instagram-grid .col-lg-4 {
                 flex: 0 0 100%;
                 max-width: 100%;
-                scroll-snap-align: center;
                 margin-right: 0;
             }
             .instagram-feed-section .couples-title {
