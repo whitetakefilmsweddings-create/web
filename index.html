@@ -1293,19 +1293,13 @@
                                     <div class="wpo-blog-item" style="margin-bottom: 10px; display: flex; flex-direction: column; height: 100%;">
                                         <div class="wpo-blog-img" style="overflow: hidden; border-radius: 12px; aspect-ratio: 1/1; position: relative;">
                                             <a href="${link}">
-                                                <img data-src="${imgSrc}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${subtitle || names || ''}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
+                                                <img class="owl-lazy" data-src="${imgSrc}" alt="${subtitle || names || ''}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
                                             </a>
                                         </div>
                                         ${contentHtml}
                                     </div>
                                 `;
                                 blogGrid.appendChild(itemDiv);
-                                
-                                // Observe the dynamically added image
-                                setTimeout(() => {
-                                    const newImg = itemDiv.querySelector('img[data-src]');
-                                    if(newImg) lazyObserver.observe(newImg);
-                                }, 0);
                             }
 
                             // Initialize Owl Carousel with autoplay and 4s delay
@@ -1318,6 +1312,7 @@
                                 margin: 30,
                                 nav: false,
                                 dots: false,
+                                lazyLoad: true,
                                 responsive: {
                                     0: {
                                         items: 1,
@@ -1438,13 +1433,10 @@
                                     if (src && src.length > 0) {
                                         tile.className = 'fav-img-tile';
                                         const img = document.createElement('img');
+                                        img.className = 'owl-lazy';
                                         img.dataset.src = src;
-                                        img.src = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
                                         img.alt = 'Favorite moment';
-                                        img.loading = 'lazy';
                                         tile.appendChild(img);
-                                        // Observe for lazy loading
-                                        setTimeout(() => lazyObserver.observe(img), 0);
                                     } else {
                                         tile.className = 'fav-img-tile empty';
                                     }
@@ -1462,6 +1454,7 @@
                                 margin: 0, // No gap
                                 nav: false,
                                 dots: false,
+                                lazyLoad: true,
                                 responsive: {
                                     0: {
                                         items: 3
