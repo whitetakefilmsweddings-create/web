@@ -81,6 +81,9 @@ function requireClient(req, res, next) {
 
 function checkPannlAuth(req, res, next) {
   if (!req.session.adminLoggedIn) {
+    if (req.xhr || req.headers.accept.indexOf('json') > -1 || req.headers['content-type'] === 'application/json') {
+      return res.status(401).json({ success: false, message: 'Session expired. Please log in again.' });
+    }
     return res.redirect('/pannl/login.php');
   }
   next();
