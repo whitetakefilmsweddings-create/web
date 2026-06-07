@@ -1759,8 +1759,8 @@
                                 }
                             }
 
-                            // Group images into columns (2 rows for desktop, 3 for mobile)
-                            const rowsPerCol = window.innerWidth >= 992 ? 2 : 3;
+                            // Group images into columns (1 row for desktop, 3 for mobile)
+                            const rowsPerCol = window.innerWidth >= 992 ? 1 : 3;
                             for (let i = 0; i < allSrcs.length; i += rowsPerCol) {
                                 const chunk = allSrcs.slice(i, i + rowsPerCol);
                                 const itemDiv = document.createElement('div');
