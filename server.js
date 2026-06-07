@@ -208,6 +208,13 @@ async function initDatabases() {
       ['contact', 'contact_title_bg', 'assets/images/slider/s3.jpg'],
       ['home', 'feature_image', 'assets/images/slider/s3.jpg'],
       ['home', 'feature_video', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
+      // Services Accordion
+      ['home', 'services_accordion_1', 'pic/service/Wedding%20Photography%20copy.webp'],
+      ['home', 'services_accordion_2', 'pic/service/Pre-Wedding%20Shoots.webp'],
+      ['home', 'services_accordion_3', 'pic/service/Engagement%20_Reception.webp'],
+      ['home', 'services_accordion_4', 'pic/service/Cinematic%20Wedding%20Films.webp'],
+      ['home', 'services_accordion_5', 'pic/service/dron.webp'],
+      ['home', 'services_accordion_6', 'pic/service/album.webp'],
       // Story Card 1
       ['home', 'story_img_1', 'pic/Your Love, Our Passion/pic1.webp'],
       ['home', 'story_names_1', 'ANEENA & GARY'],

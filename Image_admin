@@ -652,7 +652,13 @@
                 sections: {
                     'intimate_1': { title: 'Intimate Story Card 1', desc: 'First card showcase image (Krishna & Connor)' },
                     'intimate_2': { title: 'Intimate Story Card 2', desc: 'Second card showcase image (Sai & Aishwarya)' },
-                    'intimate_3': { title: 'Intimate Story Card 3', desc: 'Third card showcase image (Reshma & Rajiv)' }
+                    'intimate_3': { title: 'Intimate Story Card 3', desc: 'Third card showcase image (Reshma & Rajiv)' },
+                    'services_accordion_1': { title: 'Services Accordion 1', desc: 'Wedding Photography background image' },
+                    'services_accordion_2': { title: 'Services Accordion 2', desc: 'Pre-Wedding Shoots background image' },
+                    'services_accordion_3': { title: 'Services Accordion 3', desc: 'Engagement / Reception background image' },
+                    'services_accordion_4': { title: 'Services Accordion 4', desc: 'Cinematic Wedding Films background image' },
+                    'services_accordion_5': { title: 'Services Accordion 5', desc: 'Drone Coverage background image' },
+                    'services_accordion_6': { title: 'Services Accordion 6', desc: 'Albums & Prints background image' }
                 }
             },
             'about': {

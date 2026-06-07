@@ -568,6 +568,243 @@
     </section>
     <!-- end of wpo-about-section -->
 
+    <!-- start expanding-services-accordion -->
+    <section class="expanding-services-accordion" style="padding: 30px 0 100px 0; background: #ffffff;">
+        <div class="container" style="max-width: 1300px;">
+            <style>
+                .accordion-gallery-container {
+                    display: flex;
+                    width: 100%;
+                    height: 600px;
+                    gap: 15px;
+                    overflow: hidden;
+                    border-radius: 20px;
+                }
+                
+                .accordion-panel {
+                    position: relative;
+                    flex: 1;
+                    border-radius: 20px;
+                    background-position: center;
+                    background-size: cover;
+                    background-repeat: no-repeat;
+                    cursor: pointer;
+                    transition: flex 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                }
+                
+                .accordion-panel.active {
+                    flex: 5;
+                }
+                
+                .accordion-panel::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.8) 100%);
+                    z-index: 1;
+                    transition: opacity 0.4s ease;
+                }
+                
+                .accordion-panel:not(.active)::after {
+                    background: rgba(0,0,0,0.5);
+                }
+
+                .accordion-num {
+                    position: relative;
+                    z-index: 2;
+                    color: #fff;
+                    font-family: 'Outfit', sans-serif;
+                    font-size: 20px;
+                    font-weight: 300;
+                    padding: 30px;
+                }
+
+                .accordion-content {
+                    position: relative;
+                    z-index: 2;
+                    padding: 30px;
+                    color: #fff;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .accordion-vertical-title {
+                    position: absolute;
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    color: #fff;
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 24px;
+                    line-height: 1.2;
+                    text-align: center;
+                    width: 90%;
+                    z-index: 2;
+                    opacity: 1;
+                    transition: opacity 0.3s ease;
+                }
+
+                .accordion-panel.active .accordion-vertical-title {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+
+                .accordion-panel:not(.active) .accordion-content {
+                    opacity: 0;
+                    pointer-events: none;
+                }
+                
+                .accordion-panel.active .accordion-content {
+                    opacity: 1;
+                    transition: opacity 0.5s ease 0.3s;
+                }
+
+                .acc-tags {
+                    color: #c5a880;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    margin-bottom: 10px;
+                    font-weight: 600;
+                    font-family: 'Outfit', sans-serif;
+                }
+
+                .acc-title {
+                    font-family: 'Cormorant Garamond', serif;
+                    font-size: 36px;
+                    margin-bottom: 15px;
+                    line-height: 1.2;
+                }
+
+                .acc-desc {
+                    font-family: 'Mulish', sans-serif;
+                    font-size: 15px;
+                    color: #e0e0e0;
+                    margin-bottom: 25px;
+                    max-width: 400px;
+                }
+
+                .acc-link {
+                    color: #c5a880;
+                    font-size: 14px;
+                    font-family: 'Outfit', sans-serif;
+                    text-decoration: none;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    font-weight: 500;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: color 0.3s ease;
+                }
+                
+                .acc-link:hover {
+                    color: #fff;
+                }
+
+                @media (max-width: 991px) {
+                    .accordion-gallery-container {
+                        flex-direction: column;
+                        height: 800px;
+                    }
+                    .accordion-vertical-title {
+                        transform: none;
+                        left: 30px;
+                        bottom: 15px;
+                        text-align: left;
+                    }
+                }
+            </style>
+
+            <div class="accordion-gallery-container">
+                <!-- Panel 1 -->
+                <div class="accordion-panel active" id="accordion-panel-1" style="background-image: url('pic/service/Wedding%20Photography%20copy.webp');" onclick="activateAccordion(this)">
+                    <div class="accordion-num">01</div>
+                    <div class="accordion-vertical-title">Wedding<br>Photography</div>
+                    <div class="accordion-content">
+                        <div class="acc-tags"><i class="fa fa-star"></i> 4.9 &nbsp;&bull;&nbsp; Popular</div>
+                        <h3 class="acc-title">Wedding Photography</h3>
+                        <p class="acc-desc">Capturing your special moments forever.</p>
+                        <a href="wedding-photography.html" class="acc-link">Explore more <i class="fa fa-chevron-right" style="font-size:10px;"></i></a>
+                    </div>
+                </div>
+                <!-- Panel 2 -->
+                <div class="accordion-panel" id="accordion-panel-2" style="background-image: url('pic/service/Pre-Wedding%20Shoots.webp');" onclick="activateAccordion(this)">
+                    <div class="accordion-num">02</div>
+                    <div class="accordion-vertical-title">Pre-Wedding<br>Shoots</div>
+                    <div class="accordion-content">
+                        <div class="acc-tags"><i class="fa fa-star"></i> 4.8 &nbsp;&bull;&nbsp; Romantic</div>
+                        <h3 class="acc-title">Pre-Wedding Shoots</h3>
+                        <p class="acc-desc">Beautiful shoots to tell your love story.</p>
+                        <a href="pre-wedding-shoots.html" class="acc-link">Explore more <i class="fa fa-chevron-right" style="font-size:10px;"></i></a>
+                    </div>
+                </div>
+                <!-- Panel 3 -->
+                <div class="accordion-panel" id="accordion-panel-3" style="background-image: url('pic/service/Engagement%20_Reception.webp');" onclick="activateAccordion(this)">
+                    <div class="accordion-num">03</div>
+                    <div class="accordion-vertical-title">Engagement<br>Reception</div>
+                    <div class="accordion-content">
+                        <div class="acc-tags"><i class="fa fa-star"></i> 5.0 &nbsp;&bull;&nbsp; Festive</div>
+                        <h3 class="acc-title">Engagement / Reception</h3>
+                        <p class="acc-desc">Full coverage for your reception and henna parties.</p>
+                        <a href="engagement-reception.html" class="acc-link">Explore more <i class="fa fa-chevron-right" style="font-size:10px;"></i></a>
+                    </div>
+                </div>
+                <!-- Panel 4 -->
+                <div class="accordion-panel" id="accordion-panel-4" style="background-image: url('pic/service/Cinematic%20Wedding%20Films.webp');" onclick="activateAccordion(this)">
+                    <div class="accordion-num">04</div>
+                    <div class="accordion-vertical-title">Cinematic<br>Films</div>
+                    <div class="accordion-content">
+                        <div class="acc-tags"><i class="fa fa-star"></i> 4.9 &nbsp;&bull;&nbsp; Cinematic</div>
+                        <h3 class="acc-title">Cinematic Wedding Films</h3>
+                        <p class="acc-desc">Movie-like films to relive your best day.</p>
+                        <a href="cinematic-wedding-films.html" class="acc-link">Explore more <i class="fa fa-chevron-right" style="font-size:10px;"></i></a>
+                    </div>
+                </div>
+                <!-- Panel 5 -->
+                <div class="accordion-panel" id="accordion-panel-5" style="background-image: url('pic/service/dron.webp');" onclick="activateAccordion(this)">
+                    <div class="accordion-num">05</div>
+                    <div class="accordion-vertical-title">Drone<br>Coverage</div>
+                    <div class="accordion-content">
+                        <div class="acc-tags"><i class="fa fa-star"></i> 4.9 &nbsp;&bull;&nbsp; Epic</div>
+                        <h3 class="acc-title">Drone Coverage</h3>
+                        <p class="acc-desc">Aerial views for a spectacular perspective.</p>
+                        <a href="drone-coverage.html" class="acc-link">Explore more <i class="fa fa-chevron-right" style="font-size:10px;"></i></a>
+                    </div>
+                </div>
+                <!-- Panel 6 -->
+                <div class="accordion-panel" id="accordion-panel-6" style="background-image: url('pic/service/album.webp');" onclick="activateAccordion(this)">
+                    <div class="accordion-num">06</div>
+                    <div class="accordion-vertical-title">Albums &<br>Prints</div>
+                    <div class="accordion-content">
+                        <div class="acc-tags"><i class="fa fa-star"></i> 5.0 &nbsp;&bull;&nbsp; Memories</div>
+                        <h3 class="acc-title">Albums & Prints</h3>
+                        <p class="acc-desc">High-quality albums to preserve your memories.</p>
+                        <a href="albums-prints.html" class="acc-link">Explore more <i class="fa fa-chevron-right" style="font-size:10px;"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function activateAccordion(selectedPanel) {
+                    const panels = document.querySelectorAll('.accordion-panel');
+                    panels.forEach(panel => panel.classList.remove('active'));
+                    selectedPanel.classList.add('active');
+                }
+            </script>
+        </div>
+    </section>
+    <!-- end expanding-services-accordion -->
+
+
     <!-- start wpo-blog-section -->
     <section class="wpo-blog-section section-padding" id="blog">
         <div class="container">
@@ -1315,6 +1552,23 @@
                                 const imgElement = document.getElementById(elementId);
                                 if (imgElement) {
                                     imgElement.src = res.images[key];
+                                }
+                            }
+                        }
+
+                        const bgMappings = {
+                            'services_accordion_1': 'accordion-panel-1',
+                            'services_accordion_2': 'accordion-panel-2',
+                            'services_accordion_3': 'accordion-panel-3',
+                            'services_accordion_4': 'accordion-panel-4',
+                            'services_accordion_5': 'accordion-panel-5',
+                            'services_accordion_6': 'accordion-panel-6'
+                        };
+                        for (const [key, elementId] of Object.entries(bgMappings)) {
+                            if (res.images[key]) {
+                                const bgElement = document.getElementById(elementId);
+                                if (bgElement) {
+                                    bgElement.style.backgroundImage = `url('${res.images[key]}')`;
                                 }
                             }
                         }
