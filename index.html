@@ -1189,6 +1189,24 @@
     <!-- Dynamic Admin Images Loader -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Lazy Loading Observer
+            const lazyObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        if (el.dataset.src) {
+                            if (el.tagName === 'IMG' || el.tagName === 'IFRAME') {
+                                el.src = el.dataset.src;
+                            } else {
+                                el.style.backgroundImage = `url('${el.dataset.src}')`;
+                            }
+                            el.removeAttribute('data-src');
+                            observer.unobserve(el);
+                        }
+                    }
+                });
+            }, { rootMargin: '200px' });
+
             fetch('pannl/api.php?page=home')
                 .then(response => response.json())
                 .then(res => {
@@ -1206,7 +1224,8 @@
                             if (res.images[key]) {
                                 const imgElement = document.getElementById(elementId);
                                 if (imgElement) {
-                                    imgElement.src = res.images[key];
+                                    imgElement.dataset.src = res.images[key];
+                                    lazyObserver.observe(imgElement);
                                 }
                             }
                         }
@@ -1223,7 +1242,8 @@
                             if (res.images[key]) {
                                 const bgElement = document.getElementById(elementId);
                                 if (bgElement) {
-                                    bgElement.style.backgroundImage = `url('${res.images[key]}')`;
+                                    bgElement.dataset.src = res.images[key];
+                                    lazyObserver.observe(bgElement);
                                 }
                             }
                         }
@@ -1273,13 +1293,19 @@
                                     <div class="wpo-blog-item" style="margin-bottom: 10px; display: flex; flex-direction: column; height: 100%;">
                                         <div class="wpo-blog-img" style="overflow: hidden; border-radius: 12px; aspect-ratio: 1/1; position: relative;">
                                             <a href="${link}">
-                                                <img src="${imgSrc}" alt="${subtitle || names || ''}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
+                                                <img data-src="${imgSrc}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="${subtitle || names || ''}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;">
                                             </a>
                                         </div>
                                         ${contentHtml}
                                     </div>
                                 `;
                                 blogGrid.appendChild(itemDiv);
+                                
+                                // Observe the dynamically added image
+                                setTimeout(() => {
+                                    const newImg = itemDiv.querySelector('img[data-src]');
+                                    if(newImg) lazyObserver.observe(newImg);
+                                }, 0);
                             }
 
                             // Initialize Owl Carousel with autoplay and 4s delay
@@ -1355,13 +1381,15 @@
                         if (res.images['intimate_logo_bg']) {
                             const solidCircle = document.querySelector('.couples-shape-solid');
                             if (solidCircle) {
-                                solidCircle.style.backgroundImage = `url('${res.images['intimate_logo_bg']}')`;
+                                solidCircle.dataset.src = res.images['intimate_logo_bg'];
+                                lazyObserver.observe(solidCircle);
                             }
                         } else if (res.images['intimate_1']) {
                             // Fallback to intimate_1 image if intimate_logo_bg isn't set separately
                             const solidCircle = document.querySelector('.couples-shape-solid');
                             if (solidCircle) {
-                                solidCircle.style.backgroundImage = `url('${res.images['intimate_1']}')`;
+                                solidCircle.dataset.src = res.images['intimate_1'];
+                                lazyObserver.observe(solidCircle);
                             }
                         }
 
@@ -1410,10 +1438,13 @@
                                     if (src && src.length > 0) {
                                         tile.className = 'fav-img-tile';
                                         const img = document.createElement('img');
-                                        img.src = src;
+                                        img.dataset.src = src;
+                                        img.src = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
                                         img.alt = 'Favorite moment';
                                         img.loading = 'lazy';
                                         tile.appendChild(img);
+                                        // Observe for lazy loading
+                                        setTimeout(() => lazyObserver.observe(img), 0);
                                     } else {
                                         tile.className = 'fav-img-tile empty';
                                     }
