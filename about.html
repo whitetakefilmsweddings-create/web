@@ -399,6 +399,7 @@
                             'about_intimate_1': 'about-intimate-img-1',
                             'about_intimate_2': 'about-intimate-img-2',
                             'about_intimate_3': 'about-intimate-img-3'
+                        };
     
                     // Handle YouTube Feeds for About Page
                     if (res.success && res.feeds && res.feeds.length > 0) {
@@ -468,7 +469,7 @@
                             }
                         });
                     }
-                    };
+                        
                         for (const [key, elementId] of Object.entries(mappings)) {
                             if (res.images[key]) {
                                 const imgElement = document.getElementById(elementId);
@@ -917,7 +918,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const imageHtml = pin.image_path ? `<img src="/${pin.image_path}" class="popup-card-img">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
                         
                         const popupContent = `
-                            <div class="custom-popup ${firstPin ? 'active' : ''}">
+                            <div class="custom-popup">
                                 <div class="popup-close-btn">&times;</div>
                                 <div style="position: relative;">
                                     ${imageHtml}
