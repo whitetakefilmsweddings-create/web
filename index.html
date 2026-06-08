@@ -1449,8 +1449,11 @@
                             $('#fav-moments-slider').owlCarousel({
                                 loop: true,
                                 autoplay: true,
+                                slideTransition: 'linear',
                                 autoplayTimeout: 3000,
-                                smartSpeed: 1500, // Very smooth transition
+                                autoplaySpeed: 3000,
+                                autoplayHoverPause: false,
+                                smartSpeed: 3000,
                                 margin: 0, // No gap
                                 nav: false,
                                 dots: false,
