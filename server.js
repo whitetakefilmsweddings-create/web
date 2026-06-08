@@ -1361,7 +1361,9 @@ app.get('/pannl/about.php', checkPannlAuth, async (req, res) => {
       grouped_images[img.page_name].push(img);
     });
 
-    res.render('pannl/about', { grouped_images });
+    const [feeds] = await panlePool.query('SELECT * FROM instagram_feeds WHERE feed_key LIKE "about_yt_%" ORDER BY id ASC');
+
+    res.render('pannl/about', { grouped_images, feeds });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -1406,7 +1408,7 @@ app.post('/pannl/add_feed.php', checkPannlAuth, async (req, res) => {
   }
   try {
     const timestamp = Date.now();
-    const feed_key = type === 'yt' ? `yt_${timestamp}` : `feed_${timestamp}`;
+    const feed_key = type === 'about_yt' ? `about_yt_${timestamp}` : type === 'yt' ? `yt_${timestamp}` : `feed_${timestamp}`;
     await panlePool.execute(
       'INSERT INTO instagram_feeds (feed_key, post_url) VALUES (?, ?)',
       [feed_key, post_url]
@@ -1537,11 +1539,18 @@ app.get('/pannl/api.php', async (req, res) => {
 
     let feeds = [];
     if (!page || page === 'home') {
-      const [feedRows] = await panlePool.query('SELECT feed_key, post_url FROM instagram_feeds ORDER BY id ASC');
+      const [feedRows] = await panlePool.query('SELECT feed_key, post_url FROM instagram_feeds WHERE feed_key LIKE "yt_%" OR feed_key LIKE "feed_%" ORDER BY id ASC');
+      feeds = feedRows;
+    } else if (page === 'about') {
+      const [feedRows] = await panlePool.query('SELECT feed_key, post_url FROM instagram_feeds WHERE feed_key LIKE "about_yt_%" ORDER BY id ASC');
       feeds = feedRows;
     }
 
-    res.json({ success: true, page, images, feeds });
+    res.json({
+      success: true,
+      images: images,
+      feeds: feeds
+    });
   } catch (err) {
     res.json({ success: false, message: `Database error: ${err.message}` });
   }
