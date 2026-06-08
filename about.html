@@ -283,27 +283,23 @@
             fetch('/pannl/api.php?page=about')
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.images) {
-                        data.images.forEach(item => {
-                            if (item.section_key === 'about_hero_video') {
-                                const iframe = document.getElementById('about-hero-iframe');
-                                if (iframe && item.image_path) {
-                                    let videoId = item.image_path;
-                                    // Extract video ID if full URL is pasted
-                                    if (videoId.includes('youtube.com/watch?v=')) {
-                                        videoId = videoId.split('watch?v=')[1].split('&')[0];
-                                    } else if (videoId.includes('youtu.be/')) {
-                                        videoId = videoId.split('youtu.be/')[1].split('?')[0];
-                                    } else if (videoId.includes('embed/')) {
-                                        videoId = videoId.split('embed/')[1].split('?')[0];
-                                    }
-                                    
-                                    if (videoId) {
-                                        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`;
-                                    }
-                                }
+                    if (data && data.images && data.images['about_hero_video']) {
+                        const iframe = document.getElementById('about-hero-iframe');
+                        if (iframe) {
+                            let videoId = data.images['about_hero_video'];
+                            // Extract video ID if full URL is pasted
+                            if (videoId.includes('youtube.com/watch?v=')) {
+                                videoId = videoId.split('watch?v=')[1].split('&')[0];
+                            } else if (videoId.includes('youtu.be/')) {
+                                videoId = videoId.split('youtu.be/')[1].split('?')[0];
+                            } else if (videoId.includes('embed/')) {
+                                videoId = videoId.split('embed/')[1].split('?')[0];
                             }
-                        });
+                            
+                            if (videoId) {
+                                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`;
+                            }
+                        }
                     }
                 })
                 .catch(err => console.error('Error loading panel data:', err));
