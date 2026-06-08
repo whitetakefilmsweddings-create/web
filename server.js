@@ -202,6 +202,10 @@ async function initDatabases() {
       ['home', 'intimate_logo_bg', 'pannl/uploads/img_intimate_1_1780509901722.jpg'],
       ['about', 'about_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
       ['about', 'about_hero_video', 'ScMzIvxBSi4'],
+      ['about', 'about_intimate_1', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg'],
+      ['about', 'about_intimate_2', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg'],
+      ['about', 'about_intimate_3', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg'],
+      ['about', 'about_intimate_logo_bg', 'pannl/uploads/img_intimate_1_1780509901722.jpg'],
       ['cinematic-wedding-films', 'cinematic_wedding_films_title_bg', 'pic/service/Cinematic%20Wedding%20Films.webp'],
       ['wedding-photography', 'wedding_photography_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
       ['pre-wedding-shoots', 'pre_wedding_shoots_title_bg', 'pic/service/Pre-Wedding%20Shoots.webp'],
@@ -1341,6 +1345,23 @@ app.get('/pannl/index.php', checkPannlAuth, async (req, res) => {
     const [feeds] = await panlePool.query('SELECT * FROM instagram_feeds ORDER BY id ASC');
 
     res.render('pannl/index', { grouped_images, feeds });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/pannl/about.php', checkPannlAuth, async (req, res) => {
+  try {
+    const [images] = await panlePool.query('SELECT * FROM section_images ORDER BY id ASC');
+    const grouped_images = {};
+    images.forEach(img => {
+      if (!grouped_images[img.page_name]) {
+        grouped_images[img.page_name] = [];
+      }
+      grouped_images[img.page_name].push(img);
+    });
+
+    res.render('pannl/about', { grouped_images });
   } catch (err) {
     res.status(500).send(err.message);
   }
