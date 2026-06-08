@@ -128,23 +128,23 @@
         <!-- Main Content Area -->
         <main id="main-content" style="min-height: 50vh;">
             <!-- start of hero -->
-            <section class="static-hero-video wpo-hero-style-3" style="border: none !important; border-bottom: none !important; position: relative; overflow: hidden; height: 100vh;">
+            <section class="static-hero-video wpo-hero-style-3" style="border: none !important; border-bottom: none !important;">
                 <div class="video-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; overflow: hidden; background: #000;">
                     <!-- YouTube auto-play background -->
-                    <iframe src="https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1&mute=1&loop=1&playlist=ScMzIvxBSi4&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1" 
+                    <iframe id="about-hero-iframe" src="https://www.youtube.com/embed/ScMzIvxBSi4?autoplay=1&mute=1&loop=1&playlist=ScMzIvxBSi4&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1" 
                             frameborder="0" 
                             allow="autoplay; fullscreen" 
                             style="width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0.8;">
                     </iframe>
                 </div>
 
-                <div class="container-fluid" style="position: relative; z-index: 1; height: 100%; display: flex; align-items: center;">
+                <div class="container-fluid">
                     <div class="slide-content">
                         <div class="slide-title-sub">
                             <span>WHITETAKEFILMS</span>
                         </div>
                         <div class="slide-title">
-                            <h2>ABOUT <br class="d-lg-none">OUR STORY</h2>
+                            <h2>CRAFTING <br class="d-lg-none">UNFORGETTABLE MOMENTS</h2>
                         </div>
                         <div class="clearfix"></div>
                     </div>
@@ -274,6 +274,39 @@
     <script src="assets/js/script.js"></script>
     <!-- Dynamic Header Background Image Loader -->
     <script src="assets/js/header-loader.js"></script>
+
+    <!-- Load dynamic panel data for about page -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            fetch('/pannl/api.php?page=about')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.images) {
+                        data.images.forEach(item => {
+                            if (item.section_key === 'about_hero_video') {
+                                const iframe = document.getElementById('about-hero-iframe');
+                                if (iframe && item.image_path) {
+                                    let videoId = item.image_path;
+                                    // Extract video ID if full URL is pasted
+                                    if (videoId.includes('youtube.com/watch?v=')) {
+                                        videoId = videoId.split('watch?v=')[1].split('&')[0];
+                                    } else if (videoId.includes('youtu.be/')) {
+                                        videoId = videoId.split('youtu.be/')[1].split('?')[0];
+                                    } else if (videoId.includes('embed/')) {
+                                        videoId = videoId.split('embed/')[1].split('?')[0];
+                                    }
+                                    
+                                    if (videoId) {
+                                        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1`;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error('Error loading panel data:', err));
+        });
+    </script>
 </body>
 
 </html>

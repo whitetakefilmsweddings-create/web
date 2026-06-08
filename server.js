@@ -201,6 +201,7 @@ async function initDatabases() {
       ['home', 'intimate_3', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg'],
       ['home', 'intimate_logo_bg', 'pannl/uploads/img_intimate_1_1780509901722.jpg'],
       ['about', 'about_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
+      ['about', 'about_hero_video', 'ScMzIvxBSi4'],
       ['cinematic-wedding-films', 'cinematic_wedding_films_title_bg', 'pic/service/Cinematic%20Wedding%20Films.webp'],
       ['wedding-photography', 'wedding_photography_title_bg', 'pic/service/Wedding%20Photography%20copy.webp'],
       ['pre-wedding-shoots', 'pre_wedding_shoots_title_bg', 'pic/service/Pre-Wedding%20Shoots.webp'],
