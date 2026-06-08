@@ -1352,16 +1352,7 @@ app.get('/pannl/index.php', checkPannlAuth, async (req, res) => {
 
 app.get('/pannl/about.php', checkPannlAuth, async (req, res) => {
   try {
-    // Auto-insert any missing intimate showcase images
-    const defaultIntimate = [
-      ['about', 'about_intimate_1', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg'],
-      ['about', 'about_intimate_2', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg'],
-      ['about', 'about_intimate_3', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg'],
-      ['about', 'about_intimate_logo_bg', 'pannl/uploads/img_intimate_1_1780509901722.jpg']
-    ];
-    for (const row of defaultIntimate) {
-      await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
-    }
+
 
     const [images] = await panlePool.query('SELECT * FROM section_images ORDER BY id ASC');
     const grouped_images = {};

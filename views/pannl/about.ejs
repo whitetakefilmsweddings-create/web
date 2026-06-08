@@ -452,61 +452,6 @@
             <% } %>
         </div>
 
-        <!-- ── About Intimate Wedding Section ── -->
-        <div class="page-header" id="about-intimate" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
-            <h2>Intimate Wedding Showcase</h2>
-            <p>Edit the images and logo background for the Intimate Wedding showcase on the About page.</p>
-        </div>
-
-        <div class="sections-container" style="margin-bottom: 60px;">
-            <% if (grouped_images && grouped_images['about']) { %>
-                <% grouped_images['about'].filter(img => img.section_key.startsWith('about_intimate_')).forEach(function(img) { 
-                    const labels = {
-                        'about_intimate_1': 'Card 1 (Krishna & Connor)',
-                        'about_intimate_2': 'Card 2 (Sai & Aishwarya)',
-                        'about_intimate_3': 'Card 3 (Reshma & Rajiv)',
-                        'about_intimate_logo_bg': 'Logo Circle Background'
-                    };
-                    const label = labels[img.section_key] || img.section_key;
-                    
-                    let preview_src = img.image_path;
-                    if (!preview_src.match(/^https?:\/\//) && !preview_src.startsWith('data:')) {
-                        preview_src = '/' + preview_src;
-                    }
-                %>
-                    <div class="section-card" id="card-<%= img.section_key %>">
-                        <div class="section-card-title" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span><%= label %></span>
-                            <span style="background: #222; color: #c5a880; font-size: 11px; padding: 3px 8px; border-radius: 12px; border: 1px solid #333; text-transform: none;"><%= img.section_key %></span>
-                        </div>
-                        
-                        <div class="img-preview">
-                            <img src="<%= preview_src %>" alt="Preview" id="preview-img-<%= img.section_key %>">
-                        </div>
-                        
-                        <div class="size-info">Output Size: 1080 x 1350 px</div>
-                        
-                        <form class="upload-form" data-key="<%= img.section_key %>">
-                            <div class="file-input-wrapper">
-                                <span class="file-input-label" id="file-label-<%= img.section_key %>">Choose Image</span>
-                                <input type="file" name="image" accept="image/*" required onchange="handleFileSelect(this, '<%= img.section_key %>')">
-                            </div>
-                            
-                            <div class="progress-bar-container" id="progress-container-<%= img.section_key %>">
-                                <div class="progress-bar" id="progress-bar-<%= img.section_key %>"></div>
-                            </div>
-                            
-                            <div class="upload-status" id="status-<%= img.section_key %>"></div>
-                            
-                            <button type="submit" class="upload-btn">Upload & Crop</button>
-                        </form>
-                    </div>
-                <% }) %>
-            <% } %>
-        </div>
-    </div>
-
-
         <!-- YouTube Video Editor Section -->
         <div class="page-header" id="youtube-feed" style="margin-top: 40px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
             <h1>YouTube Feed Editor</h1>
