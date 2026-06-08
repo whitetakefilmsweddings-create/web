@@ -308,6 +308,18 @@ async function initDatabases() {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+      await panlePool.query(`
+        CREATE TABLE IF NOT EXISTS map_pins (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          title VARCHAR(255) NOT NULL,
+          description TEXT,
+          image_path LONGTEXT,
+          lat DECIMAL(10, 8) NOT NULL,
+          lng DECIMAL(11, 8) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
     
     // Ensure existing table structure is migrated to TEXT
     try {
@@ -1350,6 +1362,43 @@ app.get('/pannl/index.php', checkPannlAuth, async (req, res) => {
   }
 });
 
+
+// API to get map pins
+app.get('/api/map_pins', async (req, res) => {
+  try {
+    const [rows] = await panlePool.query('SELECT * FROM map_pins ORDER BY id DESC');
+    res.json({ success: true, pins: rows });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+// Admin Add Map Pin
+app.post('/pannl/add_map_pin', checkPannlAuth, upload.single('image'), async (req, res) => {
+  try {
+    const { title, description, lat, lng } = req.body;
+    let image_path = '';
+    if (req.file) {
+      image_path = 'pannl/uploads/' + req.file.filename;
+    }
+    await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', [title, description, image_path, lat, lng]);
+    res.json({ success: true, path: image_path });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
+// Admin Delete Map Pin
+app.post('/pannl/delete_map_pin', checkPannlAuth, express.json(), async (req, res) => {
+  try {
+    const { id } = req.body;
+    await panlePool.query('DELETE FROM map_pins WHERE id = ?', [id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
+  }
+});
+
 app.get('/pannl/about.php', checkPannlAuth, async (req, res) => {
   try {
 
@@ -1365,7 +1414,8 @@ app.get('/pannl/about.php', checkPannlAuth, async (req, res) => {
 
     const [feeds] = await panlePool.query('SELECT * FROM instagram_feeds WHERE feed_key LIKE "about_yt_%" ORDER BY id ASC');
 
-    res.render('pannl/about', { grouped_images, feeds });
+    const [map_pins] = await panlePool.query('SELECT * FROM map_pins ORDER BY id DESC');
+    res.render('pannl/about', { grouped_images, feeds, map_pins });
   } catch (err) {
     res.status(500).send(err.message);
   }
