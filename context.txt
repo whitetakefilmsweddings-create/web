@@ -1,0 +1,266 @@
+﻿
+                              <div class="header-right">
+                                  <div class="header-social-icons">
+                                      <a href="https://www.instagram.com/whitetake_films/" target="_blank"
+                                          title="Follow us on Instagram">
+                                          <i class="ti-instagram"></i>
+                                      </a>
+                                      <a href="tel:+918714128539" title="Call Us">
+                                          <i class="fi flaticon-phone-call"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div><!-- end of container -->
+              </nav>
+          </div>
+      </header>
+      <!-- end of header -->
+      <!-- start of hero -->
+      <section class="static-hero-video wpo-hero-style-3" style="border: none !important; border-bottom: none 
+!important;">
+          <div class="video-bg">
+              <!-- Landscape video for desktop -->
+              <video class="desktop-video" muted loop playsinline data-src="assets/Vedio/website.mp4">
+              </video>
+              <!-- Portrait video for mobile -->
+              <video class="mobile-video" muted loop playsinline data-src="assets/Vedio/website_1 (1).mp4">
+              </video>
+          </div>
+  
+          <div class="container-fluid">
+              <div class="slide-content">
+                  <div class="slide-title-sub">
+                      <span>WHITETAKEFILMS</span>
+                  </div>
+                  <div class="slide-title">
+                      <h2>CRAFTING <br class="d-lg-none">UNFORGETTABLE MOMENTS</h2>
+                  </div>
+                  <div class="clearfix"></div>
+              </div>
+          </div>
+      </section>
+      <!-- end of wpo-hero-slide-section-->
+      <!-- start of couples-session-section -->
+      <section class="couples-session-section" style="padding: 30px 0 100px 0; background: #ffffff; border: none 
+!important; border-top: none !important;">
+          <div class="container">
+              <div class="couples-sheet">
+                  <!-- Left Layered Collage -->
+                  <div class="couples-images-wrapper">
+                      <!-- Decorative background elements: dotted path, music notes, butterflies -->
+                      <div style="position:absolute;top:-80px;left:-50px;width:calc(100% + 100px);height:calc(100% + 
+160px);pointer-events:none;z-index:0;overflow:visible;">
+                          <!-- Dotted decorative path -->
+                          <svg width="100%" height="100%" viewBox="0 0 800 500" fill="none" 
+style="position:absolute;top:0;left:0;">
+                              <path d="M-50,250 C150,100 250,400 450,200 C580,80 700,300 850,150" stroke="#cccccc" 
+stroke-width="2" stroke-dasharray="6,6" opacity="0.35"/>
+                              <!-- Musical Notes (SVG path icons) -->
+                              <g fill="#999999" opacity="0.45" transform="translate(180, 120) scale(0.04)">
+                                  <path d="M416 0C403.4 0 391.9 8 387.2 19.7L323.2 179.7C321.1 185 320 190.7 320 
+196.4V364c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 48-48h16V224H144v140c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 
+48-48h16V32c0-14.2 9.4-26.8 23.2-30.8s28.6 1.8 36.8 14L224 93.3V32c0-14.2 9.4-26.8 23.2-30.8s28.6 1.8 36.8 14L344 
+93.3V32c0-17.7 14.3-32 32-32h40c17.7 0 32 14.3 32 32v16c0 17.7-14.3 32-32 32H384L320 0h96z"/>
+                              </g>
+                              <g fill="#999999" opacity="0.35" transform="translate(480, 260) scale(0.04)">
+                                  <path d="M416 0C403.4 0 391.9 8 387.2 19.7L323.2 179.7C321.1 185 320 190.7 320 
+196.4V364c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 48-48h16V224H144v140c0 26.5-21.5 48-48 48s-48-21.5-48-48s21.5-48 
+48-48h16V32c0-14.2 9.4-26.8 23.2-30.8s28.6 1.8 36.8 14L224 93.3V32c0-14.2 9.4-26.8 23.2-30.8s28.6 1.8 36.8 14L344 
+93.3V32c0-17.7 14.3-32 32-32h40c17.7 0 32 14.3 32 32v16c0 17.7-14.3 32-32 32H384L320 0h96z"/>
+                              </g>
+                              <!-- Butterflies (SVG path icons at 30% opacity) -->
+                              <g fill="#777777" opacity="0.3" transform="translate(70, 90) scale(0.06)">
+                                  <path d="M12 2C6.5 2 2 6.5 2 12c0 2.8 1.1 5.3 3 7.1V22c0 .6.4 1 1 1h12c.6 0 1-.4 
+1-1v-2.9c1.9-1.8 3-4.3 3-7.1 0-5.5-4.5-10-10-10zm2 17v2h-4v-2h4zm4-7c0 3.3-2.7 6-6 6s-6-2.7-6-6 2.7-6 6-6 6 2.7 6 6z"/>
+                              </g>
+                              <g fill="#777777" opacity="0.3" transform="translate(380, 80) scale(0.05)">
+                                  <path d="M12 2C6.5 2 2 6.5 2 12c0 2.8 1.1 5.3 3 7.1V22c0 .6.4 1 1 1h12c.6 0 1-.4 
+1-1v-2.9c1.9-1.8 3-4.3 3-7.1 0-5.5-4.5-10-10-10zm2 17v2h-4v-2h4zm4-7c0 3.3-2.7 6-6 6s-6-2.7-6-6 2.7-6 6-6 6 2.7 6 6z"/>
+                              </g>
+                          </svg>
+                      </div>
+  
+                      <!-- Ring Outline SVG Shape (Shape 1) -->
+                      <div class="couples-shape-ring" style="opacity:0.4;">
+                          <svg viewBox="0 0 160 160">
+                              <circle cx="80" cy="80" r="70" fill="none" stroke="#000000" stroke-width="3" 
+stroke-dasharray="8,8" />
+                          </svg>
+                      </div>
+   
+                       <!-- Image 1 (Large Circle) -->
+                        <!-- Left collage images (staggered entrance) -->
+                        <div class="couples-img u-image-circle couples-img-1">
+>                           <img src="" id="intimate-img-1" alt="Krishna and Connor" loading="lazy">
+                        </div>
+   
+                        <!-- Image 2 (Medium Circle with Border) -->
+                        <div class="couples-img u-image-circle couples-img-2">
+                            <img src="" id="intimate-img-2" alt="Sai and Aishwarya" loading="lazy">
+                        </div>
+   
+                          <div class="couples-shape-solid" 
+style="border-radius:50%;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;">
+                               <!-- Dark glass backdrop overlay with 3px blur (darkness reduced to 40%) -->
+                               <div style="position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.40);
+backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);"></div>
+                               <img src="assets/images/logo-new.png" alt="White Take Films logo" class="solid-logo" 
+style="width:125px;max-width:85%;height:auto;position:relative;z-index:2;" loading="lazy" />
+                       </div>
+                    </div>
+   
+                   <!-- Right Group Content -->
+                    <div class="couples-group">
+                        <h1 class="couples-title">Behind the Lens</h1>
+                        <div class="couples-subtitle">About us</div>
+                       <p class="couples-desc">
+                           Based in Trivandrum and traveling India-wide, WhiteTake Films is a premium wedding 
+photography and filmmaking team. Trusted by 250+ couples across 300+ events we craft cinematic films, artistic 
+photography, and luxury albums. Combining candid emotions with grand celebrations, we are known for professionalism, 
+personalized care, and fast, reliable delivery turning your once-in-a-lifetime moments into timeless stories.
+                       </p>
+                       <a href="contact.html" class="couples-btn">read more</a>
+                   </div>
+   
+                   <!-- Hidden Image 3 to prevent breaking the admin panel image swap script -->
+                   <img src="" id="intimate-img-3" style="display: none;" alt="Reshma and Rajiv">
+               </div>
+          </div>
+      </section>
+      <!-- end of wpo-about-section -->
+  
+      <!-- start expanding-services-accordion -->
+      <section class="expanding-services-accordion" style="padding: 30px 0 100px 0; background: #ffffff;">
+          <div class="container" style="max-width: 1300px;">
+              <div style="width: 100%; text-align: center; margin-bottom: 50px;">
+                  <h1 class="couples-title">Wedding Memories That Last</h1>
+                  <div class="couples-subtitle">Our Expertise</div>
+              </div>
+              <style>
+                  .accordion-gallery-container {
+                      });
+                  }
+  
+                  // Swap logic for thumbnails
+                  thumbImgs.forEach(thumb => {
+                      thumb.addEventListener('click', function () {
+                          const thumbSrc = this.src;
+                          mainImg.src = thumbSrc;
+                          mainImg.style.opacity = '0.5';
+                          setTimeout(() => mainImg.style.opacity = '1', 200);
+                      });
+                  });
+              });
+  
+              // --- 2. Mobile Auto-Scroll (0.7s transition) ---
+              const scrollContainer = document.querySelector('.case-study-area .row');
+              if (scrollContainer && window.innerWidth <= 991) {
+                  const card = scrollContainer.querySelector('.col-12');
+                  if (card) {
+                      const cardWidth = card.offsetWidth + 15; // Width + margin
+                      setInterval(() => {
+                          if (scrollContainer.scrollLeft + scrollContainer.offsetWidth >= scrollContainer.scrollWidth 
+- 10) {
+                              scrollContainer.scrollTo({ top: 0, left: 0, behavior: 'smooth' }); // Loop back
+                          } else {
+                              scrollContainer.scrollBy({ top: 0, left: cardWidth, behavior: 'smooth' });
+                          }
+                      }, 3000); // Scroll every 3 seconds
+                  }
+              }
+  
+              // --- 3. Global Reveal Animation ---
+              const allSections = document.querySelectorAll('section, footer');
+              const revealObserver = new IntersectionObserver((entries, observer) => {
+                  entries.forEach(entry => {
+                      if (entry.isIntersecting) {
+                          entry.target.classList.add('reveal-active');
+                          observer.unobserve(entry.target); // Animate only once
+                      }
+                  });
+              }, {
+                  threshold: 0.15,
+                  rootMargin: '0px 0px -120px 0px' // Delay trigger until section is 120px into the viewport
+              });
+  
+              allSections.forEach(section => {
+                  // SAKIP specific sections from failing to reveal
+                  if (!section.classList.contains('wpo-about-section')) {
+                      section.classList.add('reveal-section');
+                      revealObserver.observe(section);
+                  }
+              });
+          });
+      </script>
+  
+      <!-- Dynamic Admin Images Loader -->
+      <script>
+          document.addEventListener('DOMContentLoaded', function() {
+              // Lazy Loading Observer
+              const lazyObserver = new IntersectionObserver((entries, observer) => {
+                  entries.forEach(entry => {
+                      if (entry.isIntersecting) {
+                          const el = entry.target;
+                          if (el.dataset.src) {
+                              if (el.tagName === 'IMG' || el.tagName === 'IFRAME') {
+                                  el.src = el.dataset.src;
+                              } else {
+                                  el.style.backgroundImage = `url('${el.dataset.src}')`;
+                              }
+                              el.removeAttribute('data-src');
+                              observer.unobserve(el);
+                          }
+                      }
+                  });
+              }, { rootMargin: '200px' });
+  
+              fetch('pannl/api.php?page=home')
+                  .then(response => response.json())
+                  .then(res => {
+                      if (res.success && res.images) {
+                          const mappings = {
+>                             'intimate_1': 'intimate-img-1',
+                              'intimate_2': 'intimate-img-2',
+                              'intimate_3': 'intimate-img-3',
+                              'feature_image': 'feature-card-img',
+                              'story_img_1': 'story-avatar-1',
+                              'story_img_2': 'story-avatar-2',
+                              'story_img_3': 'story-avatar-3'
+                          };
+                          for (const [key, elementId] of Object.entries(mappings)) {
+                              if (res.images[key]) {
+                                  const imgElement = document.getElementById(elementId);
+                                  if (imgElement) {
+                                      imgElement.dataset.src = res.images[key];
+                                      lazyObserver.observe(imgElement);
+                                  }
+                              }
+                          }
+  
+                          const bgMappings = {
+                              'services_accordion_1': 'accordion-panel-1',
+                              'services_accordion_2': 'accordion-panel-2',
+                              'services_accordion_3': 'accordion-panel-3',
+                              'services_accordion_4': 'accordion-panel-4',
+                              'services_accordion_5': 'accordion-panel-5',
+                              'services_accordion_6': 'accordion-panel-6'
+                          };
+                          for (const [key, elementId] of Object.entries(bgMappings)) {
+                              if (res.images[key]) {
+                                  const bgElement = document.getElementById(elementId);
+                                  if (bgElement) {
+                                      bgElement.dataset.src = res.images[key];
+                                      lazyObserver.observe(bgElement);
+                                  }
+                              }
+                          }
+  
+                          // Populate up to 10 featured stories in "Your Love, Our Passion" section
+                          const blogGrid = document.getElementById('blog-grid');
+                          if (blogGrid) {
+                              blogGrid.innerHTML = '';
+                              for (let i = 1; i <= 10; i++) {
+
+
