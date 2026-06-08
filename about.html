@@ -86,9 +86,7 @@
 
     <link href="assets/css/wedding-bells.css" rel="stylesheet">
 
-    <!-- Leaflet Map Assets -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
 
 </head>
 
@@ -318,30 +316,51 @@
     .about-text-col { display: flex; flex-direction: column; justify-content: center; padding-right: 50px; }
     .about-text-col h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 5vw, 64px); color: #222; margin-bottom: 20px; line-height: 1.1; }
     .about-text-col p { font-size: 16px; color: #666; line-height: 1.8; margin-bottom: 20px; font-family: 'Mulish', sans-serif; }
-    .map-container { width: 100%; height: 550px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 1; border: 1px solid #eee; overflow: hidden; position: relative; }
+    /* Vector Map Styles */
+    .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
+    .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
     
-    /* Custom Leaflet Popup styling to match screenshot */
+    .custom-marker { position: absolute; background: #000; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); width: 20px; height: 20px; transform: translate(-50%, -50%); cursor: pointer; transition: transform 0.3s; z-index: 10; }
+    .custom-marker:hover { transform: translate(-50%, -50%) scale(1.2); }
+    .custom-marker::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+    
+    /* Popup styling */
+    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; padding: 0; overflow: hidden; pointer-events: none; }
+    .custom-popup.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     
     .popup-card-stars { color: #333; font-size: 12px; margin-bottom: 5px; }
-    .leaflet-popup-content-wrapper { padding: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
-    .leaflet-popup-content { margin: 0; width: 220px !important; }
     .popup-card-img { width: 100%; height: 140px; object-fit: cover; }
     .popup-card-body { padding: 15px; }
     .popup-card-price { position: absolute; top: 105px; left: 10px; color: #fff; font-weight: 800; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 99; }
     .popup-card-badge { position: absolute; top: 105px; right: 10px; background: #000; color: #fff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; z-index: 99; }
     .popup-card-title { font-weight: 700; font-size: 14px; color: #222; margin-bottom: 5px; font-family: 'Mulish', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .popup-card-desc { font-size: 11px; color: #888; margin-bottom: 10px; line-height: 1.4; }
-    .popup-card-btn { display: block; width: 100%; text-align: center; background: #000; color: #fff; padding: 8px 0; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase; text-decoration: none; transition: background 0.3s; }
-    .popup-card-btn:hover { background: #333; color: #fff; }
-    .leaflet-container a.leaflet-popup-close-button { color: #fff; top: 10px; right: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-
-    /* Custom Map Marker */
-    .custom-marker { background: #000; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.3); width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; }
-    .custom-marker::after { content: ''; width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+    
+    .popup-close-btn { position: absolute; top: 10px; right: 10px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; font-size: 18px; z-index: 100; font-weight: bold; }
     
     @media (max-width: 991px) {
         .about-text-col { padding-right: 15px; margin-bottom: 40px; }
-        .map-container { height: 400px; }
+        /* Vector Map Styles */
+    .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
+    .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
+    
+    .custom-marker { position: absolute; background: #000; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); width: 20px; height: 20px; transform: translate(-50%, -50%); cursor: pointer; transition: transform 0.3s; z-index: 10; }
+    .custom-marker:hover { transform: translate(-50%, -50%) scale(1.2); }
+    .custom-marker::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+    
+    /* Popup styling */
+    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; padding: 0; overflow: hidden; pointer-events: none; }
+    .custom-popup.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+    
+    .popup-card-stars { color: #333; font-size: 12px; margin-bottom: 5px; }
+    .popup-card-img { width: 100%; height: 140px; object-fit: cover; }
+    .popup-card-body { padding: 15px; }
+    .popup-card-price { position: absolute; top: 105px; left: 10px; color: #fff; font-weight: 800; font-size: 14px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); z-index: 99; }
+    .popup-card-badge { position: absolute; top: 105px; right: 10px; background: #000; color: #fff; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 4px; text-transform: uppercase; z-index: 99; }
+    .popup-card-title { font-weight: 700; font-size: 14px; color: #222; margin-bottom: 5px; font-family: 'Mulish', sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .popup-card-desc { font-size: 11px; color: #888; margin-bottom: 10px; line-height: 1.4; }
+    
+    .popup-close-btn { position: absolute; top: 10px; right: 10px; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.8); cursor: pointer; font-size: 18px; z-index: 100; font-weight: bold; }
     }
 </style>
 
@@ -350,14 +369,19 @@
         <div class="row align-items-center">
             <div class="col-lg-5 col-12">
                 <div class="about-text-col" data-aos="fade-right" data-aos-duration="1000">
-                    <h5 style="color: #c5a880; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; margin-bottom: 15px;">About Us</h5>
-                    <h2>Crafting Eternal Memories Across the Globe</h2>
-                    <p>We are a passionate team of destination wedding photographers dedicated to capturing the raw, authentic emotions of your special day. From intimate gatherings in the hills of Kerala to grand celebrations in royal palaces, we travel wherever your love story takes us.</p>
-                    <p>Explore our interactive map to see some of the beautiful destinations we've had the honor of shooting at. Every pin represents a unique love story, frozen in time with our cinematic approach.</p>
+                    <h5 style="color: #c5a880; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; margin-bottom: 15px;">About WhiteTake Films</h5>
+                    <h2 style="font-size: clamp(32px, 4vw, 48px); margin-bottom: 25px;">Capturing Timeless Stories With Elegance & Emotion</h2>
+                    <p>At WhiteTake Films, we believe every wedding is a once-in-a-lifetime story that deserves to be captured with elegance, emotion, and authenticity. Based in Trivandrum, we are a premium wedding photography and filmmaking team dedicated to transforming beautiful moments into timeless memories.</p>
+                    <p>With over <strong>250+ happy couples served</strong> and <strong>300+ events successfully covered</strong>, we have built our reputation on trust, creativity, and exceptional client satisfaction. Our passion goes beyond taking photographs—we craft visual stories that preserve emotions, relationships, and unforgettable moments for generations to come.</p>
+                    <p>What sets WhiteTake Films apart is our commitment to delivering results that go beyond expectations. Along with premium photography, cinematic wedding films, and luxury album design, we are known for our <strong>fast and reliable delivery process</strong>.</p>
+                    <p><strong>Trusted by 250+ couples, covering 300+ events, delivering premium memories across India — WhiteTake Films is where beautiful moments become timeless stories.</strong></p>
                 </div>
             </div>
             <div class="col-lg-7 col-12">
-                <div class="map-container" id="frontend-map" data-aos="fade-left" data-aos-duration="1000"></div>
+                <div class="map-container" id="frontend-map" data-aos="fade-left" data-aos-duration="1000">
+                    <img src="assets/images/vector_map.svg" class="vector-map-bg" alt="South India Vector Map">
+                    <div id="pins-layer"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -876,41 +900,28 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const mapElement = document.getElementById('frontend-map');
-    if (mapElement && typeof L !== 'undefined') {
-        const map = L.map('frontend-map', { scrollWheelZoom: false }).setView([10.5, 77.5], 6);
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 20
-        }).addTo(map);
-
+    const pinsLayer = document.getElementById('pins-layer');
+    if (pinsLayer) {
         fetch('/api/map_pins')
             .then(res => res.json())
             .then(data => {
                 if (data.success && data.pins) {
-                    const bounds = [];
+                    let firstPin = true;
+                    
                     data.pins.forEach(pin => {
-                        const lat = parseFloat(pin.lat);
-                        const lng = parseFloat(pin.lng);
-                        bounds.push([lat, lng]);
-
-                        const customIcon = L.divIcon({
-                            className: 'custom-marker',
-                            iconSize: [24, 24],
-                            iconAnchor: [12, 12]
-                        });
-
-                        const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+                        const marker = document.createElement('div');
+                        marker.className = 'custom-marker';
+                        marker.style.left = pin.pos_x + '%';
+                        marker.style.top = pin.pos_y + '%';
                         
                         const imageHtml = pin.image_path ? `<img src="/${pin.image_path}" class="popup-card-img">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
                         
                         const popupContent = `
-                            <div class="popup-card">
+                            <div class="custom-popup ${firstPin ? 'active' : ''}">
+                                <div class="popup-close-btn">&times;</div>
                                 <div style="position: relative;">
                                     ${imageHtml}
-                                    <div class="popup-card-price" style="font-size: 16px;">Starts at ₹50,000</div>
+                                    <div class="popup-card-price">Starts at ₹50,000</div>
                                     <div class="popup-card-badge">Featured</div>
                                 </div>
                                 <div class="popup-card-body">
@@ -924,26 +935,32 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <span><i class="fa fa-video"></i> Cinematic</span>
                                     </div>
                                     <div style="display: flex; gap: 5px;">
-                                        <button onclick="document.querySelector('.leaflet-popup-close-button').click()" style="flex: 1; background: #fff; border: 1px solid #ddd; padding: 6px; border-radius: 16px; font-size: 11px; color: #555; cursor: pointer; font-weight: bold;">Close</button>
-                                        <a href="gallery.html" style="flex: 1; text-align: center; background: #000; color: #fff; padding: 6px; border-radius: 16px; font-size: 11px; text-decoration: none; font-weight: bold;">View</a>
+                                        <a href="gallery.html" style="flex: 1; text-align: center; background: #000; color: #fff; padding: 6px; border-radius: 16px; font-size: 11px; text-decoration: none; font-weight: bold; transition: 0.3s;">View Gallery</a>
                                     </div>
                                 </div>
                             </div>
                         `;
-
-                        marker.bindPopup(popupContent, { minWidth: 220, closeButton: true });
-                    
-                        if (!window.firstMarker) window.firstMarker = marker;
+                        
+                        marker.innerHTML = popupContent;
+                        
+                        // Close btn logic
+                        const closeBtn = marker.querySelector('.popup-close-btn');
+                        closeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            marker.querySelector('.custom-popup').classList.remove('active');
+                        });
+                        
+                        // Marker click logic
+                        marker.addEventListener('click', () => {
+                            // Close all others
+                            document.querySelectorAll('.custom-popup').forEach(p => p.classList.remove('active'));
+                            // Open this
+                            marker.querySelector('.custom-popup').classList.add('active');
+                        });
+                        
+                        pinsLayer.appendChild(marker);
+                        firstPin = false;
                     });
-                    
-                    if (bounds.length > 0) {
-                        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
-                    }
-                    
-                    if (window.firstMarker) {
-                        window.firstMarker.openPopup();
-                    }
-
                 }
             })
             .catch(err => console.error('Error fetching map pins:', err));

@@ -323,14 +323,14 @@ async function initDatabases() {
       const [existingPins] = await panlePool.query('SELECT COUNT(*) as count FROM map_pins');
       if (existingPins[0].count === 0) {
         const defaultPins = [
-          ['Kochi Backwaters', 'A beautiful waterfront wedding', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg', 9.9312, 76.2673],
-          ['Munnar Tea Gardens', 'Misty hills and intimate vows', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg', 10.0892, 77.0595],
-          ['Ooty Hill Station', 'Classic vintage wedding style', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg', 11.4102, 76.6950],
-          ['Mahabalipuram Beach', 'Sunset shores in Tamil Nadu', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg', 12.6208, 80.1945],
-          ['Chennai Royal Palace', 'Grandeur and elegance', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg', 13.0827, 80.2707]
+          ['Kochi Backwaters', 'A beautiful waterfront wedding', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg', 30.5, 60.2],
+          ['Munnar Tea Gardens', 'Misty hills and intimate vows', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg', 45.0, 50.0],
+          ['Ooty Hill Station', 'Classic vintage wedding style', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg', 35.0, 30.0],
+          ['Mahabalipuram Beach', 'Sunset shores in Tamil Nadu', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg', 80.0, 35.0],
+          ['Chennai Royal Palace', 'Grandeur and elegance', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg', 82.0, 25.0]
         ];
         for (const pin of defaultPins) {
-          await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', pin);
+          await panlePool.query('INSERT INTO map_pins (title, description, image_path, pos_x, pos_y) VALUES (?, ?, ?, ?, ?)', pin);
         }
       }
     
@@ -1389,12 +1389,12 @@ app.get('/api/map_pins', async (req, res) => {
 // Admin Add Map Pin
 app.post('/pannl/add_map_pin', checkPannlAuth, upload.single('image'), async (req, res) => {
   try {
-    const { title, description, lat, lng } = req.body;
+    const { title, description, pos_x, pos_y } = req.body;
     let image_path = '';
     if (req.file) {
       image_path = 'pannl/uploads/' + req.file.filename;
     }
-    await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', [title, description, image_path, lat, lng]);
+    await panlePool.query('INSERT INTO map_pins (title, description, image_path, pos_x, pos_y) VALUES (?, ?, ?, ?, ?)', [title, description, image_path, pos_x, pos_y]);
     res.json({ success: true, path: image_path });
   } catch (err) {
     res.json({ success: false, message: err.message });
