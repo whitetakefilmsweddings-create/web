@@ -320,6 +320,19 @@ async function initDatabases() {
         )
       `);
 
+      const [existingPins] = await panlePool.query('SELECT COUNT(*) as count FROM map_pins');
+      if (existingPins[0].count === 0) {
+        const defaultPins = [
+          ['Kochi Backwaters', 'A beautiful waterfront wedding', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg', 9.9312, 76.2673],
+          ['Munnar Tea Gardens', 'Misty hills and intimate vows', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg', 10.0892, 77.0595],
+          ['Ooty Hill Station', 'Classic vintage wedding style', 'https://weddingbellsstories.com/media_library/weddingbells-image-6tfhrz.jpg', 11.4102, 76.6950],
+          ['Mahabalipuram Beach', 'Sunset shores in Tamil Nadu', 'https://weddingbellsstories.com/media_library/weddingbells-image-qksaeq.jpg', 12.6208, 80.1945],
+          ['Chennai Royal Palace', 'Grandeur and elegance', 'https://weddingbellsstories.com/media_library/weddingbells-image-i0m2s5.jpg', 13.0827, 80.2707]
+        ];
+        for (const pin of defaultPins) {
+          await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', pin);
+        }
+      }
     
     // Ensure existing table structure is migrated to TEXT
     try {
