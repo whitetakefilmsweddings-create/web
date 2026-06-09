@@ -507,6 +507,14 @@
                                 <input type="file" id="pin-image" accept="image/*" required onchange="document.getElementById('pin-file-label').innerText = this.files[0] ? this.files[0].name : 'Choose Image'">
                             </div>
                         </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #888; margin-bottom: 5px; text-transform: uppercase;">Shooters Text</label>
+                            <input type="text" id="pin-shooters" placeholder="e.g. 3 Shooters" value="3 Shooters" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; color: #888; margin-bottom: 5px; text-transform: uppercase;">Video Style Text</label>
+                            <input type="text" id="pin-video" placeholder="e.g. Cinematic" value="Cinematic" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 12px; border-radius: 8px;">
+                        </div>
                         <button type="submit" class="upload-btn" style="background: #ff0000; color: #fff; margin-top: 10px;">Add Map Pin</button>
                         <div id="pin-status" style="font-size: 12px; text-align: center; margin-top: 5px;"></div>
                     </form>
@@ -1043,38 +1051,35 @@
                 });
             }
             
-            const addPinForm = document.getElementById('add-pin-form');
-            if (addPinForm) {
-                addPinForm.addEventListener('submit', function(e) {
+            const form = document.getElementById('add-pin-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
                     e.preventDefault();
+                    const status = document.getElementById('pin-status');
+                    status.style.color = '#fff';
+                    status.innerText = 'Adding...';
                     
                     const title = document.getElementById('pin-title').value;
                     const desc = document.getElementById('pin-desc').value;
                     const lat = document.getElementById('pin-lat').value;
                     const lng = document.getElementById('pin-lng').value;
+                    const shooters = document.getElementById('pin-shooters').value;
+                    const video = document.getElementById('pin-video').value;
                     const fileInput = document.getElementById('pin-image');
-                    const status = document.getElementById('pin-status');
                     
                     if (!lat || !lng) {
                         status.style.color = '#ff4a4a';
-                        status.innerText = 'Please click on the map to select a location.';
+                        status.innerText = 'Please click on the map to select a location first.';
                         return;
                     }
-                    
-                    if (!fileInput.files || !fileInput.files[0]) {
-                        status.style.color = '#ff4a4a';
-                        status.innerText = 'Please select an image.';
-                        return;
-                    }
-                    
-                    status.style.color = '#aaa';
-                    status.innerText = 'Uploading...';
                     
                     const formData = new FormData();
                     formData.append('title', title);
                     formData.append('description', desc);
                     formData.append('lat', lat);
                     formData.append('lng', lng);
+                    formData.append('shooters_text', shooters);
+                    formData.append('video_style', video);
                     formData.append('image', fileInput.files[0]);
                     
                     fetch('/pannl/add_map_pin', {

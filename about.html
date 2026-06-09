@@ -1067,7 +1067,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const mapElement = document.getElementById('frontend-map');
     if (mapElement && typeof L !== 'undefined') {
-        const map = L.map('frontend-map', { scrollWheelZoom: false }).setView([10.5, 77.5], 6);
+        const map = L.map('frontend-map', { scrollWheelZoom: false }).setView([10.5, 76.5], 7);
         
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap &copy; CARTO',
@@ -1100,8 +1100,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="popup-card">
                                 <div style="position: relative;">
                                     ${imageHtml}
-                                    <div class="popup-card-price" style="font-size: 16px;">Starts at ₹50,000</div>
-                                    <div class="popup-card-badge">Featured</div>
                                 </div>
                                 <div class="popup-card-body">
                                     <div class="popup-card-title">${pin.title}</div>
@@ -1110,8 +1108,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                     <div class="popup-card-desc" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pin.description}</div>
                                     <div style="display: flex; gap: 10px; margin-bottom: 10px; font-size: 11px; color: #555;">
-                                        <span><i class="fa fa-camera"></i> 3 Shooters</span>
-                                        <span><i class="fa fa-video"></i> Cinematic</span>
+                                        <span><i class="fa fa-camera"></i> ${pin.shooters_text || '3 Shooters'}</span>
+                                        <span><i class="fa fa-video"></i> ${pin.video_style || 'Cinematic'}</span>
                                     </div>
                                     <div style="display: flex; gap: 5px;">
                                         <button onclick="document.querySelector('.leaflet-popup-close-button').click()" style="flex: 1; background: #fff; border: 1px solid #ddd; padding: 6px; border-radius: 16px; font-size: 11px; color: #555; cursor: pointer; font-weight: bold;">Close</button>
@@ -1127,7 +1125,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                     
                     if (bounds.length > 0) {
-                        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+                        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 7 });
                     }
                     
                     if (window.firstMarker) {

@@ -316,9 +316,19 @@ async function initDatabases() {
           image_path LONGTEXT,
           lat DECIMAL(10, 8) NOT NULL,
           lng DECIMAL(11, 8) NOT NULL,
+          shooters_text VARCHAR(100) DEFAULT '3 Shooters',
+          video_style VARCHAR(100) DEFAULT 'Cinematic',
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
+
+      // Migration: Add shooters_text and video_style columns if they don't exist
+      try {
+        await panlePool.query('ALTER TABLE map_pins ADD COLUMN shooters_text VARCHAR(100) DEFAULT "3 Shooters"');
+        await panlePool.query('ALTER TABLE map_pins ADD COLUMN video_style VARCHAR(100) DEFAULT "Cinematic"');
+      } catch (e) {
+        // Ignore if columns already exist
+      }
 
       const [existingPins] = await panlePool.query('SELECT COUNT(*) as count FROM map_pins');
       if (existingPins[0].count === 0) {
@@ -1407,7 +1417,10 @@ app.get('/api/map_pins', async (req, res) => {
 app.post('/pannl/add_map_pin', checkPannlAuth, upload.single('image'), async (req, res) => {
   try {
     const { title, description, lat, lng } = req.body;
+    const shooters_text = req.body.shooters_text || '3 Shooters';
+    const video_style = req.body.video_style || 'Cinematic';
     let image_path = '';
+    
     if (req.file) {
       const fs = require('fs');
       const targetDir = path.join(__dirname, 'pannl', 'uploads');
@@ -1419,7 +1432,12 @@ app.post('/pannl/add_map_pin', checkPannlAuth, upload.single('image'), async (re
       fs.unlinkSync(req.file.path);
       image_path = 'pannl/uploads/' + req.file.filename;
     }
-    await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', [title, description, image_path, lat, lng]);
+
+    await panlePool.query(
+      'INSERT INTO map_pins (title, description, image_path, lat, lng, shooters_text, video_style) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+      [title, description, image_path, lat, lng, shooters_text, video_style]
+    );
+
     res.json({ success: true, path: image_path });
   } catch (err) {
     res.json({ success: false, message: err.message });
