@@ -919,10 +919,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.pins.forEach(pin => {
                         const wrapper = document.createElement('div');
                         wrapper.className = 'marker-wrapper';
-                        wrapper.style.left = pin.pos_x + '%';
-                        wrapper.style.top = pin.pos_y + '%';
+                        wrapper.style.left = (pin.pos_x !== undefined ? pin.pos_x : pin.lat) + '%';
+                        wrapper.style.top = (pin.pos_y !== undefined ? pin.pos_y : pin.lng) + '%';
                         
-                        const imageHtml = pin.image_path ? `<img src="/${pin.image_path}" class="popup-card-img">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
+                        const imgSrc = pin.image_path ? (pin.image_path.startsWith('http') ? pin.image_path : '/' + pin.image_path) : '';
+                        const imageHtml = pin.image_path ? `<img src="${imgSrc}" class="popup-card-img">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
                         
                         const popupContent = `
                             <div class="custom-marker"></div>
