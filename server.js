@@ -1408,20 +1408,28 @@ app.post('/pannl/add_map_pin', checkPannlAuth, upload.single('image'), async (re
   try {
     const { title, description, lat, lng } = req.body;
     let image_path = '';
+    
     if (req.file) {
-      const fs = require('fs');
-      const targetDir = path.join(__dirname, 'pannl', 'uploads');
-      if (!fs.existsSync(targetDir)) {
-          fs.mkdirSync(targetDir, { recursive: true });
-      }
-      const newPath = path.join(targetDir, req.file.filename);
-      fs.copyFileSync(req.file.path, newPath);
-      fs.unlinkSync(req.file.path);
-      image_path = 'pannl/uploads/' + req.file.filename;
+      const tempPath = req.file.path;
+      
+      const buffer = await sharp(tempPath)
+        .resize(800, 600, {
+          fit: 'cover',
+          position: 'center'
+        })
+        .jpeg({ quality: 90 })
+        .toBuffer();
+
+      fs.unlinkSync(tempPath);
+      
+      const base64Data = buffer.toString('base64');
+      image_path = `data:image/jpeg;base64,${base64Data}`;
     }
+    
     await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', [title, description, image_path, lat, lng]);
     res.json({ success: true, path: image_path });
   } catch (err) {
+    if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
     res.json({ success: false, message: err.message });
   }
 });
