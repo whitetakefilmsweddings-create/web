@@ -370,16 +370,32 @@ async function migrateBase64Assets() {
 // ----------------------------------------------------
 
 // Route to Asset Microservice (AIP)
-app.use('/api/assets', proxy(`http://localhost:${ASSETS_PORT}`));
+app.use('/api/assets', proxy(`http://localhost:${ASSETS_PORT}`, {
+  proxyReqPathResolver: function (req) {
+    return req.originalUrl;
+  }
+}));
 
 // Route to Portal Microservice
-app.use('/Admin', proxy(`http://localhost:${PORTAL_PORT}`));
+app.use('/Admin', proxy(`http://localhost:${PORTAL_PORT}`, {
+  proxyReqPathResolver: function (req) {
+    return req.originalUrl;
+  }
+}));
 
 // Route to Pannl CMS Microservice
-app.use('/pannl', proxy(`http://localhost:${PANNL_PORT}`));
+app.use('/pannl', proxy(`http://localhost:${PANNL_PORT}`, {
+  proxyReqPathResolver: function (req) {
+    return req.originalUrl;
+  }
+}));
 
 // Route all other requests to Frontend Microservice
-app.use('/', proxy(`http://localhost:${FRONTEND_PORT}`));
+app.use('/', proxy(`http://localhost:${FRONTEND_PORT}`, {
+  proxyReqPathResolver: function (req) {
+    return req.originalUrl;
+  }
+}));
 
 // Gateway Server Start
 app.listen(PORT, async () => {
