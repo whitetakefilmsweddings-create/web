@@ -518,11 +518,7 @@
                 <% if (typeof map_pins !== 'undefined' && map_pins.length > 0) { %>
                     <% map_pins.forEach(function(pin) { %>
                         <div class="pin-item" id="pin-card-<%= pin.id %>">
-                            <% if(pin.image_path) { 
-                                const resolvedPath = (pin.image_path.startsWith('data:') || pin.image_path.startsWith('http')) ? pin.image_path : '/' + pin.image_path;
-                            %>
-                            <img src="<%= resolvedPath %>" alt="Pin Image">
-                            <% } %>
+                            <% if(pin.image_path) { %><img src="/<%= pin.image_path %>" alt="Pin Image"><% } %>
                             <div class="pin-item-title"><%= pin.title %></div>
                             <div class="pin-item-desc"><%= pin.description %></div>
                             <div style="font-family: monospace; font-size: 11px; color: #555;"><i class="fa fa-map-marker-alt"></i> <%= pin.lat %>, <%= pin.lng %></div>

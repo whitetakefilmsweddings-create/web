@@ -1094,8 +1094,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         const marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
                         
                         const fallbackSrc = '/assets/images/about.jpg';
-                        const resolvedPath = pin.image_path ? (pin.image_path.startsWith('data:') || pin.image_path.startsWith('http') ? pin.image_path : '/' + pin.image_path) : '';
-                        const imageHtml = resolvedPath ? `<img src="${resolvedPath}" class="popup-card-img" onerror="this.onerror=null; this.src='${fallbackSrc}';">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
+                        const imageHtml = pin.image_path ? `<img src="/${pin.image_path}" class="popup-card-img" onerror="this.onerror=null; this.src='${fallbackSrc}';">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
                         
                         const popupContent = `
                             <div class="popup-card">
