@@ -170,7 +170,8 @@ js_logic = """
                     }
 """
 
-new_text = new_text.replace('                    }', js_logic + '                    }', 1)
+if '// Handle YouTube Feeds for About Page' not in new_text:
+    new_text = new_text.replace('                    }', js_logic + '                    }', 1)
 
 with open('about.html', 'w', encoding='utf-8') as f:
     f.write(new_text)

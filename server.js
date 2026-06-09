@@ -1379,8 +1379,25 @@ app.get('/pannl/index.php', checkPannlAuth, async (req, res) => {
 // API to get map pins
 app.get('/api/map_pins', async (req, res) => {
   try {
+    const fs = require('fs');
+    const path = require('path');
     const [rows] = await panlePool.query('SELECT * FROM map_pins ORDER BY id DESC');
-    res.json({ success: true, pins: rows });
+    
+    // Check if images exist, otherwise use fallback
+    const pins = rows.map(pin => {
+        let p = pin.image_path;
+        if (p) {
+            const absolutePath = path.join(__dirname, p.startsWith('/') ? p.slice(1) : p);
+            if (!fs.existsSync(absolutePath)) {
+                pin.image_path = 'assets/images/about.jpg';
+            }
+        } else {
+            pin.image_path = 'assets/images/about.jpg';
+        }
+        return pin;
+    });
+
+    res.json({ success: true, pins: pins });
   } catch (err) {
     res.json({ success: false, message: err.message });
   }
@@ -1392,6 +1409,14 @@ app.post('/pannl/add_map_pin', checkPannlAuth, upload.single('image'), async (re
     const { title, description, lat, lng } = req.body;
     let image_path = '';
     if (req.file) {
+      const fs = require('fs');
+      const targetDir = path.join(__dirname, 'pannl', 'uploads');
+      if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, { recursive: true });
+      }
+      const newPath = path.join(targetDir, req.file.filename);
+      fs.copyFileSync(req.file.path, newPath);
+      fs.unlinkSync(req.file.path);
       image_path = 'pannl/uploads/' + req.file.filename;
     }
     await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', [title, description, image_path, lat, lng]);
