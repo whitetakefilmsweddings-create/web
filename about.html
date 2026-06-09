@@ -368,6 +368,121 @@
 </section>
 <!-- end of about-map-section -->
 
+<!-- start of why-us-section -->
+<style>
+    .why-us-section { padding: 100px 0; background: #fdfdfd; border-bottom: 1px solid #eaeaea; }
+    .why-us-section .section-title { text-align: center; margin-bottom: 60px; }
+    .why-us-section .section-title h2 { font-family: 'Mulish', sans-serif; font-size: 44px; color: #555; margin-bottom: 10px; font-weight: 400; }
+    .why-us-section .section-title p { font-size: 18px; color: #333; font-family: 'Mulish', sans-serif; }
+    
+    .why-us-grid { display: flex; flex-wrap: wrap; justify-content: center; max-width: 1000px; margin: 0 auto; }
+    .why-us-col { width: 50%; padding: 0 15px; }
+    
+    .wu-item { display: flex; align-items: flex-start; margin-bottom: 40px; }
+    
+    /* Left column items */
+    .wu-col-left .wu-item { flex-direction: row; justify-content: flex-end; }
+    .wu-col-left .wu-text { text-align: right; padding-right: 20px; }
+    
+    /* Right column items */
+    .wu-col-right .wu-item { flex-direction: row; }
+    .wu-col-right .wu-text { text-align: left; padding-left: 20px; }
+    
+    .wu-icon { 
+        width: 80px; height: 80px; 
+        border-radius: 20px; 
+        display: flex; justify-content: center; align-items: center; 
+        flex-shrink: 0; color: #fff; font-size: 36px; 
+        background: #000;
+    }
+    
+    .wu-text h4 { font-family: 'Mulish', sans-serif; font-size: 18px; font-weight: 600; color: #000; margin-bottom: 8px; margin-top: 5px; }
+    .wu-text p { font-family: 'Mulish', sans-serif; font-size: 12px; color: #666; line-height: 1.6; margin: 0; }
+    
+    @media (max-width: 767px) {
+        .why-us-col { width: 100%; }
+        /* On mobile, stack them consistently */
+        .wu-col-left .wu-item { flex-direction: row-reverse; justify-content: flex-start; }
+        .wu-col-left .wu-text { text-align: left; padding-right: 0; padding-left: 20px; }
+    }
+</style>
+
+<section class="why-us-section">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up" data-aos-duration="1000">
+            <h2>Our Services</h2>
+            <p>Your <span style="text-decoration: underline;">subtitle</span> in this line</p>
+        </div>
+        <div class="why-us-grid">
+            <!-- Left Column -->
+            <div class="why-us-col wu-col-left">
+                <div class="wu-item" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="wu-text">
+                        <h4>Documentation</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                    <div class="wu-icon bg-1"><i class="fa fa-files-o"></i></div>
+                </div>
+                <div class="wu-item" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="100">
+                    <div class="wu-text">
+                        <h4>Accounting</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                    <div class="wu-icon bg-2"><i class="fa fa-calculator"></i></div>
+                </div>
+                <div class="wu-item" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="200">
+                    <div class="wu-text">
+                        <h4>Statistic</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                    <div class="wu-icon bg-3"><i class="fa fa-line-chart"></i></div>
+                </div>
+                <div class="wu-item" data-aos="fade-right" data-aos-duration="1000" data-aos-delay="300">
+                    <div class="wu-text">
+                        <h4>Power</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                    <div class="wu-icon bg-4"><i class="fa fa-plug"></i></div>
+                </div>
+            </div>
+            
+            <!-- Right Column -->
+            <div class="why-us-col wu-col-right">
+                <div class="wu-item" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="wu-icon bg-5"><i class="fa fa-television"></i></div>
+                    <div class="wu-text">
+                        <h4>Presentation</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                </div>
+                <div class="wu-item" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="100">
+                    <div class="wu-icon bg-6"><i class="fa fa-money"></i></div>
+                    <div class="wu-text">
+                        <h4>Finance</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                </div>
+                <div class="wu-item" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                    <div class="wu-icon bg-7"><i class="fa fa-user"></i></div>
+                    <div class="wu-text">
+                        <h4>Consulting</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                </div>
+                <div class="wu-item" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="300">
+                    <div class="wu-icon bg-8"><i class="fa fa-trophy"></i></div>
+                    <div class="wu-text">
+                        <h4>SEO Analysis</h4>
+                        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- end of why-us-section -->
+
+
 <!-- start of technology-section -->
 <style>
     .tech-section { padding: 100px 0; background: #fff; color: #333; border-bottom: 1px solid #eaeaea; }
