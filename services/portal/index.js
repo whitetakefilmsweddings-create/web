@@ -1,0 +1,1016 @@
+const express = require('express');
+const session = require('express-session');
+const path = require('path');
+const fs = require('fs');
+const archiver = require('archiver');
+const crypto = require('crypto');
+require('dotenv').config();
+
+const { tdsPool, sessionStore } = require('../../config/db');
+const GoogleDrive = require('../../config/google_drive');
+
+const app = express();
+const PORT = process.env.PORTAL_PORT || 3002;
+
+// Setup EJS views pointing to root views directory
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, '../../views'));
+
+// Body Parser
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Shared Session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'whitetake_films_express_secret_2026',
+  store: sessionStore,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+}));
+
+// Serves Static Files/Directories needed by Admin Portal (if accessed directly, but gateway handles this too)
+app.use('/Admin/assets', express.static(path.join(__dirname, '../../Admin/assets')));
+app.use('/Admin/template', express.static(path.join(__dirname, '../../Admin/template')));
+app.use('/face', express.static(path.join(__dirname, '../../Admin/face')));
+
+// Authentication Middleware Helpers
+function requireAdmin(req, res, next) {
+  if (!req.session.userId || req.session.role !== 'admin') {
+    return res.redirect('/Admin/admin/login.php');
+  }
+  next();
+}
+
+function requireClient(req, res, next) {
+  if (!req.session.userId || req.session.role !== 'client') {
+    return res.redirect('/Admin/client/login.php');
+  }
+  next();
+}
+
+// ----------------------------------------------------
+// PORTAL ROUTES
+// ----------------------------------------------------
+
+// Admin Redirects
+app.get('/Admin', (req, res) => res.redirect('/Admin/admin/dashboard.php'));
+app.get('/Admin/index.php', (req, res) => res.redirect('/Admin/admin/dashboard.php'));
+
+// ADMIN ACTIONS
+app.get('/Admin/admin/login.php', (req, res) => {
+  if (req.session.userId && req.session.role === 'admin') {
+    return res.redirect('/Admin/admin/dashboard.php');
+  }
+  res.render('admin/login', { error: '' });
+});
+
+app.post('/Admin/admin/login.php', async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const [rows] = await tdsPool.execute('SELECT * FROM admins WHERE email = ?', [email]);
+    const admin = rows[0];
+
+    if (admin && password === admin.password) {
+      req.session.userId = admin.id;
+      req.session.role = 'admin';
+      return res.redirect('/Admin/admin/dashboard.php');
+    } else {
+      res.render('admin/login', { error: 'Invalid credentials' });
+    }
+  } catch (err) {
+    res.render('admin/login', { error: err.message });
+  }
+});
+
+app.get('/Admin/admin/logout.php', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/Admin/admin/login.php');
+  });
+});
+
+app.get('/Admin/admin/dashboard.php', requireAdmin, async (req, res) => {
+  try {
+    const [[{ clientCount }]] = await tdsPool.query('SELECT COUNT(*) as clientCount FROM clients');
+    const [[{ invoiceCount }]] = await tdsPool.query('SELECT COUNT(*) as invoiceCount FROM invoices');
+    const [[{ pendingRevenue }]] = await tdsPool.query("SELECT SUM(amount) as pendingRevenue FROM invoices WHERE status = 'unpaid'");
+    
+    res.render('admin/dashboard', {
+      clientCount,
+      invoiceCount,
+      pendingRevenue: pendingRevenue || 0
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/clients.php', requireAdmin, async (req, res) => {
+  const search = req.query.search || '';
+  const date = req.query.date || '';
+  let sql = 'SELECT * FROM clients WHERE 1=1';
+  const params = [];
+
+  if (search) {
+    sql += ' AND (name LIKE ? OR username LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`);
+  }
+  if (date) {
+    sql += ' AND DATE(created_at) = ?';
+    params.push(date);
+  }
+  sql += ' ORDER BY created_at DESC';
+
+  try {
+    const [clients] = await tdsPool.execute(sql, params);
+    res.render('admin/clients', { clients, search, date });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/create_client.php', requireAdmin, (req, res) => {
+  const randPassword = crypto.randomBytes(4).toString('hex');
+  res.render('admin/create_client', { msg: '', password: randPassword });
+});
+
+app.post('/Admin/admin/create_client.php', requireAdmin, async (req, res) => {
+  const { name, email, username, password, folder_id } = req.body;
+  if (name && email && username && password) {
+    try {
+      await tdsPool.execute(
+        'INSERT INTO clients (name, email, username, password, folder_id) VALUES (?, ?, ?, ?, ?)',
+        [name, email, username, password, folder_id || null]
+      );
+      res.redirect('/Admin/admin/clients.php');
+    } catch (err) {
+      res.render('admin/create_client', { msg: err.message, password });
+    }
+  } else {
+    res.render('admin/create_client', { msg: 'Please fill all required fields', password });
+  }
+});
+
+app.get('/Admin/admin/view_client.php', requireAdmin, async (req, res) => {
+  const id = req.query.id || 0;
+  try {
+    const [clients] = await tdsPool.execute('SELECT * FROM clients WHERE id = ?', [id]);
+    const client = clients[0];
+    if (!client) return res.status(404).send('Client not found');
+
+    const [invoices] = await tdsPool.execute('SELECT * FROM invoices WHERE client_id = ? ORDER BY created_at DESC', [id]);
+    const [appointments] = await tdsPool.execute('SELECT * FROM appointments WHERE client_id = ? ORDER BY appointment_date ASC', [id]);
+
+    const protocol = req.secure ? 'https' : 'http';
+    const host = req.get('host');
+    const galleryUrl = `${protocol}://${host}/Admin/client/login.php?code=${client.gallery_code || ''}`;
+    const shareText = `Hello ${client.name},\n\nHere is the direct link to your photo gallery:\n${galleryUrl}\n\n(Access Code: ${client.gallery_code || 'PENDING'})`;
+
+    let faceAppUrl = `${protocol}://${host}/face/index.html`;
+    if (client.ai_folder_id) {
+      faceAppUrl += `?folder_id=${client.ai_folder_id}`;
+    }
+    const shareTextFace = `Find your photos from the event using Face AI:\n${faceAppUrl}`;
+
+    res.render('admin/view_client', {
+      client,
+      msg: req.session.flashMsg || '',
+      invoices,
+      appointments,
+      totalInv: invoices.length,
+      totalApp: appointments.length,
+      faceAppUrl,
+      shareText,
+      shareTextFace
+    });
+    req.session.flashMsg = null;
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/view_client.php', requireAdmin, async (req, res) => {
+  const id = req.query.id || 0;
+  try {
+    if (req.body.update_profile) {
+      const { name, email, username, password } = req.body;
+      await tdsPool.execute(
+        'UPDATE clients SET name = ?, email = ?, username = ?, password = ? WHERE id = ?',
+        [name, email, username, password, id]
+      );
+      req.session.flashMsg = 'Profile updated!';
+    } else if (req.body.update_gallery) {
+      const { folder_id, gallery_code } = req.body;
+      await tdsPool.execute(
+        'UPDATE clients SET folder_id = ?, gallery_code = ? WHERE id = ?',
+        [folder_id, gallery_code, id]
+      );
+      req.session.flashMsg = 'Gallery settings updated!';
+    } else if (req.body.update_face_ai) {
+      const { ai_folder_id } = req.body;
+      await tdsPool.execute(
+        'UPDATE clients SET ai_folder_id = ? WHERE id = ?',
+        [ai_folder_id, id]
+      );
+      req.session.flashMsg = 'Face AI settings updated!';
+    } else if (req.body.add_appointment) {
+      const { app_date, app_time } = req.body;
+      const fullDate = `${app_date} ${app_time}`;
+      await tdsPool.execute('INSERT INTO appointments (client_id, appointment_date) VALUES (?, ?)', [id, fullDate]);
+      req.session.flashMsg = 'Appointment added!';
+    } else if (req.body.delete_invoice) {
+      const { invoice_id } = req.body;
+      await tdsPool.execute('DELETE FROM invoices WHERE id = ?', [invoice_id]);
+      req.session.flashMsg = 'Invoice deleted!';
+    }
+    res.redirect(`/Admin/admin/view_client.php?id=${id}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/delete_client.php', requireAdmin, async (req, res) => {
+  const id = req.body.client_id || 0;
+  if (!id) return res.status(400).send('Invalid Client ID');
+  try {
+    await tdsPool.execute('DELETE FROM appointments WHERE client_id = ?', [id]);
+    await tdsPool.execute('DELETE FROM clients WHERE id = ?', [id]);
+    res.redirect('/Admin/admin/clients.php?msg=client_deleted');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
+  const clientId = req.query.id;
+  if (!clientId) return res.status(400).send('Client ID required');
+
+  try {
+    const [clients] = await tdsPool.execute('SELECT * FROM clients WHERE id = ?', [clientId]);
+    const client = clients[0];
+    if (!client) return res.status(404).send('Client not found');
+
+    const folderId = client.folder_id;
+
+    // Fetch Selections
+    const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [clientId]);
+    const selections = selRows.map(r => r.file_id);
+
+    const drive = new GoogleDrive();
+    let files = [];
+    let selectedFiles = [];
+    let error = '';
+
+    if (folderId) {
+      try {
+        const dFiles = await drive.getFiles(folderId);
+        for (const file of dFiles) {
+          const mime = file.getMimeType();
+          if (mime === 'application/vnd.google-apps.folder' || mime.includes('zip')) {
+            continue;
+          }
+          const isSelected = selections.includes(file.getId());
+          const cleanFile = {
+            id: file.getId(),
+            name: file.getName(),
+            src: (file.getThumbnailLink() || '').replace('=s220', '=s600'),
+            is_selected: isSelected
+          };
+          files.push(cleanFile);
+          if (isSelected) {
+            selectedFiles.push(cleanFile);
+          }
+        }
+      } catch (driveErr) {
+        error = `Drive Error: ${driveErr.message}`;
+      }
+    }
+
+    const unselectedFiles = files.filter(f => !f.is_selected);
+
+    res.render('admin/client_selection', {
+      client,
+      files,
+      selectedFiles,
+      unselectedFiles,
+      clientId,
+      error,
+      successMsg: req.session.flashSuccess || ''
+    });
+    req.session.flashSuccess = null;
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
+  const clientId = req.query.id;
+  if (!clientId) return res.status(400).send('Client ID required');
+
+  try {
+    const [clients] = await tdsPool.execute('SELECT folder_id FROM clients WHERE id = ?', [clientId]);
+    const client = clients[0];
+    if (!client) return res.status(404).send('Client not found');
+    const folderId = client.folder_id;
+
+    const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [clientId]);
+    const selections = selRows.map(r => r.file_id);
+
+    const drive = new GoogleDrive();
+    const dFiles = await drive.getFiles(folderId);
+    
+    let deletedCount = 0;
+    let failedCount = 0;
+
+    for (const file of dFiles) {
+      const mime = file.getMimeType();
+      if (mime === 'application/vnd.google-apps.folder' || mime.includes('zip')) {
+        continue;
+      }
+      if (!selections.includes(file.getId())) {
+        try {
+          await drive.deleteFile(file.getId());
+          deletedCount++;
+        } catch (delErr) {
+          failedCount++;
+        }
+      }
+    }
+
+    req.session.flashSuccess = `Deleted ${deletedCount} files. ${failedCount > 0 ? `Failed to delete ${failedCount} files.` : ''}`;
+    res.redirect(`/Admin/admin/client_selection.php?id=${clientId}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
+  const clientId = req.query.client_id;
+  const type = req.query.type || 'gallery';
+  if (!clientId) return res.status(400).send('Client ID required');
+
+  try {
+    const [clients] = await tdsPool.execute('SELECT * FROM clients WHERE id = ?', [clientId]);
+    const client = clients[0];
+    if (!client) return res.status(404).send('Client not found');
+
+    const folderId = (type === 'face_ai') ? (client.ai_folder_id || '') : (client.folder_id || '');
+    const folderName = (type === 'face_ai') ? 'Face AI Folder' : 'Gallery Folder';
+
+    if (!folderId) return res.status(400).send(`No ${folderName} configured.`);
+
+    const drive = new GoogleDrive();
+    let files = [];
+    let error = '';
+
+    try {
+      const dFiles = await drive.getFiles(folderId);
+      for (const file of dFiles) {
+        const mime = file.getMimeType();
+        if (mime === 'application/vnd.google-apps.folder') continue;
+
+        files.push({
+          id: file.getId(),
+          name: file.getName(),
+          src: (file.getThumbnailLink() || '').replace('=s220', '=s600'),
+          mime
+        });
+      }
+    } catch (driveErr) {
+      error = `Drive Error: ${driveErr.message}`;
+    }
+
+    res.render('admin/cleanup_drive', {
+      client,
+      folderName,
+      files,
+      msg: req.session.flashCleanMsg || '',
+      error: error || req.session.flashCleanErr || ''
+    });
+    req.session.flashCleanMsg = null;
+    req.session.flashCleanErr = null;
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
+  const clientId = req.query.client_id;
+  const filesToDelete = req.body.files || [];
+
+  if (!clientId) return res.status(400).send('Client ID required');
+
+  try {
+    const drive = new GoogleDrive();
+    let deletedCount = 0;
+    let failedCount = 0;
+    let lastError = '';
+
+    for (const fileId of filesToDelete) {
+      try {
+        await drive.deleteFile(fileId);
+        deletedCount++;
+      } catch (err) {
+        failedCount++;
+        lastError = err.message;
+      }
+    }
+
+    req.session.flashCleanMsg = `Successfully deleted ${deletedCount} images.`;
+    if (failedCount > 0) {
+      req.session.flashCleanErr = `Failed to delete ${failedCount} images. Last Error: ${lastError}`;
+    }
+    res.redirect(`/Admin/admin/cleanup_drive.php?client_id=${clientId}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/download_file.php', requireAdmin, async (req, res) => {
+  const fileId = req.query.file_id;
+  if (!fileId) return res.status(400).send('File ID required');
+
+  try {
+    const drive = new GoogleDrive();
+    const meta = await drive.getFileMetadata(fileId);
+    if (!meta) return res.status(404).send('File not found');
+
+    res.setHeader('Content-Description', 'File Transfer');
+    res.setHeader('Content-Type', meta.getMimeType());
+    res.setHeader('Content-Disposition', `attachment; filename="${meta.getName()}"`);
+
+    const stream = await drive.downloadFileStream(fileId);
+    stream.pipe(res);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/download_zip.php', requireAdmin, async (req, res) => {
+  const clientId = req.query.client_id;
+  if (!clientId) return res.status(400).send('Client ID required');
+
+  try {
+    const [clients] = await tdsPool.execute('SELECT name FROM clients WHERE id = ?', [clientId]);
+    const clientName = clients[0]?.name;
+    if (!clientName) return res.status(404).send('Client not found');
+
+    const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [clientId]);
+    const selections = selRows.map(r => r.file_id);
+
+    const totalFiles = selections.length;
+    let start = parseInt(req.query.start || 1);
+    let end = parseInt(req.query.end || totalFiles);
+
+    if (start < 1) start = 1;
+    if (end > totalFiles) end = totalFiles;
+
+    const batchSelections = selections.slice(start - 1, end);
+    const rangeStr = (start === 1 && end === totalFiles) ? '' : `_Target_${start}-${end}`;
+    const zipName = `WhiteTake_Selections_${clientName.replace(/[^a-zA-Z0-9_\-]/g, '_')}${rangeStr}.zip`;
+
+    res.attachment(zipName);
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.pipe(res);
+
+    const drive = new GoogleDrive();
+    for (const fileId of batchSelections) {
+      try {
+        const meta = await drive.getFileMetadata(fileId);
+        if (meta) {
+          const stream = await drive.downloadFileStream(fileId);
+          archive.append(stream, { name: meta.getName() });
+        }
+      } catch (err) {
+        console.error(`Error zipping file ${fileId}:`, err.message);
+      }
+    }
+    await archive.finalize();
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/create_invoice.php', requireAdmin, async (req, res) => {
+  const selected_client_id = req.query.client_id || '';
+  try {
+    const [clients] = await tdsPool.query('SELECT * FROM clients ORDER BY name ASC');
+    res.render('admin/create_invoice', {
+      clients,
+      selected_client_id,
+      msg: ''
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/create_invoice.php', requireAdmin, async (req, res) => {
+  const { client_id, title, status, items } = req.body;
+  const parsedItems = items ? Object.values(items) : [];
+
+  let totalAmount = 0;
+  parsedItems.forEach(item => {
+    totalAmount += parseFloat(item.price || 0) * parseInt(item.qty || 1);
+  });
+
+  if (client_id && title && parsedItems.length > 0) {
+    const conn = await tdsPool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      const [invRes] = await conn.execute(
+        'INSERT INTO invoices (client_id, title, amount, status) VALUES (?, ?, ?, ?)',
+        [client_id, title, totalAmount, status]
+      );
+      const invoiceId = invRes.insertId;
+
+      for (const item of parsedItems) {
+        const price = parseFloat(item.price || 0);
+        const qty = parseInt(item.qty || 1);
+        const itemTotal = price * qty;
+        await conn.execute(
+          'INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total) VALUES (?, ?, ?, ?, ?)',
+          [invoiceId, item.desc, qty, price, itemTotal]
+        );
+      }
+
+      await conn.commit();
+      res.redirect('/Admin/admin/invoices.php');
+    } catch (err) {
+      await conn.rollback();
+      const [clients] = await tdsPool.query('SELECT * FROM clients ORDER BY name ASC');
+      res.render('admin/create_invoice', { clients, selected_client_id: client_id, msg: err.message });
+    } finally {
+      conn.release();
+    }
+  } else {
+    const [clients] = await tdsPool.query('SELECT * FROM clients ORDER BY name ASC');
+    res.render('admin/create_invoice', { clients, selected_client_id: client_id, msg: 'Please add at least one item.' });
+  }
+});
+
+app.get('/Admin/admin/edit_invoice.php', requireAdmin, async (req, res) => {
+  const id = req.query.id;
+  try {
+    const [invoices] = await tdsPool.execute('SELECT * FROM invoices WHERE id = ?', [id]);
+    const invoice = invoices[0];
+    if (!invoice) return res.status(404).send('Invoice not found');
+
+    const [clients] = await tdsPool.query('SELECT * FROM clients ORDER BY name ASC');
+    const [items] = await tdsPool.execute('SELECT * FROM invoice_items WHERE invoice_id = ?', [id]);
+
+    res.render('admin/edit_invoice', {
+      invoice,
+      clients,
+      items,
+      msg: ''
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/edit_invoice.php', requireAdmin, async (req, res) => {
+  const id = req.query.id;
+  const { client_id, title, status, items } = req.body;
+  const parsedItems = items ? Object.values(items) : [];
+
+  let totalAmount = 0;
+  parsedItems.forEach(item => {
+    totalAmount += parseFloat(item.price || 0) * parseInt(item.qty || 1);
+  });
+
+  const conn = await tdsPool.getConnection();
+  try {
+    await conn.beginTransaction();
+
+    await conn.execute(
+      'UPDATE invoices SET client_id = ?, title = ?, amount = ?, status = ? WHERE id = ?',
+      [client_id, title, totalAmount, status, id]
+    );
+
+    // Delete existing items and re-insert
+    await conn.execute('DELETE FROM invoice_items WHERE invoice_id = ?', [id]);
+
+    for (const item of parsedItems) {
+      const price = parseFloat(item.price || 0);
+      const qty = parseInt(item.qty || 1);
+      const itemTotal = price * qty;
+      await conn.execute(
+        'INSERT INTO invoice_items (invoice_id, description, quantity, unit_price, total) VALUES (?, ?, ?, ?, ?)',
+        [id, item.desc, qty, price, itemTotal]
+      );
+    }
+
+    await conn.commit();
+    res.redirect('/Admin/admin/invoices.php');
+  } catch (err) {
+    await conn.rollback();
+    const [invoices] = await tdsPool.execute('SELECT * FROM invoices WHERE id = ?', [id]);
+    const [clients] = await tdsPool.query('SELECT * FROM clients ORDER BY name ASC');
+    res.render('admin/edit_invoice', { invoice: invoices[0], clients, items: parsedItems, msg: err.message });
+  } finally {
+    conn.release();
+  }
+});
+
+app.get('/Admin/admin/invoices.php', requireAdmin, async (req, res) => {
+  try {
+    const [invoices] = await tdsPool.query(`
+      SELECT i.*, c.name as client_name 
+      FROM invoices i 
+      JOIN clients c ON i.client_id = c.id 
+      ORDER BY i.created_at DESC
+    `);
+    res.render('admin/invoices', { invoices });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// CLIENT ACTIONS
+app.get('/Admin/client/login.php', (req, res) => {
+  // Magic link login
+  const code = req.query.code;
+  if (code) {
+    tdsPool.execute('SELECT * FROM clients WHERE gallery_code = ?', [code])
+      .then(([rows]) => {
+        const client = rows[0];
+        if (client) {
+          req.session.userId = client.id;
+          req.session.role = 'client';
+          req.session[`gallery_access_${client.id}`] = true;
+          return res.redirect('/Admin/client/gallery.php');
+        }
+        res.render('client/login', { error: 'Invalid Access Code' });
+      })
+      .catch(err => {
+        res.render('client/login', { error: err.message });
+      });
+  } else {
+    if (req.session.userId && req.session.role === 'client') {
+      return res.redirect('/Admin/client/dashboard.php');
+    }
+    res.render('client/login', { error: '' });
+  }
+});
+
+app.post('/Admin/client/login.php', async (req, res) => {
+  const { access_code, username, password } = req.body;
+  try {
+    if (access_code) {
+      const [rows] = await tdsPool.execute('SELECT * FROM clients WHERE gallery_code = ?', [access_code]);
+      const client = rows[0];
+      if (client) {
+        req.session.userId = client.id;
+        req.session.role = 'client';
+        req.session[`gallery_access_${client.id}`] = true;
+        return res.redirect('/Admin/client/gallery.php');
+      } else {
+        res.render('client/login', { error: 'Invalid Access Code' });
+      }
+    } else if (username) {
+      const [rows] = await tdsPool.execute('SELECT * FROM clients WHERE username = ?', [username]);
+      const client = rows[0];
+      if (client && password === client.password) {
+        req.session.userId = client.id;
+        req.session.role = 'client';
+        return res.redirect('/Admin/client/dashboard.php');
+      } else {
+        res.render('client/login', { error: 'Invalid credentials' });
+      }
+    }
+  } catch (err) {
+    res.render('client/login', { error: err.message });
+  }
+});
+
+app.get('/Admin/client/logout.php', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/Admin/client/login.php');
+  });
+});
+
+app.get('/Admin/client/dashboard.php', requireClient, async (req, res) => {
+  const userId = req.session.userId;
+  try {
+    const [clients] = await tdsPool.execute('SELECT * FROM clients WHERE id = ?', [userId]);
+    const client = clients[0];
+
+    const [[{ unpaidCount }]] = await tdsPool.execute(
+      "SELECT COUNT(*) as unpaidCount FROM invoices WHERE client_id = ? AND status = 'unpaid'",
+      [userId]
+    );
+
+    res.render('client/dashboard', { client, unpaidCount });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/client/gallery.php', requireClient, async (req, res) => {
+  const userId = req.session.userId;
+  let folderId = req.query.folder || null;
+
+  try {
+    const [clients] = await tdsPool.execute('SELECT folder_id, gallery_code, name FROM clients WHERE id = ?', [userId]);
+    const client = clients[0];
+
+    // Check gallery lock code
+    if (client.gallery_code) {
+      if (!req.session[`gallery_access_${userId}`]) {
+        return res.render('client/gallery_lock', { error: '', userId });
+      }
+    }
+
+    // Selections
+    const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [userId]);
+    const selections = selRows.map(r => r.file_id);
+
+    if (!folderId) {
+      folderId = client.folder_id;
+    }
+
+    let files = [];
+    let zipFileId = null;
+    let error = '';
+
+    if (folderId) {
+      try {
+        const drive = new GoogleDrive();
+        const dFiles = await drive.getFiles(folderId);
+
+        for (const file of dFiles) {
+          const mime = file.getMimeType();
+          if (mime === 'application/zip' || mime === 'application/x-zip-compressed') {
+            zipFileId = file.getId();
+            continue;
+          }
+
+          const isFolder = mime === 'application/vnd.google-apps.folder';
+          let cover = null;
+          if (isFolder) {
+            cover = await drive.getFolderCover(file.getId());
+          }
+
+          files.push({
+            id: file.getId(),
+            name: file.getName(),
+            type: isFolder ? 'folder' : 'image',
+            src: isFolder ? '' : (file.getThumbnailLink() || '').replace('=s220', '=s600'),
+            cover,
+            link: isFolder ? `?folder=${file.getId()}` : '#'
+          });
+        }
+      } catch (driveErr) {
+        error = `Drive error: ${driveErr.message}`;
+      }
+    } else {
+      error = 'No gallery linked.';
+    }
+
+    res.render('client/gallery', {
+      folderId,
+      rootFolderId: client.folder_id,
+      error,
+      files,
+      selections,
+      zipFileId,
+      client
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/client/gallery.php', requireClient, async (req, res) => {
+  const userId = req.session.userId;
+  const { access_code } = req.body;
+  try {
+    const [clients] = await tdsPool.execute('SELECT gallery_code FROM clients WHERE id = ?', [userId]);
+    if (clients[0] && access_code === clients[0].gallery_code) {
+      req.session[`gallery_access_${userId}`] = true;
+      res.redirect('/Admin/client/gallery.php');
+    } else {
+      res.render('client/gallery_lock', { error: 'Incorrect Access Code', userId });
+    }
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/client/selections.php', requireClient, async (req, res) => {
+  const userId = req.session.userId;
+  try {
+    const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [userId]);
+    const selections = selRows.map(r => r.file_id);
+
+    let files = [];
+    let error = '';
+
+    if (selections.length > 0) {
+      try {
+        const drive = new GoogleDrive();
+        for (const fileId of selections) {
+          const file = await drive.getFileMetadata(fileId);
+          if (file) {
+            const mime = file.getMimeType();
+            if (mime === 'application/vnd.google-apps.folder' || mime.includes('zip')) {
+              continue;
+            }
+            files.push({
+              id: file.getId(),
+              name: file.getName(),
+              src: (file.getThumbnailLink() || '').replace('=s220', '=s600')
+            });
+          }
+        }
+      } catch (driveErr) {
+        error = `Drive error: ${driveErr.message}`;
+      }
+    }
+
+    res.render('client/selections', { files, error });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/client/invoices.php', requireClient, async (req, res) => {
+  const userId = req.session.userId;
+  try {
+    const [invoices] = await tdsPool.execute('SELECT * FROM invoices WHERE client_id = ? ORDER BY created_at DESC', [userId]);
+    res.render('client/invoices', { invoices });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/client/invoice_view.php', async (req, res) => {
+  const id = req.query.id || 0;
+  if (!id) return res.status(400).send('Invalid Invoice ID');
+
+  try {
+    const [invoices] = await tdsPool.execute('SELECT * FROM invoices WHERE id = ?', [id]);
+    const invoice = invoices[0];
+    if (!invoice) return res.status(404).send('Invoice not found');
+
+    const [clients] = await tdsPool.execute('SELECT * FROM clients WHERE id = ?', [invoice.client_id]);
+    const client = clients[0];
+
+    const isAdmin = req.session.userId && req.session.role === 'admin';
+    const isClient = req.session.userId && req.session.role === 'client';
+
+    if (!isAdmin && !isClient) {
+      return res.redirect('/Admin/client/login.php');
+    }
+
+    if (isClient && req.session.userId != invoice.client_id) {
+      return res.status(403).send('Unauthorized access to this invoice.');
+    }
+
+    const [items] = await tdsPool.execute('SELECT * FROM invoice_items WHERE invoice_id = ?', [id]);
+    const cleanItems = items.length > 0 ? items : [{
+      description: invoice.title,
+      unit_price: invoice.amount,
+      quantity: 1,
+      total: invoice.amount
+    }];
+
+    const date = new Date(invoice.created_at).toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' });
+    const invoiceNo = `INV-${String(invoice.id).padStart(5, '0')}`;
+
+    res.render('client/invoice_view', {
+      invoiceNo,
+      date,
+      invoice,
+      client,
+      items: cleanItems,
+      total: invoice.amount
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/client/download.php', requireClient, async (req, res) => {
+  const fileId = req.query.id;
+  if (!fileId) return res.status(400).send('File ID required');
+
+  try {
+    const drive = new GoogleDrive();
+    const meta = await drive.getFileMetadata(fileId);
+    if (!meta) return res.status(404).send('File not found');
+
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${meta.getName()}"`);
+
+    const stream = await drive.downloadFileStream(fileId);
+    stream.pipe(res);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/client/download_zip.php', requireClient, async (req, res) => {
+  const folderId = req.query.folder_id;
+  const folderName = req.query.folder_name || 'gallery';
+  if (!folderId) return res.status(400).send('Folder ID required');
+
+  try {
+    const zipName = `WhiteTake_${folderName.replace(/[^a-zA-Z0-9_\-]/g, '_')}.zip`;
+    res.attachment(zipName);
+
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.pipe(res);
+
+    const drive = new GoogleDrive();
+    const dFiles = await drive.getFiles(folderId);
+    
+    for (const file of dFiles) {
+      if (file.getMimeType() !== 'application/vnd.google-apps.folder') {
+        const stream = await drive.downloadFileStream(file.getId());
+        archive.append(stream, { name: file.getName() });
+      }
+    }
+    await archive.finalize();
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/client/ajax_selection.php', requireClient, async (req, res) => {
+  const clientId = req.session.userId;
+  const { file_id, action } = req.body;
+
+  if (!file_id || !action) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
+
+  try {
+    if (action === 'select') {
+      const [existing] = await tdsPool.execute('SELECT id FROM client_selections WHERE client_id = ? AND file_id = ?', [clientId, file_id]);
+      if (existing.length === 0) {
+        await tdsPool.execute('INSERT INTO client_selections (client_id, file_id) VALUES (?, ?)', [clientId, file_id]);
+      }
+    } else if (action === 'deselect') {
+      await tdsPool.execute('DELETE FROM client_selections WHERE client_id = ? AND file_id = ?', [clientId, file_id]);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/Admin/client/ajax_rejection.php', requireClient, async (req, res) => {
+  const clientId = req.session.userId;
+  const { file_id, action } = req.body;
+
+  if (!file_id || !action) {
+    return res.status(400).json({ error: 'Missing parameters' });
+  }
+
+  try {
+    if (action === 'reject') {
+      const [existing] = await tdsPool.execute('SELECT id FROM client_rejections WHERE client_id = ? AND file_id = ?', [clientId, file_id]);
+      if (existing.length === 0) {
+        await tdsPool.execute('INSERT INTO client_rejections (client_id, file_id) VALUES (?, ?)', [clientId, file_id]);
+      }
+    } else if (action === 'restore') {
+      await tdsPool.execute('DELETE FROM client_rejections WHERE client_id = ? AND file_id = ?', [clientId, file_id]);
+    }
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/Admin/client/get_files_json.php', requireClient, async (req, res) => {
+  const folderId = req.query.folder_id;
+  if (!folderId) return res.json({ error: 'No folder ID' });
+
+  try {
+    const drive = new GoogleDrive();
+    const files = await drive.getFiles(folderId);
+    
+    const cleanFiles = [];
+    for (const f of files) {
+      if (f.getMimeType() !== 'application/vnd.google-apps.folder') {
+        cleanFiles.push({
+          id: f.getId(),
+          name: f.getName(),
+          mime: f.getMimeType()
+        });
+      }
+    }
+    res.json({ success: true, files: cleanFiles });
+  } catch (err) {
+    res.json({ error: err.message });
+  }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Portal Microservice running on http://localhost:${PORT}`);
+});
