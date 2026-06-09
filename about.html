@@ -370,11 +370,11 @@
 
 <!-- start of technology-section -->
 <style>
-    .tech-section { padding: 100px 0; background: #000; color: #fff; border-bottom: 1px solid #222; }
+    .tech-section { padding: 100px 0; background: #fff; color: #333; border-bottom: 1px solid #eaeaea; }
     .tech-text-col { display: flex; flex-direction: column; justify-content: center; padding-left: 50px; }
-    .tech-text-col h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 5vw, 64px); color: #fff; margin-bottom: 20px; line-height: 1.1; }
-    .tech-text-col p { font-size: 16px; color: #ccc; line-height: 1.8; margin-bottom: 20px; font-family: 'Mulish', sans-serif; }
-    .model-container { width: 100%; height: 550px; border-radius: 12px; z-index: 1; overflow: hidden; position: relative; background: radial-gradient(circle, #222 0%, #000 100%); display: flex; justify-content: center; align-items: center; }
+    .tech-text-col h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 5vw, 64px); color: #1c2b39; margin-bottom: 20px; line-height: 1.1; }
+    .tech-text-col p { font-size: 16px; color: #666; line-height: 1.8; margin-bottom: 20px; font-family: 'Mulish', sans-serif; }
+    .model-container { width: 100%; height: 550px; border-radius: 12px; z-index: 1; overflow: hidden; position: relative; background: radial-gradient(circle, #fff 0%, #f9f9f9 100%); display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
     model-viewer { width: 100%; height: 100%; outline: none; }
     
     @media (max-width: 991px) {
@@ -388,15 +388,15 @@
         <div class="row align-items-center flex-row-reverse">
             <div class="col-lg-5 col-12">
                 <div class="tech-text-col" data-aos="fade-left" data-aos-duration="1000">
-                      <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 44px; letter-spacing: 1px; color: #fff; text-transform: uppercase; margin-bottom: 15px; margin-top: 0;">OUR TECHNOLOGY</h2>
-                      <h5 style="color: #888; font-weight: 400; font-size: 18px; margin-bottom: 30px; font-family: 'Mulish', sans-serif; text-transform: none;">The gear we use</h5>
-                      <p style="color: #ccc; line-height: 1.9; font-size: 16px; font-weight: 400; font-family: 'Mulish', sans-serif; margin-bottom: 40px;">To capture your epic moments in stunning detail and cinematic quality, we rely on top-tier equipment. Explore the gear that helps us craft unforgettable stories through light and motion.</p>
+                      <h2 style="font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 44px; letter-spacing: 1px; color: #1c2b39; text-transform: uppercase; margin-bottom: 15px; margin-top: 0;">OUR TECHNOLOGY</h2>
+                      <h5 style="color: #627284; font-weight: 400; font-size: 18px; margin-bottom: 30px; font-family: 'Mulish', sans-serif; text-transform: none;">The gear we use</h5>
+                      <p style="color: #666; line-height: 1.9; font-size: 16px; font-weight: 400; font-family: 'Mulish', sans-serif; margin-bottom: 40px;">To capture your epic moments in stunning detail and cinematic quality, we rely on top-tier equipment. Explore the gear that helps us craft unforgettable stories through light and motion.</p>
                 </div>
             </div>
             <div class="col-lg-7 col-12">
                 <div class="model-container" data-aos="fade-right" data-aos-duration="1000">
                     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-                    <model-viewer src="assets/3d/sony_alpha_3.glb" auto-rotate camera-controls shadow-intensity="1" alt="Sony Alpha 3D Model" environment-image="neutral" exposure="1"></model-viewer>
+                    <model-viewer src="assets/3d/sony_alpha_3.glb" loading="lazy" auto-rotate camera-controls shadow-intensity="1" alt="Sony Alpha 3D Model" environment-image="neutral" exposure="1"></model-viewer>
                 </div>
             </div>
         </div>
