@@ -320,14 +320,14 @@
     .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
     .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; }
     
-    .custom-marker { position: absolute; width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; transform: translate(-50%, -100%); cursor: pointer; z-index: 999; border: none; box-shadow: none; border-radius: 0; transition: transform 0.3s; }
-    .custom-marker:hover { transform: translate(-50%, -100%) scale(1.1); }
-    .custom-marker::after { display: none; }
-    .custom-marker-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #333; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; }
-    .vertical-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 100px; color: rgba(0,0,0,0.03); font-family: 'Cormorant Garamond', serif; pointer-events: none; white-space: nowrap; font-weight: 700; letter-spacing: 5px; }
+    /* Map Marker Wrapper */
+    .marker-wrapper { position: absolute; transform: translate(-50%, -100%); z-index: 100; cursor: default; }
+    .custom-marker { width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; cursor: pointer; transition: transform 0.3s; margin: 0 auto; }
+    .custom-marker:hover { transform: scale(1.1); }
+    .custom-marker-label { color: #333; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; text-align: center; margin-top: 5px; text-shadow: 0 0 3px #fff; }
     
     /* Popup styling */
-    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; padding: 0; overflow: hidden; pointer-events: none; }
+    .custom-popup { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; padding: 0; overflow: hidden; pointer-events: none; cursor: default; }
     .custom-popup.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     
     .popup-card-stars { color: #333; font-size: 12px; margin-bottom: 5px; }
@@ -346,14 +346,14 @@
     .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
     .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; }
     
-    .custom-marker { position: absolute; width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; transform: translate(-50%, -100%); cursor: pointer; z-index: 999; border: none; box-shadow: none; border-radius: 0; transition: transform 0.3s; }
-    .custom-marker:hover { transform: translate(-50%, -100%) scale(1.1); }
-    .custom-marker::after { display: none; }
-    .custom-marker-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #333; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; }
-    .vertical-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 100px; color: rgba(0,0,0,0.03); font-family: 'Cormorant Garamond', serif; pointer-events: none; white-space: nowrap; font-weight: 700; letter-spacing: 5px; }
+    /* Map Marker Wrapper */
+    .marker-wrapper { position: absolute; transform: translate(-50%, -100%); z-index: 100; cursor: default; }
+    .custom-marker { width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; cursor: pointer; transition: transform 0.3s; margin: 0 auto; }
+    .custom-marker:hover { transform: scale(1.1); }
+    .custom-marker-label { color: #333; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; text-align: center; margin-top: 5px; text-shadow: 0 0 3px #fff; }
     
     /* Popup styling */
-    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; padding: 0; overflow: hidden; pointer-events: none; }
+    .custom-popup { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; padding: 0; overflow: hidden; pointer-events: none; cursor: default; }
     .custom-popup.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     
     .popup-card-stars { color: #333; font-size: 12px; margin-bottom: 5px; }
@@ -917,15 +917,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     let firstPin = true;
                     
                     data.pins.forEach(pin => {
-                        const marker = document.createElement('div');
-                        marker.className = 'custom-marker';
-                        marker.style.left = pin.pos_x + '%';
-                        marker.style.top = pin.pos_y + '%';
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'marker-wrapper';
+                        wrapper.style.left = pin.pos_x + '%';
+                        wrapper.style.top = pin.pos_y + '%';
                         
                         const imageHtml = pin.image_path ? `<img src="/${pin.image_path}" class="popup-card-img">` : `<div class="popup-card-img" style="background: #eee;"></div>`;
                         
                         const popupContent = `
-                            <div class="custom-popup">
+                            <div class="custom-marker"></div>
+                            <div class="custom-marker-label">${pin.title}</div>
+                            <div class="custom-popup ${firstPin ? 'active' : ''}">
                                 <div class="popup-close-btn">&times;</div>
                                 <div style="position: relative;">
                                     ${imageHtml}
@@ -949,27 +951,28 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         `;
                         
-                        marker.innerHTML = `<div class="custom-marker-label">${pin.title}</div>` + popupContent;
+                        wrapper.innerHTML = popupContent;
                         
-                        // Close btn logic
-                        const closeBtn = marker.querySelector('.popup-close-btn');
+                        const markerIcon = wrapper.querySelector('.custom-marker');
+                        const popup = wrapper.querySelector('.custom-popup');
+                        const closeBtn = wrapper.querySelector('.popup-close-btn');
+                        
+                        // Close button logic
                         closeBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            marker.querySelector('.custom-popup').classList.remove('active');
+                            popup.classList.remove('active');
                         });
                         
-                                                // Marker click logic
-                        marker.addEventListener('click', (e) => {
-                            if (e.target.closest('.custom-popup') && !e.target.classList.contains('popup-close-btn')) {
-                                return; // don't close if clicking inside popup
-                            }
+                        // Marker icon logic
+                        markerIcon.addEventListener('click', (e) => {
+                            e.stopPropagation();
                             // Close all others
                             document.querySelectorAll('.custom-popup').forEach(p => p.classList.remove('active'));
                             // Open this
-                            marker.querySelector('.custom-popup').classList.add('active');
+                            popup.classList.add('active');
                         });
                         
-                        pinsLayer.appendChild(marker);
+                        pinsLayer.appendChild(wrapper);
                         firstPin = false;
                     });
                 }
