@@ -20,7 +20,7 @@ text = re.sub(r'<h5 style="color: #c5a880.*?</p>\s*</div>', new_text_content.str
 # 2. Replace Leaflet CSS/JS and add Vector Map CSS
 vector_map_css = '''
     /* Vector Map Styles */
-    .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
+    .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%); mask-image: radial-gradient(circle at center, black 40%, transparent 100%); }
     .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0.9; }
     
     .custom-marker { position: absolute; background: #000; border: 3px solid #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); width: 20px; height: 20px; transform: translate(-50%, -50%); cursor: pointer; transition: transform 0.3s; z-index: 10; }
