@@ -333,6 +333,26 @@ async function initDatabases() {
           await panlePool.query('INSERT INTO map_pins (title, description, image_path, lat, lng) VALUES (?, ?, ?, ?, ?)', pin);
         }
       }
+
+      // Migrate any broken pins pointing to deleted ephemeral uploads
+      try {
+        const [oldPins] = await panlePool.query('SELECT * FROM map_pins WHERE image_path LIKE "pannl/uploads/%"');
+        if (oldPins.length > 0) {
+          const fs = require('fs');
+          const path = require('path');
+          const sharp = require('sharp');
+          const fallbackImg = path.join(__dirname, 'assets', 'images', 'about.jpg');
+          if (fs.existsSync(fallbackImg)) {
+            const buffer = await sharp(fallbackImg).resize(800, 600, {fit: 'cover'}).jpeg({quality: 90}).toBuffer();
+            const base64Data = buffer.toString('base64');
+            const dbPath = `data:image/jpeg;base64,${base64Data}`;
+            await panlePool.query('UPDATE map_pins SET image_path = ? WHERE image_path LIKE "pannl/uploads/%"', [dbPath]);
+            console.log('Successfully migrated broken pins to Base64.');
+          }
+        }
+      } catch (e) {
+        console.error('Migration error:', e);
+      }
     
     // Ensure existing table structure is migrated to TEXT
     try {
