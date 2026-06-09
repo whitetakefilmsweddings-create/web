@@ -1646,8 +1646,15 @@ app.get('/pannl/api.php', async (req, res) => {
   }
 });
 
+app.get('/health', (req, res) => res.json({ status: 'ok', version: '2:00 PM codebase' }));
+
 // Start Server
 app.listen(PORT, async () => {
   console.log(`Server is running on http://localhost:${PORT}`);
-  await initDatabases();
+  try {
+    await initDatabases();
+    console.log("Databases initialized successfully");
+  } catch (err) {
+    console.error("Database Initialization Error:", err);
+  }
 });
