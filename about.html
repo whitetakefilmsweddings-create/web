@@ -312,22 +312,22 @@
 
 <!-- start of about-map-section -->
 <style>
-    .about-map-section { padding: 100px 0; background: #1b232f; border-bottom: none; }
+    .about-map-section { padding: 100px 0; background: #fff; border-bottom: 1px solid #eaeaea; }
     .about-text-col { display: flex; flex-direction: column; justify-content: center; padding-right: 50px; }
-    .about-text-col h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 5vw, 64px); color: #eaeaea; margin-bottom: 20px; line-height: 1.1; }
-    .about-text-col p { font-size: 16px; color: #a5b0bd; line-height: 1.8; margin-bottom: 20px; font-family: 'Mulish', sans-serif; }
+    .about-text-col h2 { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 5vw, 64px); color: #222; margin-bottom: 20px; line-height: 1.1; }
+    .about-text-col p { font-size: 16px; color: #666; line-height: 1.8; margin-bottom: 20px; font-family: 'Mulish', sans-serif; }
     /* Vector Map Styles */
     .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
     .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; }
     
-    .custom-marker { position: absolute; width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; border: none; box-shadow: none; border-radius: 0; transition: transform 0.3s; }
+    .custom-marker { position: absolute; width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; transform: translate(-50%, -100%); cursor: pointer; z-index: 999; border: none; box-shadow: none; border-radius: 0; transition: transform 0.3s; }
     .custom-marker:hover { transform: translate(-50%, -100%) scale(1.1); }
     .custom-marker::after { display: none; }
-    .custom-marker-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #a5b0bd; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; }
-    .vertical-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 100px; color: rgba(255,255,255,0.03); font-family: 'Cormorant Garamond', serif; pointer-events: none; white-space: nowrap; font-weight: 700; letter-spacing: 5px; }
+    .custom-marker-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #333; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; }
+    .vertical-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 100px; color: rgba(0,0,0,0.03); font-family: 'Cormorant Garamond', serif; pointer-events: none; white-space: nowrap; font-weight: 700; letter-spacing: 5px; }
     
     /* Popup styling */
-    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; padding: 0; overflow: hidden; pointer-events: none; }
+    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; padding: 0; overflow: hidden; pointer-events: none; }
     .custom-popup.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     
     .popup-card-stars { color: #333; font-size: 12px; margin-bottom: 5px; }
@@ -346,14 +346,14 @@
     .map-container { width: 100%; height: auto; padding-bottom: 100%; border-radius: 12px; z-index: 1; border: none; overflow: visible; position: relative; background: transparent; box-shadow: none; }
     .vector-map-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; opacity: 1; }
     
-    .custom-marker { position: absolute; width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; transform: translate(-50%, -100%); cursor: pointer; z-index: 10; border: none; box-shadow: none; border-radius: 0; transition: transform 0.3s; }
+    .custom-marker { position: absolute; width: 24px; height: 32px; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20c0-6.6-5.4-12-12-12zm0 16c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z" fill="%23d35400"/></svg>') no-repeat center center; background-size: contain; transform: translate(-50%, -100%); cursor: pointer; z-index: 999; border: none; box-shadow: none; border-radius: 0; transition: transform 0.3s; }
     .custom-marker:hover { transform: translate(-50%, -100%) scale(1.1); }
     .custom-marker::after { display: none; }
-    .custom-marker-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #a5b0bd; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; }
-    .vertical-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 100px; color: rgba(255,255,255,0.03); font-family: 'Cormorant Garamond', serif; pointer-events: none; white-space: nowrap; font-weight: 700; letter-spacing: 5px; }
+    .custom-marker-label { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); color: #333; font-size: 11px; white-space: nowrap; pointer-events: none; font-weight: 700; font-family: 'Mulish', sans-serif; }
+    .vertical-text { position: absolute; right: -20px; top: 50%; transform: translateY(-50%) rotate(90deg); font-size: 100px; color: rgba(0,0,0,0.03); font-family: 'Cormorant Garamond', serif; pointer-events: none; white-space: nowrap; font-weight: 700; letter-spacing: 5px; }
     
     /* Popup styling */
-    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 20; padding: 0; overflow: hidden; pointer-events: none; }
+    .custom-popup { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); width: 240px; background: #fff; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 9999; padding: 0; overflow: hidden; pointer-events: none; }
     .custom-popup.active { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); pointer-events: auto; }
     
     .popup-card-stars { color: #333; font-size: 12px; margin-bottom: 5px; }
@@ -370,9 +370,9 @@
 
 <section class="about-map-section">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-5 col-12">
-                <div class="about-text-col" data-aos="fade-right" data-aos-duration="1000">
+        <div class="row">
+            <div class="col-lg-10 col-12 mx-auto text-center mb-5">
+                <div class="about-text-col" data-aos="fade-up" data-aos-duration="1000" style="padding-right: 0;">
                     <h5 style="color: #c5a880; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 13px; margin-bottom: 15px;">About WhiteTake Films</h5>
                     <h2 style="font-size: clamp(32px, 4vw, 48px); margin-bottom: 25px;">Capturing Timeless Stories With Elegance & Emotion</h2>
                     <p>At WhiteTake Films, we believe every wedding is a once-in-a-lifetime story that deserves to be captured with elegance, emotion, and authenticity. Based in Trivandrum, we are a premium wedding photography and filmmaking team dedicated to transforming beautiful moments into timeless memories.</p>
@@ -381,7 +381,9 @@
                     <p><strong>Trusted by 250+ couples, covering 300+ events, delivering premium memories across India — WhiteTake Films is where beautiful moments become timeless stories.</strong></p>
                 </div>
             </div>
-            <div class="col-lg-7 col-12">
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-md-10 mx-auto col-12">
                 <div class="map-container" id="frontend-map" data-aos="fade-left" data-aos-duration="1000">
                     <div class="vertical-text">South India</div>
                     <img src="assets/images/vector_map.svg" class="vector-map-bg" alt="South India Vector Map">
@@ -956,8 +958,11 @@ document.addEventListener('DOMContentLoaded', function() {
                             marker.querySelector('.custom-popup').classList.remove('active');
                         });
                         
-                        // Marker click logic
-                        marker.addEventListener('click', () => {
+                                                // Marker click logic
+                        marker.addEventListener('click', (e) => {
+                            if (e.target.closest('.custom-popup') && !e.target.classList.contains('popup-close-btn')) {
+                                return; // don't close if clicking inside popup
+                            }
                             // Close all others
                             document.querySelectorAll('.custom-popup').forEach(p => p.classList.remove('active'));
                             // Open this
