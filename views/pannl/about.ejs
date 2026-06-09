@@ -360,15 +360,13 @@
         }
     </style>
 
-    <!-- Vector Map Assets -->
+    <!-- Leaflet Map Assets -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         .map-card { background-color: #111; border: 1px solid #1c1c1c; border-radius: 16px; padding: 25px; transition: transform 0.3s; }
         .map-card-title { font-size: 16px; font-weight: 900; text-transform: uppercase; color: #fff; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 15px; }
-        
-        .vector-map-wrapper { position: relative; width: 100%; max-width: 400px; margin: 0 auto 20px auto; border-radius: 12px; background: #fff; overflow: hidden; border: 1px solid #333; cursor: crosshair; }
-        .vector-map-img { width: 100%; display: block; }
-        .admin-map-pin { position: absolute; width: 16px; height: 16px; background: #000; border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        
+        #admin-map { height: 300px; width: 100%; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; z-index: 1; }
         .pin-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 20px; }
         .pin-item { background: #050505; border: 1px solid #222; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 8px; }
         .pin-item img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; }
@@ -484,13 +482,10 @@
                 <!-- Left: Map to pick location -->
                 <div style="flex: 1; min-width: 300px;">
                     <p style="font-size: 13px; color: #aaa; margin-bottom: 10px;">Click anywhere on the map to set the exact pin location.</p>
-                    <div class="vector-map-wrapper" id="admin-map-wrapper">
-                        <img src="/assets/images/vector_map.svg" class="vector-map-img" alt="Map">
-                        <div class="admin-map-pin" id="admin-marker" style="left: 50%; top: 50%;"></div>
-                    </div>
+                    <div id="admin-map"></div>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="pin-x" placeholder="X %" readonly style="background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; flex: 1; font-family: monospace; font-size: 12px;">
-                        <input type="text" id="pin-y" placeholder="Y %" readonly style="background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; flex: 1; font-family: monospace; font-size: 12px;">
+                        <input type="text" id="pin-lat" placeholder="Latitude" readonly style="background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; flex: 1; font-family: monospace; font-size: 12px;">
+                        <input type="text" id="pin-lng" placeholder="Longitude" readonly style="background: #000; border: 1px solid #333; color: #fff; padding: 8px; border-radius: 6px; flex: 1; font-family: monospace; font-size: 12px;">
                     </div>
                 </div>
 
@@ -526,7 +521,7 @@
                             <% if(pin.image_path) { %><img src="/<%= pin.image_path %>" alt="Pin Image"><% } %>
                             <div class="pin-item-title"><%= pin.title %></div>
                             <div class="pin-item-desc"><%= pin.description %></div>
-                            <div style="font-family: monospace; font-size: 11px; color: #555;"><i class="fa fa-map-marker-alt"></i> X: <%= pin.pos_x %>%, Y: <%= pin.pos_y %>%</div>
+                            <div style="font-family: monospace; font-size: 11px; color: #555;"><i class="fa fa-map-marker-alt"></i> <%= pin.lat %>, <%= pin.lng %></div>
                             <button class="pin-delete-btn" onclick="deleteMapPin(<%= pin.id %>)"><i class="fa fa-trash"></i> Remove Pin</button>
                         </div>
                     <% }) %>
@@ -1021,31 +1016,30 @@
             });
         });
     
-        // --- Vector Map Editor Logic ---
+        // --- Interactive Map Editor Logic ---
+        let adminMap, adminMarker;
+        
         document.addEventListener('DOMContentLoaded', function() {
-            const mapWrapper = document.getElementById('admin-map-wrapper');
-            const adminMarker = document.getElementById('admin-marker');
-            const pinXInput = document.getElementById('pin-x');
-            const pinYInput = document.getElementById('pin-y');
-            
-            if (mapWrapper) {
-                // Default center
-                pinXInput.value = '50.00';
-                pinYInput.value = '50.00';
+            const mapContainer = document.getElementById('admin-map');
+            if (mapContainer && typeof L !== 'undefined') {
+                adminMap = L.map('admin-map').setView([10.8505, 76.2711], 6);
                 
-                mapWrapper.addEventListener('click', function(e) {
-                    const rect = mapWrapper.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    
-                    const percentX = (x / rect.width) * 100;
-                    const percentY = (y / rect.height) * 100;
-                    
-                    adminMarker.style.left = percentX + '%';
-                    adminMarker.style.top = percentY + '%';
-                    
-                    pinXInput.value = percentX.toFixed(2);
-                    pinYInput.value = percentY.toFixed(2);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; OpenStreetMap &copy; CARTO',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                }).addTo(adminMap);
+                
+                adminMarker = L.marker([10.8505, 76.2711]).addTo(adminMap);
+                document.getElementById('pin-lat').value = '10.850500';
+                document.getElementById('pin-lng').value = '76.271100';
+                
+                adminMap.on('click', function(e) {
+                    const lat = e.latlng.lat;
+                    const lng = e.latlng.lng;
+                    adminMarker.setLatLng([lat, lng]);
+                    document.getElementById('pin-lat').value = lat.toFixed(6);
+                    document.getElementById('pin-lng').value = lng.toFixed(6);
                 });
             }
             
@@ -1056,12 +1050,12 @@
                     
                     const title = document.getElementById('pin-title').value;
                     const desc = document.getElementById('pin-desc').value;
-                    const posX = document.getElementById('pin-x').value;
-                    const posY = document.getElementById('pin-y').value;
+                    const lat = document.getElementById('pin-lat').value;
+                    const lng = document.getElementById('pin-lng').value;
                     const fileInput = document.getElementById('pin-image');
                     const status = document.getElementById('pin-status');
                     
-                    if (!posX || !posY) {
+                    if (!lat || !lng) {
                         status.style.color = '#ff4a4a';
                         status.innerText = 'Please click on the map to select a location.';
                         return;
@@ -1079,8 +1073,8 @@
                     const formData = new FormData();
                     formData.append('title', title);
                     formData.append('description', desc);
-                    formData.append('pos_x', posX);
-                    formData.append('pos_y', posY);
+                    formData.append('lat', lat);
+                    formData.append('lng', lng);
                     formData.append('image', fileInput.files[0]);
                     
                     fetch('/pannl/add_map_pin', {
