@@ -25,28 +25,7 @@ const panlePool = mysql.createPool({
   charset: 'utf8mb4'
 });
 
-// Create shared session store
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
-
-const sessionStore = new MySQLStore({
-  clearExpired: true,
-  checkExpirationInterval: 900000,
-  expiration: 86400000,
-  createDatabaseTable: true,
-  schema: {
-    tableName: 'sessions',
-    columnNames: {
-      session_id: 'session_id',
-      expires: 'expires',
-      data: 'data'
-    }
-  }
-}, tdsPool);
-
 module.exports = {
   tdsPool,
-  panlePool,
-  sessionStore
+  panlePool
 };
-
