@@ -588,7 +588,7 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
 
     if (folderId) {
       try {
-        const dFiles = await drive.getFiles(folderId);
+        const dFiles = await drive.getAllFilesRecursive(folderId);
         for (const file of dFiles) {
           const mime = file.getMimeType();
           if (mime === 'application/vnd.google-apps.folder' || mime.includes('zip')) {
@@ -642,7 +642,7 @@ app.post('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => 
     const selections = selRows.map(r => r.file_id);
 
     const drive = new GoogleDrive();
-    const dFiles = await drive.getFiles(folderId);
+    const dFiles = await drive.getAllFilesRecursive(folderId);
     
     let deletedCount = 0;
     let failedCount = 0;
@@ -689,7 +689,7 @@ app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
     let error = '';
 
     try {
-      const dFiles = await drive.getFiles(folderId);
+      const dFiles = await drive.getAllFilesRecursive(folderId);
       for (const file of dFiles) {
         const mime = file.getMimeType();
         if (mime === 'application/vnd.google-apps.folder') continue;
@@ -1064,7 +1064,7 @@ app.get('/Admin/client/gallery.php', requireClient, async (req, res) => {
     if (folderId) {
       try {
         const drive = new GoogleDrive();
-        const dFiles = await drive.getFiles(folderId);
+        const dFiles = await drive.getAllFilesRecursive(folderId);
 
         for (const file of dFiles) {
           const mime = file.getMimeType();
@@ -1251,7 +1251,7 @@ app.get('/Admin/client/download_zip.php', requireClient, async (req, res) => {
     archive.pipe(res);
 
     const drive = new GoogleDrive();
-    const dFiles = await drive.getFiles(folderId);
+    const dFiles = await drive.getAllFilesRecursive(folderId);
     
     for (const file of dFiles) {
       if (file.getMimeType() !== 'application/vnd.google-apps.folder') {
@@ -1317,7 +1317,7 @@ app.get('/Admin/client/get_files_json.php', requireClient, async (req, res) => {
 
   try {
     const drive = new GoogleDrive();
-    const files = await drive.getFiles(folderId);
+    const files = await drive.getAllFilesRecursive(folderId);
     
     const cleanFiles = [];
     for (const f of files) {

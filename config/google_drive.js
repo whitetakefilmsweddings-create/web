@@ -140,6 +140,27 @@ class GoogleDrive {
     return files;
   }
 
+  async getAllFilesRecursive(folderId) {
+    let allFiles = [];
+    const files = await this.getFiles(folderId);
+    const subfolderPromises = [];
+    
+    for (const file of files) {
+      if (file.getMimeType() === 'application/vnd.google-apps.folder') {
+        subfolderPromises.push(this.getAllFilesRecursive(file.getId()));
+      } else {
+        allFiles.push(file);
+      }
+    }
+    
+    const subfolderResults = await Promise.all(subfolderPromises);
+    for (const subFiles of subfolderResults) {
+      allFiles = allFiles.concat(subFiles);
+    }
+    
+    return allFiles;
+  }
+
   async deleteFile(fileId) {
     await this.authenticateServiceAccount();
     if (!this.accessToken) {
