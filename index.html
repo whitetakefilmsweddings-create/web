@@ -952,6 +952,255 @@
     </section>
     <!-- end our-favorite-moments-section -->
 
+    <!-- start custom-plan-ai-section -->
+    <section class="custom-plan-ai-section section-padding" id="custom-plan" style="background-color: #000; padding: 80px 0; color: #fff; border-top: 1px solid #222;">
+        <div class="container">
+            <div style="width: 100%; text-align: center; margin-bottom: 40px;">
+                <h1 class="couples-title" style="color: #fff;">Build Your Custom Plan</h1>
+                <div class="couples-subtitle" style="color: #aaa;">Answer a few questions and our AI will build a tailored package for you</div>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10 col-12">
+                    <div class="ai-chat-container" style="background: #111; border-radius: 24px; padding: 30px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); border: 1px solid #333;">
+                        
+                        <!-- Chat Box -->
+                        <div id="ai-chat-box" style="height: 350px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; scroll-behavior: smooth;">
+                            <!-- Initial Bot Message -->
+                            <div class="chat-message bot-msg" style="align-self: flex-start; max-width: 80%; display: flex; gap: 10px;">
+                                <div style="width: 35px; height: 35px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <img src="assets/images/logo-black.png" alt="WhiteTake AI" style="width: 25px; object-fit: contain;">
+                                </div>
+                                <div class="chat-msg-bot">
+                                    Hi there! 👋 I'm your WhiteTake assistant. To customize a package for you, what type of event are you planning? (e.g., Wedding, Pre-Wedding, Engagement)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Chat Input Area -->
+                        <div class="chat-input-area" id="ai-options-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                            <!-- Options will be injected here dynamically -->
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="ai-chat-input" placeholder="Type your answer here..." style="flex-grow: 1; background: #222; border: 1px solid #444; border-radius: 50px; padding: 12px 20px; color: #fff; font-family: 'Mulish', sans-serif; font-size: 14px; outline: none;">
+                            <button id="ai-chat-send" style="background: #fff; color: #000; border: none; border-radius: 50px; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.2s;">
+                                <i class="fa fa-paper-plane" style="font-size: 16px;"></i>
+                            </button>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            #ai-chat-box::-webkit-scrollbar {
+                width: 6px;
+            }
+            #ai-chat-box::-webkit-scrollbar-track {
+                background: #111; 
+            }
+            #ai-chat-box::-webkit-scrollbar-thumb {
+                background: #444; 
+                border-radius: 10px;
+            }
+            .chat-msg-user {
+                align-self: flex-end;
+                background: #fff;
+                color: #000;
+                padding: 12px 18px;
+                border-radius: 18px 18px 4px 18px;
+                font-family: 'Mulish', sans-serif;
+                font-size: 14px;
+                max-width: 80%;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                animation: popIn 0.3s ease;
+            }
+            .chat-msg-bot {
+                align-self: flex-start;
+                background: #222;
+                color: #ddd;
+                padding: 12px 18px;
+                border-radius: 18px 18px 18px 4px;
+                font-family: 'Mulish', sans-serif;
+                font-size: 14px;
+                max-width: 80%;
+                animation: popIn 0.3s ease;
+            }
+            .ai-option-btn {
+                background: transparent;
+                border: 1px solid #555;
+                color: #fff;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 13px;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-family: 'Mulish', sans-serif;
+            }
+            .ai-option-btn:hover {
+                background: #fff;
+                color: #000;
+                border-color: #fff;
+            }
+            #ai-chat-send:hover {
+                transform: scale(1.05);
+            }
+            @keyframes popIn {
+                0% { opacity: 0; transform: translateY(10px); }
+                100% { opacity: 1; transform: translateY(0); }
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const chatBox = document.getElementById('ai-chat-box');
+                const chatInput = document.getElementById('ai-chat-input');
+                const sendBtn = document.getElementById('ai-chat-send');
+                const optionsContainer = document.getElementById('ai-options-container');
+                
+                const phoneNumber = "+918714128539"; 
+                
+                let step = 0;
+                let userAnswers = {};
+                
+                const flow = [
+                    {
+                        question: "Hi there! 👋 I'm your WhiteTake assistant. To customize a package for you, what type of event are you planning?",
+                        key: "event",
+                        options: ["Wedding", "Pre-Wedding", "Engagement", "Other"]
+                    },
+                    {
+                        question: "Great! Are we covering the Bride's side, Groom's side, or Both?",
+                        key: "side",
+                        options: ["Bride Side", "Groom Side", "Both Sides"]
+                    },
+                    {
+                        question: "How many days will the events span across?",
+                        key: "days",
+                        options: ["1 Day", "2 Days", "3+ Days"]
+                    },
+                    {
+                        question: "Roughly how many guests are you expecting?",
+                        key: "guests",
+                        options: ["Under 200", "200 - 500", "500 - 1000", "1000+"]
+                    },
+                    {
+                        question: "Awesome! I've noted down your requirements. Click the button below to send this directly to our team on WhatsApp, and we'll instantly share a customized quote with you!",
+                        key: "done",
+                        options: []
+                    }
+                ];
+
+                function renderOptions(options) {
+                    optionsContainer.innerHTML = '';
+                    options.forEach(opt => {
+                        const btn = document.createElement('button');
+                        btn.className = 'ai-option-btn';
+                        btn.innerText = opt;
+                        btn.onclick = () => handleUserInput(opt);
+                        optionsContainer.appendChild(btn);
+                    });
+                }
+
+                function addMessage(text, isUser = false) {
+                    const msgDiv = document.createElement('div');
+                    if (isUser) {
+                        msgDiv.className = 'chat-msg-user';
+                        msgDiv.innerText = text;
+                    } else {
+                        msgDiv.style.alignSelf = 'flex-start';
+                        msgDiv.style.maxWidth = '80%';
+                        msgDiv.style.display = 'flex';
+                        msgDiv.style.gap = '10px';
+                        
+                        const avatar = document.createElement('div');
+                        avatar.style.cssText = 'width: 35px; height: 35px; border-radius: 50%; background: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;';
+                        avatar.innerHTML = '<img src="assets/images/logo-black.png" style="width: 25px; object-fit: contain;">';
+                        
+                        const textDiv = document.createElement('div');
+                        textDiv.className = 'chat-msg-bot';
+                        textDiv.innerHTML = text; 
+                        
+                        msgDiv.appendChild(avatar);
+                        msgDiv.appendChild(textDiv);
+                    }
+                    chatBox.appendChild(msgDiv);
+                    
+                    // Smooth scroll to bottom
+                    setTimeout(() => {
+                        chatBox.scrollTo({
+                            top: chatBox.scrollHeight,
+                            behavior: 'smooth'
+                        });
+                    }, 50);
+                }
+
+                function nextStep() {
+                    step++;
+                    if (step < flow.length) {
+                        const current = flow[step];
+                        // Simulate typing delay
+                        setTimeout(() => {
+                            if (step === flow.length - 1) {
+                                // Final step - Generate WhatsApp Link
+                                let summary = `Hello WhiteTake Films! 👋 I'm looking for a custom photography package.\n\nHere are my requirements:\n`;
+                                summary += `📌 *Event:* ${userAnswers['event']}\n`;
+                                summary += `📌 *Side:* ${userAnswers['side']}\n`;
+                                summary += `📌 *Duration:* ${userAnswers['days']}\n`;
+                                summary += `📌 *Expected Guests:* ${userAnswers['guests']}\n\n`;
+                                summary += `Please let me know the best packages and pricing!`;
+                                
+                                const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(summary)}`;
+                                
+                                const finalMsg = `${current.question}<br><br><a href="${waUrl}" target="_blank" style="display: inline-block; background: #25D366; color: #fff; padding: 12px 24px; border-radius: 50px; text-decoration: none; font-weight: bold; font-family: 'Outfit', sans-serif; box-shadow: 0 4px 10px rgba(37,211,102,0.3);"><i class="fa fa-whatsapp" style="font-size: 16px; margin-right: 8px;"></i> Send to WhatsApp</a>`;
+                                
+                                addMessage(finalMsg, false);
+                                renderOptions([]);
+                                chatInput.disabled = true;
+                                sendBtn.disabled = true;
+                                chatInput.placeholder = "Plan complete! Check WhatsApp.";
+                                chatInput.style.opacity = '0.5';
+                                sendBtn.style.opacity = '0.5';
+                            } else {
+                                addMessage(current.question, false);
+                                renderOptions(current.options);
+                            }
+                        }, 800); // 800ms bot delay for realism
+                    }
+                }
+
+                function handleUserInput(text) {
+                    if (!text.trim() || step >= flow.length - 1) return;
+                    
+                    addMessage(text, true);
+                    const current = flow[step];
+                    userAnswers[current.key] = text;
+                    
+                    chatInput.value = '';
+                    optionsContainer.innerHTML = '';
+                    
+                    nextStep();
+                }
+
+                sendBtn.addEventListener('click', () => {
+                    handleUserInput(chatInput.value);
+                });
+
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleUserInput(chatInput.value);
+                    }
+                });
+
+                // Init first step options
+                renderOptions(flow[0].options);
+            });
+        </script>
+    </section>
+    <!-- end custom-plan-ai-section -->
+
     <!-- start pricing-section -->
     <section class="pricing-section section-padding" id="pricing" style="background-color: #fdfdfd; padding: 80px 0; border-top: 1px solid #eaeaea;">
         <div class="container">
