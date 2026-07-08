@@ -1732,9 +1732,26 @@
                             const videoModal = document.getElementById('feature-video-modal');
                             const videoIframe = document.getElementById('feature-video-iframe');
                             const closeBtn = document.getElementById('close-feature-video-modal');
+                            const featureImgElement = document.getElementById('feature-card-img');
 
                             if (videoTrigger && videoModal && videoIframe) {
-                                const embedUrl = convertToEmbedUrl(res.images['feature_video']);
+                                // Extract video ID for embed and thumbnail fallback
+                                const url = res.images['feature_video'];
+                                const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+                                const match = url.match(regExp);
+                                const videoId = (match && match[2].length === 11) ? match[2] : null;
+                                const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+
+                                // If we have a video ID, apply the YouTube thumbnail as a fallback
+                                if (videoId && featureImgElement) {
+                                    featureImgElement.setAttribute('onerror', `this.onerror=null; this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg';`);
+                                    // If no valid src was set yet, force the YouTube thumbnail immediately
+                                    if (!featureImgElement.dataset.src || featureImgElement.dataset.src.includes('assets/images/')) {
+                                        featureImgElement.dataset.src = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                                        featureImgElement.src = featureImgElement.dataset.src;
+                                    }
+                                }
+
                                 videoTrigger.addEventListener('click', function() {
                                     videoIframe.src = embedUrl;
                                     videoModal.style.display = 'flex';
