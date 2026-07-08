@@ -1596,7 +1596,11 @@
                             if (res.images[key]) {
                                 const imgElement = document.getElementById(elementId);
                                 if (imgElement) {
-                                    imgElement.dataset.src = res.images[key];
+                                    let imgPath = res.images[key];
+                                    if (imgPath.includes('s3.jpg')) {
+                                        imgPath = imgPath.replace('s3.jpg', 'slide-3.jpg');
+                                    }
+                                    imgElement.dataset.src = imgPath;
                                     lazyObserver.observe(imgElement);
                                 }
                             }
@@ -1614,7 +1618,11 @@
                             if (res.images[key]) {
                                 const bgElement = document.getElementById(elementId);
                                 if (bgElement) {
-                                    bgElement.dataset.src = res.images[key];
+                                    let imgPath = res.images[key];
+                                    if (imgPath.includes('s3.jpg')) {
+                                        imgPath = imgPath.replace('s3.jpg', 'slide-3.jpg');
+                                    }
+                                    bgElement.dataset.src = imgPath;
                                     lazyObserver.observe(bgElement);
                                 }
                             }
