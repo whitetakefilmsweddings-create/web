@@ -938,10 +938,11 @@
                         alert('Upload error: ' + (res.message || 'Unknown error'));
                     }
                 } catch(err) {
-                    alert('Server error during upload.');
+                    alert('Server error during upload: ' + xhr.responseText.substring(0, 150));
                 }
                 input.value = '';
             };
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.send(formData);
         }
 
@@ -1017,6 +1018,7 @@
                 
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/pannl/upload.php', true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 
                 xhr.upload.addEventListener('progress', function(e) {
                     if (e.lengthComputable) {
@@ -1044,7 +1046,7 @@
                             }
                         } catch(e) {
                             statusDiv.className = 'upload-status error';
-                            statusDiv.innerText = 'Upload failed. Server error.';
+                            statusDiv.innerText = 'Server Error: ' + xhr.responseText.substring(0, 100);
                         }
                     }
                 };
