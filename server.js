@@ -212,9 +212,9 @@ async function initDatabases() {
       ['engagement-reception', 'engagement_reception_title_bg', 'pic/service/Engagement%20_Reception.webp'],
       ['drone-coverage', 'drone_coverage_title_bg', 'pic/service/dron.webp'],
       ['albums-prints', 'albums_prints_title_bg', 'pic/service/album.webp'],
-      ['gallery', 'gallery_title_bg', 'assets/images/slider/s3.jpg'],
-      ['contact', 'contact_title_bg', 'assets/images/slider/s3.jpg'],
-      ['home', 'feature_image', 'assets/images/slider/s3.jpg'],
+      ['gallery', 'gallery_title_bg', 'assets/images/slider/slide-3.jpg'],
+      ['contact', 'contact_title_bg', 'assets/images/slider/slide-3.jpg'],
+      ['home', 'feature_image', 'assets/images/slider/slide-3.jpg'],
       ['home', 'feature_video', 'https://www.youtube.com/watch?v=F384n1wXQoY'],
       // Services Accordion
       ['home', 'services_accordion_1', 'pic/service/Wedding%20Photography%20copy.webp'],
@@ -293,6 +293,8 @@ async function initDatabases() {
     }
     // Clean up deprecated home page sections no longer in use
     await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
+    // Fix broken default image paths in existing databases
+    await panlePool.query("UPDATE section_images SET image_path = 'assets/images/slider/slide-3.jpg' WHERE image_path = 'assets/images/slider/s3.jpg'");
     // Run schema migration to change image_path column to LONGTEXT if it's currently VARCHAR(255)
     try {
       await panlePool.query('ALTER TABLE section_images MODIFY COLUMN image_path LONGTEXT NOT NULL');
