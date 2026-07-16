@@ -1515,6 +1515,25 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
         [page_name, section_key, text_value || '']
       );
     }
+    
+    // --- STATIC HTML GENERATION ---
+    const cheerio = require('cheerio');
+    const path = require('path');
+    const fs = require('fs');
+    const fileToUpdate = section_key.startsWith('about_') ? 'about.html' : 'index.html';
+    const filePath = path.join(__dirname, fileToUpdate);
+    
+    if (fs.existsSync(filePath)) {
+        const html = fs.readFileSync(filePath, 'utf8');
+        const $ = cheerio.load(html);
+        const elementId = section_key.replace(/_/g, '-');
+        if ($(`#${elementId}`).length > 0) {
+            $(`#${elementId}`).html(text_value || '');
+            fs.writeFileSync(filePath, $.html());
+        }
+    }
+    // ------------------------------
+    
     res.json({ success: true });
   } catch (err) {
     res.json({ success: false, message: err.message });
