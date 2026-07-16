@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;600;900&display=swap" rel="stylesheet">
     <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- TinyMCE -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -434,6 +436,87 @@
         <div class="page-header" id="about">
             <h1>About Page Editor</h1>
             <p>Upload new images and update text for the About Us page sections.</p>
+        </div>
+        
+        <% 
+           function getTextVal(key, defaultVal) {
+               if (grouped_images && grouped_images['about']) {
+                   const match = grouped_images['about'].find(img => img.section_key === key);
+                   if (match && match.image_path) return match.image_path;
+               }
+               return defaultVal;
+           }
+        %>
+
+        <div class="page-header" style="margin-top: 20px; border-top: 1px solid #1a1a1a; padding-top: 20px;">
+            <h2>About Page Text Editor</h2>
+            <p>Update main titles, subtitles, and paragraphs on the About Us Page.</p>
+        </div>
+
+        <div class="sections-container" style="margin-bottom: 40px;">
+            <!-- Behind the Lens -->
+            <div class="section-card">
+                <div class="section-card-title">Behind the Lens Section</div>
+                
+                <form class="text-update-form" data-key="about_about_title" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Main Title</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('about_about_title', 'BEHIND THE LENS') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Title</button>
+                    <div class="upload-status" id="text-status-about_about_title"></div>
+                </form>
+
+                <form class="text-update-form" data-key="about_about_subtitle" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Subtitle</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('about_about_subtitle', 'About us') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Subtitle</button>
+                    <div class="upload-status" id="text-status-about_about_subtitle"></div>
+                </form>
+
+                <form class="text-update-form" data-key="about_about_desc" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Description</label>
+                    <textarea name="text_value" class="tinymce-editor" rows="4"><%= getTextVal('about_about_desc', 'Based in Trivandrum and traveling India-wide, WhiteTake Films is a premium wedding photography and filmmaking team. Trusted by 250+ couples across 300+ events we craft cinematic films, artistic photography, and luxury albums. Combining candid emotions with grand celebrations, we are known for professionalism, personalized care, and fast, reliable delivery turning your once-in-a-lifetime moments into timeless stories.') %></textarea>
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Description</button>
+                    <div class="upload-status" id="text-status-about_about_desc"></div>
+                </form>
+            </div>
+
+            <!-- Our Technology -->
+            <div class="section-card">
+                <div class="section-card-title">Our Technology Section</div>
+                
+                <form class="text-update-form" data-key="about_tech_title" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Main Title</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('about_tech_title', 'OUR TECHNOLOGY') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Title</button>
+                    <div class="upload-status" id="text-status-about_tech_title"></div>
+                </form>
+
+                <form class="text-update-form" data-key="about_tech_subtitle" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Subtitle</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('about_tech_subtitle', 'The gear we use') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Subtitle</button>
+                    <div class="upload-status" id="text-status-about_tech_subtitle"></div>
+                </form>
+            </div>
+
+            <!-- Why Choose Us -->
+            <div class="section-card">
+                <div class="section-card-title">Why Choose Us Section</div>
+                
+                <form class="text-update-form" data-key="about_why_title" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Main Title</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('about_why_title', 'WHY CHOOSE US') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Title</button>
+                    <div class="upload-status" id="text-status-about_why_title"></div>
+                </form>
+
+                <form class="text-update-form" data-key="about_why_subtitle" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Subtitle</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('about_why_subtitle', 'Our Expertise & Services') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Subtitle</button>
+                    <div class="upload-status" id="text-status-about_why_subtitle"></div>
+                </form>
+            </div>
         </div>
         
         <!-- ── About Page Hero Video Section ── -->
@@ -1123,6 +1206,74 @@
             });
         }
 
+</script>
+<script>
+    // Initialize TinyMCE for textarea text editors
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: '.tinymce-editor',
+            skin: 'oxide-dark',
+            content_css: 'dark',
+            menubar: false,
+            plugins: 'lists link code',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | link | removeformat | code',
+            height: 250,
+            branding: false
+        });
+    }
+
+    // Trigger TinyMCE save on form submit for text editors
+    document.querySelectorAll('.text-update-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Trigger TinyMCE save to textarea
+            if (typeof tinymce !== 'undefined') {
+                tinymce.triggerSave();
+            }
+            const key = this.getAttribute('data-key');
+            const textVal = this.querySelector('[name="text_value"]').value;
+            const statusDiv = document.getElementById('text-status-' + key);
+            const urlTextDiv = document.getElementById('url-text-' + key);
+            
+            if (statusDiv) {
+                statusDiv.className = 'upload-status';
+                statusDiv.style.color = '#aaa';
+                statusDiv.innerText = 'Saving...';
+            }
+            
+            fetch('/pannl/update_section_text.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ section_key: key, text_value: textVal })
+            })
+            .then(response => response.json())
+            .then(res => {
+                if (res.success) {
+                    if (statusDiv) {
+                        statusDiv.style.color = '#4aff4a';
+                        statusDiv.innerText = 'Saved successfully!';
+                    }
+                    if (urlTextDiv) {
+                        urlTextDiv.innerText = textVal;
+                    }
+                    if (statusDiv) setTimeout(() => { statusDiv.innerText = ''; }, 3000);
+                } else {
+                    if (statusDiv) {
+                        statusDiv.style.color = '#ff4a4a';
+                        statusDiv.innerText = 'Error: ' + res.message;
+                    }
+                }
+            })
+            .catch(err => {
+                if (statusDiv) {
+                    statusDiv.style.color = '#ff4a4a';
+                    statusDiv.innerText = 'Failed to save. Server error.';
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>
