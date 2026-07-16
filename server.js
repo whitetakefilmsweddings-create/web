@@ -1568,7 +1568,19 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
         const $ = cheerio.load(html);
         const elementId = section_key.replace(/_/g, '-');
         if ($(`#${elementId}`).length > 0) {
-            $(`#${elementId}`).html(text_value || '');
+            if (elementId.endsWith('-yt')) {
+                const url = text_value || '';
+                $(`#${elementId}`).attr('src', url);
+                if (url) {
+                    $(`#${elementId}`).css('display', 'block');
+                    $(`#${elementId.replace('-yt', '-img')}`).css('display', 'none');
+                } else {
+                    $(`#${elementId}`).css('display', 'none');
+                    $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
+                }
+            } else {
+                $(`#${elementId}`).html(text_value || '');
+            }
             fs.writeFileSync(filePath, $.html());
         }
     }

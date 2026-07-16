@@ -69,6 +69,17 @@
         <div class="panel-grid">
             <div class="panel">
                 <h3>Main Service Text</h3>
+                <form class="text-update-form" data-key="srv_<%= svc %>_yt">
+                    <div class="form-group">
+                        <label>YouTube Embed URL (Optional, replaces left image)</label>
+                        <input type="text" name="text_value" value="<%= getTxt('srv_' + svc + '_yt') %>" placeholder="e.g. https://www.youtube.com/embed/XXXX">
+                        <div class="upload-status" id="text-status-srv_<%= svc %>_yt"></div>
+                    </div>
+                    <button class="btn">Save Video Link</button>
+                </form>
+
+                <hr style="border-color: #333; margin: 20px 0;">
+
                 <form class="text-update-form" data-key="srv_<%= svc %>_subtitle">
                     <div class="form-group">
                         <label>Subtitle (e.g. Wedding Photography)</label>
