@@ -8,6 +8,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;600;900&display=swap" rel="stylesheet">
     <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- TinyMCE -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -582,7 +584,7 @@
                         <!-- Description -->
                         <form class="text-update-form" data-key="story_desc_<%= i %>">
                             <label style="font-size: 11px; color: #777; display: block; margin-bottom: 4px;">Story Description</label>
-                            <textarea name="text_value" required rows="4" 
+                            <textarea name="text_value" class="tinymce-editor" rows="4" 
                                       style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 8px 10px; border-radius: 6px; font-size: 12px; resize: vertical; line-height: 1.4; margin-bottom: 6px;"><%= descObj.image_path %></textarea>
                             <button type="submit" class="upload-btn" style="margin: 0; width: 100%; font-size: 12px;">Save Description</button>
                             <div class="upload-status" id="text-status-story_desc_<%= i %>" style="font-size: 10px; margin-top: 2px;"></div>
@@ -1096,6 +1098,10 @@
         document.querySelectorAll('.text-update-form').forEach(form => {
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                // Trigger TinyMCE save to textarea
+                if (typeof tinymce !== 'undefined') {
+                    tinymce.triggerSave();
+                }
                 const key = this.getAttribute('data-key');
                 const textVal = this.querySelector('[name="text_value"]').value;
                 const statusDiv = document.getElementById('text-status-' + key);
@@ -1229,6 +1235,20 @@
                 }
             });
         });
+        
+        // Initialize TinyMCE
+        if (typeof tinymce !== 'undefined') {
+            tinymce.init({
+                selector: '.tinymce-editor',
+                skin: 'oxide-dark',
+                content_css: 'dark',
+                menubar: false,
+                plugins: 'lists link code',
+                toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist | link | removeformat | code',
+                height: 250,
+                branding: false
+            });
+        }
     </script>
 </body>
 </html>
