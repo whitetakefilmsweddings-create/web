@@ -1501,10 +1501,20 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
     return res.json({ success: false, message: 'Missing parameters' });
   }
   try {
-    await panlePool.execute(
-      'UPDATE section_images SET image_path = ? WHERE section_key = ?',
-      [text_value || '', section_key]
-    );
+    const [rows] = await panlePool.execute('SELECT id FROM section_images WHERE section_key = ?', [section_key]);
+    
+    if (rows.length > 0) {
+      await panlePool.execute(
+        'UPDATE section_images SET image_path = ? WHERE section_key = ?',
+        [text_value || '', section_key]
+      );
+    } else {
+      const page_name = section_key.startsWith('about_') ? 'about' : 'home';
+      await panlePool.execute(
+        'INSERT INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)',
+        [page_name, section_key, text_value || '']
+      );
+    }
     res.json({ success: true });
   } catch (err) {
     res.json({ success: false, message: err.message });
