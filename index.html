@@ -561,11 +561,11 @@
  
                  <!-- Right Group Content -->
                   <div class="couples-group">
-                      <h1 class="couples-title">Behind the Lens</h1>
-                      <div class="couples-subtitle">About us</div>
-                     <p class="couples-desc">
+                      <h1 class="couples-title" id="home-about-title">Behind the Lens</h1>
+                      <div class="couples-subtitle" id="home-about-subtitle">About us</div>
+                     <div class="couples-desc" id="home-about-desc">
                          Based in Trivandrum and traveling India-wide, WhiteTake Films is a premium wedding photography and filmmaking team. Trusted by 250+ couples across 300+ events we craft cinematic films, artistic photography, and luxury albums. Combining candid emotions with grand celebrations, we are known for professionalism, personalized care, and fast, reliable delivery turning your once-in-a-lifetime moments into timeless stories.
-                     </p>
+                     </div>
                      <a href="contact.html" class="couples-btn">read more</a>
                  </div>
  
@@ -580,8 +580,8 @@
     <section class="expanding-services-accordion" style="padding: 30px 0 100px 0; background: #ffffff;">
         <div class="container" style="max-width: 1300px;">
             <div style="width: 100%; text-align: center; margin-bottom: 50px;">
-                <h1 class="couples-title">Wedding Memories That Last</h1>
-                <div class="couples-subtitle">Our Expertise</div>
+                <h1 class="couples-title" id="home-expertise-title">Wedding Memories That Last</h1>
+                <div class="couples-subtitle" id="home-expertise-subtitle">Our Expertise</div>
             </div>
             <style>
                 .accordion-gallery-container {
@@ -838,7 +838,7 @@
                     }
                 </style>
                 <div style="width: 100%; text-align: center; margin-bottom: 50px;">
-                    <h1 class="couples-title">Your Love, Our Passion</h1>
+                    <h1 class="couples-title" id="home-stories-title">Your Love, Our Passion</h1>
                     <div class="couples-subtitle">Featured Stories</div>
                 </div>
             </div>
@@ -1605,6 +1605,27 @@
                                     lazyObserver.observe(imgElement);
                                 }
                             }
+                        }
+
+                        // Inject Dynamic Home Page Text
+                        if (res.images['home_about_title']) {
+                            document.getElementById('home-about-title').innerHTML = res.images['home_about_title'];
+                        }
+                        if (res.images['home_about_subtitle']) {
+                            document.getElementById('home-about-subtitle').innerHTML = res.images['home_about_subtitle'];
+                        }
+                        if (res.images['home_about_desc']) {
+                            document.getElementById('home-about-desc').innerHTML = res.images['home_about_desc'];
+                        }
+                        if (res.images['home_expertise_title']) {
+                            document.getElementById('home-expertise-title').innerHTML = res.images['home_expertise_title'];
+                        }
+                        if (res.images['home_expertise_subtitle']) {
+                            document.getElementById('home-expertise-subtitle').innerHTML = res.images['home_expertise_subtitle'];
+                        }
+                        const storiesTitle = document.getElementById('home-stories-title');
+                        if (storiesTitle && res.images['home_stories_title']) {
+                            storiesTitle.innerHTML = res.images['home_stories_title'];
                         }
 
                         const bgMappings = {

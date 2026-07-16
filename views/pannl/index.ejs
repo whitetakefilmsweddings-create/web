@@ -419,6 +419,85 @@
     <div class="content-area">
         <div class="page-header" id="home">
             <h1>Home Page Editor</h1>
+            <p>Update texts and upload new images for the Home Page.</p>
+        </div>
+
+        <% 
+           function getTextVal(key, defaultVal) {
+               if (grouped_images && grouped_images['home']) {
+                   const match = grouped_images['home'].find(img => img.section_key === key);
+                   if (match && match.image_path) return match.image_path;
+               }
+               return defaultVal;
+           }
+        %>
+
+        <div class="page-header" style="margin-top: 20px; border-top: 1px solid #1a1a1a; padding-top: 20px;">
+            <h2>Home Page Text Editor</h2>
+            <p>Update main titles, subtitles, and paragraphs on the Home Page.</p>
+        </div>
+
+        <div class="sections-container" style="margin-bottom: 40px;">
+            <!-- Behind the Lens -->
+            <div class="section-card">
+                <div class="section-card-title">Behind the Lens Section</div>
+                
+                <form class="text-update-form" data-key="home_about_title" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Main Title</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('home_about_title', 'Behind the Lens') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Title</button>
+                    <div class="upload-status" id="text-status-home_about_title"></div>
+                </form>
+
+                <form class="text-update-form" data-key="home_about_subtitle" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Subtitle</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('home_about_subtitle', 'About us') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Subtitle</button>
+                    <div class="upload-status" id="text-status-home_about_subtitle"></div>
+                </form>
+
+                <form class="text-update-form" data-key="home_about_desc" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Description</label>
+                    <textarea name="text_value" class="tinymce-editor" rows="4"><%= getTextVal('home_about_desc', 'Based in Trivandrum and traveling India-wide, WhiteTake Films is a premium wedding photography and filmmaking team. Trusted by 250+ couples across 300+ events we craft cinematic films, artistic photography, and luxury albums. Combining candid emotions with grand celebrations, we are known for professionalism, personalized care, and fast, reliable delivery turning your once-in-a-lifetime moments into timeless stories.') %></textarea>
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Description</button>
+                    <div class="upload-status" id="text-status-home_about_desc"></div>
+                </form>
+            </div>
+
+            <!-- Our Expertise -->
+            <div class="section-card">
+                <div class="section-card-title">Our Expertise Section</div>
+                
+                <form class="text-update-form" data-key="home_expertise_title" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Main Title</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('home_expertise_title', 'Wedding Memories That Last') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Title</button>
+                    <div class="upload-status" id="text-status-home_expertise_title"></div>
+                </form>
+
+                <form class="text-update-form" data-key="home_expertise_subtitle" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Subtitle</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('home_expertise_subtitle', 'Our Expertise') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Subtitle</button>
+                    <div class="upload-status" id="text-status-home_expertise_subtitle"></div>
+                </form>
+            </div>
+
+            <!-- Featured Stories -->
+            <div class="section-card">
+                <div class="section-card-title">Featured Stories Section</div>
+                
+                <form class="text-update-form" data-key="home_stories_title" style="display: flex; flex-direction: column; gap: 5px;">
+                    <label style="font-size: 11px; color: #777;">Main Title</label>
+                    <input type="text" name="text_value" value="<%= getTextVal('home_stories_title', 'Your Love, Our Passion') %>" required style="width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px;">
+                    <button type="submit" class="upload-btn" style="padding: 8px;">Save Title</button>
+                    <div class="upload-status" id="text-status-home_stories_title"></div>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-header" style="margin-top: 40px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+            <h2>Home Page Images</h2>
             <p>Upload new images to sections. Images will be automatically cropped and resized to exactly 1080 X 1350 format.</p>
         </div>
         
