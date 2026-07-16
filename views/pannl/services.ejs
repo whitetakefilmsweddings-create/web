@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Admin - WhiteTake Films</title>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js" referrerpolicy="origin"></script>
+    <style>
+        body { font-family: 'Mulish', sans-serif; background-color: #111; color: #fff; margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background-color: #000; padding: 20px; border-right: 1px solid #333; overflow-y: auto; }
+        .content { flex-grow: 1; padding: 40px; overflow-y: auto; background-color: #111; }
+        .logo { font-size: 24px; font-weight: 900; letter-spacing: 2px; color: #fff; margin-bottom: 40px; text-decoration: none; display: block; }
+        .sidebar a { display: block; color: #888; text-decoration: none; padding: 12px 15px; margin-bottom: 10px; border-radius: 8px; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background-color: #222; color: #fff; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 28px; font-weight: 600; margin: 0 0 10px 0; }
+        .page-header p { color: #888; font-size: 14px; margin: 0; }
+        .svc-select { background: #222; color: #fff; border: 1px solid #444; padding: 10px; width: 100%; border-radius: 6px; font-size: 16px; margin-bottom: 30px; }
+        
+        .panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; }
+        .panel { background-color: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid #2a2a2a; }
+        .panel h3 { font-size: 18px; margin: 0 0 20px 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; }
+        .form-group input, .form-group textarea { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 6px; box-sizing: border-box; }
+        .btn { background: #fff; color: #000; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-top: 10px; width: 100%; }
+        .btn:hover { background: #e0e0e0; }
+        .upload-status { font-size: 12px; margin-top: 5px; min-height: 18px; }
+        .success { color: #4caf50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/pannl/index.php" class="logo">WHITETAKEFILMS</a>
+        <a href="/pannl/index.php">Home Page</a>
+        <a href="/pannl/about.php">About Page</a>
+        <a href="/pannl/services.php" class="active">Service Pages</a>
+        <a href="/pannl/logout.php" style="margin-top: 50px; background: #ff4c4c; color: #fff; text-align: center;">SIGN OUT</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="page-header">
+            <h1>Service Pages Editor</h1>
+            <p>Select a service page to update its dark-themed layout text and features.</p>
+        </div>
+
+        <select class="svc-select" id="svc-select" onchange="window.location.href='/pannl/services.php?svc=' + this.value">
+            <option value="wedding" <%= svc === 'wedding' ? 'selected' : '' %>>Wedding Photography</option>
+            <option value="cinema" <%= svc === 'cinema' ? 'selected' : '' %>>Cinematic Wedding Films</option>
+            <option value="prewedding" <%= svc === 'prewedding' ? 'selected' : '' %>>Pre-Wedding Shoots</option>
+            <option value="engagement" <%= svc === 'engagement' ? 'selected' : '' %>>Engagement & Reception</option>
+            <option value="drone" <%= svc === 'drone' ? 'selected' : '' %>>Drone Coverage</option>
+            <option value="albums" <%= svc === 'albums' ? 'selected' : '' %>>Albums & Prints</option>
+        </select>
+
+        <% 
+            function getTxt(key) {
+                return (grouped_images['services'] && grouped_images['services'].find(img => img.section_key === key)?.image_path) || '';
+            }
+        %>
+
+        <div class="panel-grid">
+            <div class="panel">
+                <h3>Main Service Text</h3>
+                <form class="text-update-form" data-key="srv_<%= svc %>_subtitle">
+                    <div class="form-group">
+                        <label>Subtitle (e.g. Wedding Photography)</label>
+                        <input type="text" name="text_value" value="<%= getTxt('srv_' + svc + '_subtitle') %>">
+                        <div class="upload-status" id="text-status-srv_<%= svc %>_subtitle"></div>
+                    </div>
+                    <button class="btn">Save Subtitle</button>
+                </form>
+                
+                <hr style="border-color: #333; margin: 20px 0;">
+                
+                <form class="text-update-form" data-key="srv_<%= svc %>_title">
+                    <div class="form-group">
+                        <label>Main Title</label>
+                        <input type="text" name="text_value" value="<%= getTxt('srv_' + svc + '_title') %>">
+                        <div class="upload-status" id="text-status-srv_<%= svc %>_title"></div>
+                    </div>
+                    <button class="btn">Save Title</button>
+                </form>
+
+                <hr style="border-color: #333; margin: 20px 0;">
+
+                <form class="text-update-form" data-key="srv_<%= svc %>_desc">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="text_value" rows="5"><%= getTxt('srv_' + svc + '_desc') %></textarea>
+                        <div class="upload-status" id="text-status-srv_<%= svc %>_desc"></div>
+                    </div>
+                    <button class="btn">Save Description</button>
+                </form>
+            </div>
+            
+            <div class="panel">
+                <h3>Feature Grid Boxes</h3>
+                <p style="color: #888; font-size: 12px; margin-bottom: 20px;">Update the 6 features shown on the right side.</p>
+                
+                <% for(let i=1; i<=6; i++) { %>
+                <div style="background: #222; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <div style="font-weight: 600; margin-bottom: 10px;">Feature <%= i %></div>
+                    
+                    <form class="text-update-form" data-key="srv_<%= svc %>_f<%= i %>_title">
+                        <div class="form-group">
+                            <label>Title</label>
+                            <input type="text" name="text_value" value="<%= getTxt('srv_' + svc + '_f' + i + '_title') %>">
+                            <div class="upload-status" id="text-status-srv_<%= svc %>_f<%= i %>_title"></div>
+                        </div>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;">Save Title</button>
+                    </form>
+                    
+                    <form class="text-update-form" data-key="srv_<%= svc %>_f<%= i %>_desc" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea name="text_value" rows="2"><%= getTxt('srv_' + svc + '_f' + i + '_desc') %></textarea>
+                            <div class="upload-status" id="text-status-srv_<%= svc %>_f<%= i %>_desc"></div>
+                        </div>
+                        <button class="btn" style="padding: 5px 10px; font-size: 12px;">Save Description</button>
+                    </form>
+                </div>
+                <% } %>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.text-update-form').forEach(form => {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const key = form.dataset.key;
+                const textVal = form.querySelector('[name="text_value"]').value;
+                const statusDiv = document.getElementById('text-status-' + key);
+                
+                statusDiv.textContent = 'Saving...';
+                statusDiv.className = 'upload-status';
+
+                try {
+                    const res = await fetch('/pannl/update_section_text.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ section_key: key, text_value: textVal })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        statusDiv.textContent = 'Saved successfully!';
+                        statusDiv.className = 'upload-status success';
+                        setTimeout(() => statusDiv.textContent = '', 3000);
+                    } else {
+                        statusDiv.textContent = 'Error: ' + data.message;
+                        statusDiv.className = 'upload-status error';
+                    }
+                } catch (err) {
+                    statusDiv.textContent = 'Network error.';
+                    statusDiv.className = 'upload-status error';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

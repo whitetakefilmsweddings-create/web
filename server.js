@@ -1473,9 +1473,37 @@ app.get('/pannl/about.php', checkPannlAuth, async (req, res) => {
     const [feeds] = await panlePool.query('SELECT * FROM instagram_feeds WHERE feed_key LIKE "about_yt_%" ORDER BY id ASC');
 
     const [map_pins] = await panlePool.query('SELECT * FROM map_pins ORDER BY id DESC');
-    res.render('pannl/about', { grouped_images, feeds, map_pins });
+
+    res.render('pannl/about', { 
+        grouped_images, 
+        feeds,
+        map_pins
+    });
   } catch (err) {
-    res.status(500).send(err.message);
+    console.error(err);
+    res.status(500).send('Database error');
+  }
+});
+
+app.get('/pannl/services.php', checkPannlAuth, async (req, res) => {
+  try {
+    const svc = req.query.svc || 'wedding';
+    const [images] = await panlePool.query('SELECT * FROM section_images ORDER BY id ASC');
+    const grouped_images = {};
+    images.forEach(img => {
+      if (!grouped_images[img.page_name]) {
+        grouped_images[img.page_name] = [];
+      }
+      grouped_images[img.page_name].push(img);
+    });
+
+    res.render('pannl/services', { 
+        grouped_images,
+        svc
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Database error');
   }
 });
 
@@ -1509,7 +1537,10 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
         [text_value || '', section_key]
       );
     } else {
-      const page_name = section_key.startsWith('about_') ? 'about' : 'home';
+      let page_name = 'home';
+      if (section_key.startsWith('about_')) page_name = 'about';
+      if (section_key.startsWith('srv_')) page_name = 'services';
+      
       await panlePool.execute(
         'INSERT INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)',
         [page_name, section_key, text_value || '']
@@ -1520,7 +1551,16 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
     const cheerio = require('cheerio');
     const path = require('path');
     const fs = require('fs');
-    const fileToUpdate = section_key.startsWith('about_') ? 'about.html' : 'index.html';
+    
+    let fileToUpdate = 'index.html';
+    if (section_key.startsWith('about_')) fileToUpdate = 'about.html';
+    if (section_key.startsWith('srv_wedding')) fileToUpdate = 'wedding-photography.html';
+    if (section_key.startsWith('srv_cinema')) fileToUpdate = 'cinematic-wedding-films.html';
+    if (section_key.startsWith('srv_prewedding')) fileToUpdate = 'pre-wedding-shoots.html';
+    if (section_key.startsWith('srv_engagement')) fileToUpdate = 'engagement-reception.html';
+    if (section_key.startsWith('srv_drone')) fileToUpdate = 'drone-coverage.html';
+    if (section_key.startsWith('srv_albums')) fileToUpdate = 'albums-prints.html';
+    
     const filePath = path.join(__dirname, fileToUpdate);
     
     if (fs.existsSync(filePath)) {

@@ -241,54 +241,111 @@
         </section>
         <!-- end page-title -->
 
-        <!-- Service Description -->
-        <section class="service-description">
+                <!-- Service Description - Dark Theme Redesign -->
+        <section class="service-dark-section" style="background: #0f1014; padding: 100px 0;">
             <div class="container">
-                <div class="row">
-                    <div class="col-12">
-                        <h2>Preserving Memories in Handcrafted Albums</h2>
-                        <p>
-                            In the digital age, a physical wedding album remains the most timeless way to preserve your
-                            memories. We offer exquisite, handcrafted photo albums and museum-quality prints that you
-                            can hold, share, and pass down through generations. From leather-bound covers to lay-flat
-                            pages, our albums are designed to be a family heirloom that beautifully narrates the story
-                            of your special day.
-                        </p>
-
-                        <!-- Special Features Icons -->
-                        <div class="row service-features">
-                            <div class="col-lg-3 col-md-6 col-6 feature-item">
-                                <div class="icon-box">
-                                    <i class="fi flaticon-gallery"></i>
+                <div class="row align-items-center">
+                    <!-- Left: Large Image -->
+                    <div class="col-lg-5 col-md-12 mb-5 mb-lg-0">
+                        <div class="service-feature-image" style="border-radius: 20px; overflow: hidden; position: relative;">
+                            <img id="srv-albums-img" src="assets/images/service/albums-prints.jpg" alt="Albums & Prints" style="width: 100%; height: auto; object-fit: cover; aspect-ratio: 4/5;">
+                        </div>
+                    </div>
+                    <!-- Right: Text & Grid -->
+                    <div class="col-lg-7 col-md-12 ps-lg-5">
+                        <h4 class="service-subtitle" id="srv-albums-subtitle" style="color: #c0aa83; font-family: 'Mulish', sans-serif; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 15px; font-weight: 600;">Albums & Prints</h4>
+                        
+                        <h2 class="service-title" id="srv-albums-title" style="color: #ffffff; font-family: 'Cormorant Garamond', serif; font-size: 42px; line-height: 1.2; margin-bottom: 25px; font-weight: 300;">Tangible memories crafted with premium quality.</h2>
+                        
+                        <div class="service-desc" id="srv-albums-desc" style="color: #999999; font-family: 'Mulish', sans-serif; font-size: 16px; line-height: 1.8; margin-bottom: 40px;">
+                            Preserve your legacy in beautifully designed, handcrafted albums and prints that you can hold and pass down through generations.
+                        </div>
+                        
+                        <!-- 2x3 Feature Grid -->
+                        <div class="row">
+                            <!-- Box 1 -->
+                            <div class="col-md-6 mb-4">
+                                <div class="service-grid-box" style="background: #1a1b20; border: 1px solid #2a2b30; border-radius: 12px; padding: 25px; height: 100%; transition: all 0.3s ease;">
+                                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                                        <i class="fi flaticon-gallery" style="color: #c0aa83; font-size: 24px; margin-top: 3px;"></i>
+                                        <div>
+                                            <h4 id="srv-albums-f1-title" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Feature 1</h4>
+                                            <p id="srv-albums-f1-desc" style="color: #888888; font-size: 14px; line-height: 1.6; margin-bottom: 0;">Description for this feature goes here.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h4>Premium Paper</h4>
-                                <p>Thick, archival-quality matte or glossy paper that resists fading over time.</p>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-6 feature-item">
-                                <div class="icon-box">
-                                    <i class="fi flaticon-heart"></i>
+                            <!-- Box 2 -->
+                            <div class="col-md-6 mb-4">
+                                <div class="service-grid-box" style="background: #1a1b20; border: 1px solid #2a2b30; border-radius: 12px; padding: 25px; height: 100%; transition: all 0.3s ease;">
+                                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                                        <i class="fi flaticon-wedding-rings" style="color: #c0aa83; font-size: 24px; margin-top: 3px;"></i>
+                                        <div>
+                                            <h4 id="srv-albums-f2-title" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Feature 2</h4>
+                                            <p id="srv-albums-f2-desc" style="color: #888888; font-size: 14px; line-height: 1.6; margin-bottom: 0;">Description for this feature goes here.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h4>Custom Design</h4>
-                                <p>Personalized layouts designed by our team to tell your story beautifully.</p>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-6 feature-item">
-                                <div class="icon-box">
-                                    <i class="fi flaticon-wedding-rings"></i>
+                            <!-- Box 3 -->
+                            <div class="col-md-6 mb-4">
+                                <div class="service-grid-box" style="background: #1a1b20; border: 1px solid #2a2b30; border-radius: 12px; padding: 25px; height: 100%; transition: all 0.3s ease;">
+                                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                                        <i class="fi flaticon-heart" style="color: #c0aa83; font-size: 24px; margin-top: 3px;"></i>
+                                        <div>
+                                            <h4 id="srv-albums-f3-title" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Feature 3</h4>
+                                            <p id="srv-albums-f3-desc" style="color: #888888; font-size: 14px; line-height: 1.6; margin-bottom: 0;">Description for this feature goes here.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h4>Luxury Covers</h4>
-                                <p>A wide range of cover options including genuine leather, linen, and silk.</p>
                             </div>
-                            <div class="col-lg-3 col-md-6 col-6 feature-item">
-                                <div class="icon-box">
-                                    <i class="fi flaticon-edit"></i>
+                            <!-- Box 4 -->
+                            <div class="col-md-6 mb-4">
+                                <div class="service-grid-box" style="background: #1a1b20; border: 1px solid #2a2b30; border-radius: 12px; padding: 25px; height: 100%; transition: all 0.3s ease;">
+                                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                                        <i class="fi flaticon-edit" style="color: #c0aa83; font-size: 24px; margin-top: 3px;"></i>
+                                        <div>
+                                            <h4 id="srv-albums-f4-title" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Feature 4</h4>
+                                            <p id="srv-albums-f4-desc" style="color: #888888; font-size: 14px; line-height: 1.6; margin-bottom: 0;">Description for this feature goes here.</p>
+                                        </div>
+                                    </div>
                                 </div>
-                                <h4>Wall Art</h4>
-                                <p>Stunning large-format canvases and framed prints to decorate your home.</p>
+                            </div>
+                            <!-- Box 5 -->
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <div class="service-grid-box" style="background: #1a1b20; border: 1px solid #2a2b30; border-radius: 12px; padding: 25px; height: 100%; transition: all 0.3s ease;">
+                                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                                        <i class="fi flaticon-gallery" style="color: #c0aa83; font-size: 24px; margin-top: 3px;"></i>
+                                        <div>
+                                            <h4 id="srv-albums-f5-title" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Feature 5</h4>
+                                            <p id="srv-albums-f5-desc" style="color: #888888; font-size: 14px; line-height: 1.6; margin-bottom: 0;">Description for this feature goes here.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Box 6 -->
+                            <div class="col-md-6">
+                                <div class="service-grid-box" style="background: #1a1b20; border: 1px solid #2a2b30; border-radius: 12px; padding: 25px; height: 100%; transition: all 0.3s ease;">
+                                    <div style="display: flex; align-items: flex-start; gap: 15px;">
+                                        <i class="fi flaticon-camera" style="color: #c0aa83; font-size: 24px; margin-top: 3px;"></i>
+                                        <div>
+                                            <h4 id="srv-albums-f6-title" style="color: #ffffff; font-size: 16px; font-weight: 600; margin-bottom: 8px;">Feature 6</h4>
+                                            <p id="srv-albums-f6-desc" style="color: #888888; font-size: 14px; line-height: 1.6; margin-bottom: 0;">Description for this feature goes here.</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <style>
+                .service-grid-box:hover {
+                    background: #22232a !important;
+                    border-color: #c0aa83 !important;
+                    transform: translateY(-5px);
+                }
+            </style>
         </section>
 
         <!-- start wpo-portfolio-section -->
