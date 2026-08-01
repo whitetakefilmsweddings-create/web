@@ -1644,7 +1644,7 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                 if (url) {
                     $(`#${elementId}`).css('display', 'block');
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'none');
-                    $(`#${elementId}`).parent().css('padding-bottom', '125%');
+                    $(`#${elementId}`).parent().css('padding-bottom', '56.25%');
                 } else {
                     $(`#${elementId}`).css('display', 'none');
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
