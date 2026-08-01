@@ -110,8 +110,23 @@ async function initFooterInstagram() {
             
             let footerHTML = '';
             toShow.forEach((feed) => {
-                let cleanUrl = feed.post_url.trim().split('?')[0];
+                let rawUrl = feed.post_url ? feed.post_url.trim() : '';
+                let cleanUrl = rawUrl;
+                
+                // Extract from embed code if needed
+                const permalinkMatch = rawUrl.match(/data-instgrm-permalink="([^"]+)"/);
+                if (permalinkMatch) {
+                    cleanUrl = permalinkMatch[1];
+                } else if (rawUrl.includes('<iframe') || rawUrl.includes('<blockquote')) {
+                    const igMatch = rawUrl.match(/(https:\/\/(www\.)?instagram\.com\/(p|reel|tv)\/[a-zA-Z0-9_-]+)/);
+                    if (igMatch) {
+                        cleanUrl = igMatch[1];
+                    }
+                }
+                
+                cleanUrl = cleanUrl.split('?')[0];
                 if (!cleanUrl.endsWith('/')) cleanUrl += '/';
+                
                 const thumbUrl = cleanUrl + 'media/?size=t';
                 footerHTML += createFooterItem(thumbUrl, 'Instagram Post', cleanUrl);
             });
