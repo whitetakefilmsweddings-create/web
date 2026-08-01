@@ -1644,9 +1644,11 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                 if (url) {
                     $(`#${elementId}`).css('display', 'block');
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'none');
+                    $(`#${elementId}`).parent().css('padding-bottom', '125%');
                 } else {
                     $(`#${elementId}`).css('display', 'none');
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
+                    $(`#${elementId}`).parent().css('padding-bottom', '0');
                 }
             } else {
                 $(`#${elementId}`).html(final_text_value);
