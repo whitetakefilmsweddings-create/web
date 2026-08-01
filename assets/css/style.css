@@ -5222,11 +5222,11 @@ wpo-hero-slider-s3
 }
 
 .wpo-site-footer .about-widget ul li a {
-  color: #000000;
+  color: #ffffff;
   width: 42px;
   height: 42px;
   line-height: 46px;
-  background: #e8d5ca;
+  background: #000000;
   display: block;
   text-align: center;
   border-radius: 50%;
@@ -5234,8 +5234,8 @@ wpo-hero-slider-s3
 }
 
 .wpo-site-footer .about-widget ul li a:hover {
-  background: #000000;
-  color: #fff;
+  background: #e8d5ca;
+  color: #000000;
 }
 
 .wpo-site-footer .about-widget ul li+li {
