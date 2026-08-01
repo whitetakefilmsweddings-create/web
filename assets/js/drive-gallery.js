@@ -62,7 +62,7 @@ function createGalleryItem(imageUrl, altText = 'Gallery Image') {
 function createFooterItem(imageUrl, altText = 'Instagram Image') {
     return `
         <li>
-            <a href="${imageUrl}" class="fancybox" data-fancybox-group="footer-gall">
+            <a href="https://www.instagram.com/whitetake_films/" target="_blank">
                 <img src="${imageUrl}" alt="${altText}" loading="lazy">
             </a>
         </li>
@@ -94,20 +94,16 @@ async function initGallery(files) {
 /**
  * Initialize the Footer Instagram Widget
  */
-async function initFooterInstagram(files) {
+async function initFooterInstagram() {
     const container = document.getElementById('instagram-footer-list');
     if (!container) return;
 
     console.log('Initializing Footer Instagram...');
 
-    // Take first 6 files
-    const footerFiles = files.slice(0, 6);
-
     let footerHTML = '';
-    footerFiles.forEach((file) => {
-        // Use thumbnail size to save bandwidth
-        footerHTML += createFooterItem(getDriveImageUrl(file, 'thumbnail'), file.name);
-    });
+    for(let i = 1; i <= 6; i++) {
+        footerHTML += createFooterItem(`assets/images/instragram/${i}.jpg`, `Instagram ${i}`);
+    }
 
     container.innerHTML = footerHTML;
 }
@@ -187,17 +183,15 @@ async function init() {
 
     if (!hasGallery && !hasFooter && !hasAbout) return;
 
-    // Fetch files for Main Gallery and Footer
-    if (hasGallery || hasFooter) {
+    // Fetch files for Main Gallery
+    if (hasGallery) {
         const files = await listFiles(GALLERY_FOLDER_ID);
+        await initGallery(files);
+    }
 
-        if (hasGallery) {
-            await initGallery(files);
-        }
-
-        if (hasFooter) {
-            await initFooterInstagram(files);
-        }
+    // Always load local images for footer
+    if (hasFooter) {
+        await initFooterInstagram();
     }
 
     // Fetch files for About Section
