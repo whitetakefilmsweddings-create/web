@@ -1661,8 +1661,13 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                     $(`#${elementId}`).parent().css({
                         'padding-bottom': '0',
                         'height': '100%',
-                        'min-height': '400px'
+                        'min-height': '400px',
+                        'margin-left': 'calc(-50vw + 50%)',
+                        'width': 'calc(50vw - 50% + 100%)',
+                        'border-radius': '0 20px 20px 0'
                     });
+                    
+                    $(`#${elementId}`).closest('.service-dark-section').css('padding', '240px 0 100px');
                 } else {
                     $(`#${elementId}`).css('display', 'none');
                     $(`#${elementId.replace('-yt', '-img')}`).css({
@@ -1682,8 +1687,13 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                     $(`#${elementId}`).parent().css({
                         'padding-bottom': '0',
                         'height': '100%',
-                        'min-height': '400px'
+                        'min-height': '400px',
+                        'margin-left': 'calc(-50vw + 50%)',
+                        'width': 'calc(50vw - 50% + 100%)',
+                        'border-radius': '0 20px 20px 0'
                     });
+                    
+                    $(`#${elementId}`).closest('.service-dark-section').css('padding', '240px 0 100px');
                 }
             } else {
                 $(`#${elementId}`).html(final_text_value);
