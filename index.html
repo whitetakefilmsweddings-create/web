@@ -1226,12 +1226,18 @@
 
         <div class="container" style="position: relative; z-index: 1;">
 
-            <!-- Animated blob + header -->
+            <!-- Lottie Animation + header -->
+            <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
             <div class="ai-section-header">
                 <div class="ai-blob-wrap">
-                    <div class="ai-blob">
-                        <img src="assets/images/logo-new.png" alt="WhiteTake AI">
-                    </div>
+                    <dotlottie-player
+                        src="https://lottie.host/5287cfb2-5d54-4064-ae00-4dff63780474/e86KHP51af.lottie"
+                        background="transparent"
+                        speed="1"
+                        style="width: 160px; height: 160px; margin: 0 auto;"
+                        loop
+                        autoplay>
+                    </dotlottie-player>
                 </div>
                 <div class="ai-tag">
                     <div class="line"></div>
