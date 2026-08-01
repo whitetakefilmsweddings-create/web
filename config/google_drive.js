@@ -140,6 +140,37 @@ class GoogleDrive {
     return files;
   }
 
+  async getFilesByIds(fileIds) {
+    const files = [];
+    if (!fileIds || fileIds.length === 0) return files;
+    await this.authenticateServiceAccount();
+
+    for (let i = 0; i < fileIds.length; i += 50) {
+      const batch = fileIds.slice(i, i + 50);
+      const q = batch.map(id => `id='${id}'`).join(' or ');
+      const params = {
+        pageSize: 100,
+        fields: 'files(id, name, mimeType, webContentLink, webViewLink, thumbnailLink)',
+        q: `(${q}) and trashed = false`
+      };
+
+      if (!this.accessToken) {
+        params.key = this.apiKey;
+      }
+
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${this.endpoint}?${queryString}`;
+      
+      const res = await this.request(url);
+      if (res.code === 200 && res.data && res.data.files) {
+        for (const fileData of res.data.files) {
+          files.push(new SimpleDriveFile(fileData));
+        }
+      }
+    }
+    return files;
+  }
+
   async getAllFilesRecursive(folderId) {
     let allFiles = [];
     const files = await this.getFiles(folderId);

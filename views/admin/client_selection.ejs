@@ -72,12 +72,66 @@
             color: white;
             transform: scale(1.1);
         }
+
+        /* Folder Card Design */
+        .folder-card {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .folder-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        }
+        .folder-cover {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .folder-placeholder {
+            height: 180px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            color: #dee2e6;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .folder-body {
+            padding: 15px;
+            background: #fff;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .folder-name {
+            font-weight: 600;
+            color: #000;
+            text-align: center;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
     <div class="container py-5">
         <div class="d-flex align-items-center mb-4">
-            <a href="/Admin/admin/view_client.php?id=<%= client.id %>" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
+            <% if (folderId !== rootFolderId) { %>
+                <a href="javascript:history.back()" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
+            <% } else { %>
+                <a href="/Admin/admin/view_client.php?id=<%= client.id %>" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
+            <% } %>
             <div>
                 <h2 class="mb-0 fw-bold">Client Selections</h2>
                 <p class="text-muted mb-0">Client: <%= client.name %></p>
@@ -209,9 +263,40 @@
                         <% } %>
                     </div>
                     <div class="card-body">
-                         <% if (files && files.length > 0) { %>
+                         <% 
+                         const folders = files.filter(f => f.type === 'folder');
+                         if (folders.length > 0) { 
+                         %>
+                             <h6 class="mb-3 text-muted">Folders</h6>
+                             <div class="row g-3 mb-4">
+                                 <% folders.forEach(function(f) { %>
+                                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                                         <a href="<%= f.link %>" class="text-decoration-none">
+                                             <div class="folder-card">
+                                                 <% if (f.cover) { %>
+                                                     <img src="<%= f.cover %>" class="folder-cover" loading="lazy">
+                                                 <% } else { %>
+                                                     <div class="folder-placeholder">
+                                                         <i class="bi bi-folder" style="font-size: 4rem;"></i>
+                                                     </div>
+                                                 <% } %>
+                                                 <div class="folder-body">
+                                                     <div class="folder-name"><%= f.name %></div>
+                                                 </div>
+                                             </div>
+                                         </a>
+                                     </div>
+                                 <% }) %>
+                             </div>
+                         <% } %>
+
+                         <% 
+                         const images = files.filter(f => f.type === 'image');
+                         if (images.length > 0) { 
+                         %>
+                            <h6 class="mb-3 text-muted">Photos in this Folder</h6>
                             <div class="gallery-grid">
-                                <% files.forEach(function(f) { %>
+                                <% images.forEach(function(f) { %>
                                     <div class="gallery-item <%= f.is_selected ? '' : 'unselected' %>" title="<%= f.name %>">
                                         <a href="/Admin/admin/download_file.php?file_id=<%= f.id %>" class="download-btn" title="Download" target="_blank">
                                             <i class="bi bi-download"></i>
@@ -228,8 +313,8 @@
                                     </div>
                                 <% }) %>
                             </div>
-                        <% } else { %>
-                            <div class="alert alert-info">No photos found.</div>
+                        <% } else if (folders.length === 0) { %>
+                            <div class="alert alert-info">No photos found in this folder.</div>
                         <% } %>
                     </div>
                 </div>

@@ -570,6 +570,7 @@ app.post('/Admin/admin/delete_client.php', requireAdmin, async (req, res) => {
 
 app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
   const clientId = req.query.id;
+  let folderId = req.query.folder || null;
   if (!clientId) return res.status(400).send('Client ID required');
 
   try {
@@ -577,7 +578,9 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
     const client = clients[0];
     if (!client) return res.status(404).send('Client not found');
 
-    const folderId = client.folder_id;
+    if (!folderId) {
+      folderId = client.folder_id;
+    }
 
     // Fetch Selections
     const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [clientId]);
@@ -590,22 +593,41 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
 
     if (folderId) {
       try {
-        const dFiles = await drive.getAllFilesRecursive(folderId);
+        const dFiles = await drive.getFiles(folderId);
         for (const file of dFiles) {
           const mime = file.getMimeType();
-          if (mime === 'application/vnd.google-apps.folder' || mime.includes('zip')) {
+          if (mime === 'application/zip' || mime === 'application/x-zip-compressed') {
             continue;
           }
+          const isFolder = mime === 'application/vnd.google-apps.folder';
+          
+          let cover = null;
+          if (isFolder) {
+            cover = await drive.getFolderCover(file.getId());
+          }
+
           const isSelected = selections.includes(file.getId());
-          const cleanFile = {
+          files.push({
             id: file.getId(),
             name: file.getName(),
-            src: (file.getThumbnailLink() || '').replace('=s220', '=s600'),
+            type: isFolder ? 'folder' : 'image',
+            src: isFolder ? '' : (file.getThumbnailLink() || '').replace('=s220', '=s600'),
+            cover,
+            link: isFolder ? `?id=${clientId}&folder=${file.getId()}` : '#',
             is_selected: isSelected
-          };
-          files.push(cleanFile);
-          if (isSelected) {
-            selectedFiles.push(cleanFile);
+          });
+        }
+        
+        // Fetch all selected files' metadata efficiently across all folders for the Selected Photos tab
+        if (selections.length > 0) {
+          const selectedDriveFiles = await drive.getFilesByIds(selections);
+          for (const sFile of selectedDriveFiles) {
+            selectedFiles.push({
+              id: sFile.getId(),
+              name: sFile.getName(),
+              src: (sFile.getThumbnailLink() || '').replace('=s220', '=s600'),
+              is_selected: true
+            });
           }
         }
       } catch (driveErr) {
@@ -613,7 +635,7 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
       }
     }
 
-    const unselectedFiles = files.filter(f => !f.is_selected);
+    const unselectedFiles = files.filter(f => f.type === 'image' && !f.is_selected);
 
     res.render('admin/client_selection', {
       client,
@@ -621,6 +643,8 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
       selectedFiles,
       unselectedFiles,
       clientId,
+      folderId,
+      rootFolderId: client.folder_id,
       error,
       successMsg: req.session.flashSuccess || ''
     });
@@ -674,6 +698,7 @@ app.post('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => 
 app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
   const clientId = req.query.client_id;
   const type = req.query.type || 'gallery';
+  let currentFolderId = req.query.folder || null;
   if (!clientId) return res.status(400).send('Client ID required');
 
   try {
@@ -681,27 +706,45 @@ app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
     const client = clients[0];
     if (!client) return res.status(404).send('Client not found');
 
-    const folderId = (type === 'face_ai') ? (client.ai_folder_id || '') : (client.folder_id || '');
-    const folderName = (type === 'face_ai') ? 'Face AI Folder' : 'Gallery Folder';
+    const rootFolderId = (type === 'face_ai') ? (client.ai_folder_id || '') : (client.folder_id || '');
+    const baseFolderName = (type === 'face_ai') ? 'Face AI Folder' : 'Gallery Folder';
 
-    if (!folderId) return res.status(400).send(`No ${folderName} configured.`);
+    if (!rootFolderId) return res.status(400).send(`No ${baseFolderName} configured.`);
+    if (!currentFolderId) currentFolderId = rootFolderId;
 
     const drive = new GoogleDrive();
     let files = [];
+    let folders = [];
     let error = '';
+    let currentFolderName = baseFolderName;
 
     try {
-      const dFiles = await drive.getAllFilesRecursive(folderId);
+      if (currentFolderId !== rootFolderId) {
+        const meta = await drive.getFileMetadata(currentFolderId);
+        if (meta) currentFolderName = meta.getName();
+      }
+
+      const dFiles = await drive.getFiles(currentFolderId);
       for (const file of dFiles) {
         const mime = file.getMimeType();
-        if (mime === 'application/vnd.google-apps.folder') continue;
-
-        files.push({
-          id: file.getId(),
-          name: file.getName(),
-          src: (file.getThumbnailLink() || '').replace('=s220', '=s600'),
-          mime
-        });
+        if (mime === 'application/zip' || mime === 'application/x-zip-compressed') continue;
+        
+        if (mime === 'application/vnd.google-apps.folder') {
+          let cover = await drive.getFolderCover(file.getId());
+          folders.push({
+            id: file.getId(),
+            name: file.getName(),
+            cover: cover || '',
+            link: `/Admin/admin/cleanup_drive.php?client_id=${clientId}&type=${type}&folder=${file.getId()}`
+          });
+        } else {
+          files.push({
+            id: file.getId(),
+            name: file.getName(),
+            src: (file.getThumbnailLink() || '').replace('=s220', '=s600'),
+            mime
+          });
+        }
       }
     } catch (driveErr) {
       error = `Drive Error: ${driveErr.message}`;
@@ -709,7 +752,12 @@ app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
 
     res.render('admin/cleanup_drive', {
       client,
-      folderName,
+      folderName: currentFolderName,
+      rootFolderId,
+      currentFolderId,
+      clientId,
+      type,
+      folders,
       files,
       msg: req.session.flashCleanMsg || '',
       error: error || req.session.flashCleanErr || ''
@@ -1066,7 +1114,7 @@ app.get('/Admin/client/gallery.php', requireClient, async (req, res) => {
     if (folderId) {
       try {
         const drive = new GoogleDrive();
-        const dFiles = await drive.getAllFilesRecursive(folderId);
+        const dFiles = await drive.getFiles(folderId);
 
         for (const file of dFiles) {
           const mime = file.getMimeType();
