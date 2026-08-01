@@ -718,7 +718,7 @@
                 <button onclick="closeFavModal()" style="position:absolute;top:15px;right:15px;background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1;">&times;</button>
 
                 <div id="fav-modal-title" style="font-size:16px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Slot #1</div>
-                <div style="font-size:12px;color:#555;margin-bottom:20px;">1080 × 1080 px · Max 10 MB</div>
+                <div id="fav-modal-size-text" style="font-size:12px;color:#555;margin-bottom:20px;">1080 × 1080 px · Max 10 MB</div>
 
                 <!-- Image preview -->
                 <div id="fav-modal-preview-wrap" style="width:100%;aspect-ratio:1/1;border-radius:12px;overflow:hidden;background:#000;border:1px solid #222;margin-bottom:20px;position:relative;">
@@ -757,6 +757,44 @@
         <style>
             .fav-thumb:hover { border-color: #444 !important; }
         </style>
+
+        <!-- ── Footer Instagram Images ── -->
+        <div class="page-header" id="footer-instagram" style="margin-top: 60px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
+            <h1>Footer Instagram Images</h1>
+            <p>Upload the 6 images that will appear in the "From Our Feed" matrix in the footer across all pages.</p>
+        </div>
+
+        <!-- Footer Grid -->
+        <div id="footer-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 60px;">
+            <% if (grouped_images && grouped_images['home']) {
+                const footerImages = grouped_images['home'].filter(img => img.section_key.startsWith('footer_img_'));
+                footerImages.forEach(function(img) {
+                    let preview_src = img.image_path;
+                    if (preview_src && !preview_src.match(/^https?:\/\//) && !preview_src.startsWith('data:')) {
+                        preview_src = '/' + preview_src;
+                    }
+                    const slotNum = img.section_key.replace('footer_img_', '');
+                    const isFilled = preview_src && preview_src.length > 1 && !preview_src.includes('400x308');
+            %>
+                <div class="fav-thumb"
+                     id="fav-thumb-<%= img.section_key %>"
+                     onclick="openFavModal('<%= img.section_key %>', '<%= slotNum %>', <%= isFilled ? 'true' : 'false' %>)"
+                     style="aspect-ratio:1/1; border-radius:10px; overflow:hidden; position:relative; cursor:pointer; background:#111; border:1px solid #1c1c1c; transition:border-color 0.2s;">
+                    <% if (isFilled) { %>
+                        <img src="<%= preview_src %>" id="fav-thumb-img-<%= img.section_key %>" alt="Footer Slot <%= slotNum %>" style="width:100%;height:100%;object-fit:cover;display:block;">
+                        <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:6px 6px 5px;display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:10px;font-weight:700;color:#fff;">#<%= slotNum %></span>
+                            <i class="fa fa-check-circle" style="font-size:11px;color:#4aff4a;"></i>
+                        </div>
+                    <% } else { %>
+                        <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#444;">
+                            <i class="fa fa-plus" style="font-size:20px;"></i>
+                            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">#<%= slotNum %></span>
+                        </div>
+                    <% } %>
+                </div>
+            <% }); } %>
+        </div>
 
         <!-- Instagram Feed Editor Section -->
         <div class="page-header" id="instagram-feed" style="margin-top: 0px; border-top: 1px solid #1a1a1a; padding-top: 40px;">
@@ -903,7 +941,14 @@
             _favCurrentFilled = isFilled;
 
             // Update modal title
-            document.getElementById('fav-modal-title').textContent = 'Slot #' + slotNum;
+            let titleText = 'Slot #' + slotNum;
+            let sizeText = '1080 × 1080 px · Max 10 MB';
+            if (key.startsWith('footer_img_')) {
+                titleText = 'Footer Image #' + slotNum;
+                sizeText = '400 × 400 px · Max 10 MB';
+            }
+            document.getElementById('fav-modal-title').textContent = titleText;
+            document.getElementById('fav-modal-size-text').textContent = sizeText;
 
             // Show/hide image
             const img       = document.getElementById('fav-modal-img');

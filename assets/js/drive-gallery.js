@@ -104,16 +104,29 @@ async function initFooterInstagram() {
         const response = await fetch('pannl/api.php?page=home');
         const res = await response.json();
         
+        let igFeeds = [];
         if (res.success && res.feeds && res.feeds.length > 0) {
-            const igFeeds = res.feeds.filter(f => !f.feed_key.startsWith('yt_'));
-            const toShow = igFeeds.slice(0, 6);
+            igFeeds = res.feeds.filter(f => !f.feed_key.startsWith('yt_'));
+        }
+        const toShow = igFeeds.slice(0, 6);
+        
+        let footerHTML = '';
+        for (let i = 0; i < 6; i++) {
+            const slotNum = i + 1;
+            let cleanUrl = 'https://www.instagram.com/whitetake_films/';
+            let thumbUrl = `assets/images/instragram/${slotNum}.jpg`;
             
-            let footerHTML = '';
-            toShow.forEach((feed) => {
+            // Check if there is a custom uploaded image in the database
+            if (res.images && res.images[`footer_img_${slotNum}`]) {
+                thumbUrl = res.images[`footer_img_${slotNum}`];
+            }
+            
+            // If there's an associated instagram post, link to it
+            if (toShow[i]) {
+                const feed = toShow[i];
                 let rawUrl = feed.post_url ? feed.post_url.trim() : '';
-                let cleanUrl = rawUrl;
+                cleanUrl = rawUrl;
                 
-                // Extract from embed code if needed
                 const permalinkMatch = rawUrl.match(/data-instgrm-permalink="([^"]+)"/);
                 if (permalinkMatch) {
                     cleanUrl = permalinkMatch[1];
@@ -126,27 +139,19 @@ async function initFooterInstagram() {
                 
                 cleanUrl = cleanUrl.split('?')[0];
                 if (!cleanUrl.endsWith('/')) cleanUrl += '/';
-                
-                const thumbUrl = cleanUrl + 'media/?size=t';
-                footerHTML += createFooterItem(thumbUrl, 'Instagram Post', cleanUrl);
-            });
-            
-            for (let i = toShow.length + 1; i <= 6; i++) {
-                footerHTML += createFooterItem(`assets/images/instragram/${i}.jpg`, `Instagram ${i}`);
             }
-            container.innerHTML = footerHTML;
-            return;
+            
+            footerHTML += createFooterItem(thumbUrl, `Instagram ${slotNum}`, cleanUrl);
         }
+        container.innerHTML = footerHTML;
     } catch (e) {
         console.error('Failed to load instagram feeds for footer', e);
+        let footerHTML = '';
+        for(let i = 1; i <= 6; i++) {
+            footerHTML += createFooterItem(`assets/images/instragram/${i}.jpg`, `Instagram ${i}`);
+        }
+        container.innerHTML = footerHTML;
     }
-
-    let footerHTML = '';
-    for(let i = 1; i <= 6; i++) {
-        footerHTML += createFooterItem(`assets/images/instragram/${i}.jpg`, `Instagram ${i}`);
-    }
-
-    container.innerHTML = footerHTML;
 }
 
 const ABOUT_FOLDER_ID = '1QfXgZ76rDOwOqMJ2QewHqgW_tFTVUbZ-'; // About section folder

@@ -287,9 +287,12 @@ async function initDatabases() {
     for (const row of defaults) {
       await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', row);
     }
-    // Initialize 30 placeholder records for Our Favorite Moments gallery
     for (let i = 1; i <= 30; i++) {
       await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', ['home', `favorite_${i}`, '']);
+    }
+    // Initialize 6 placeholder records for Footer Instagram
+    for (let i = 1; i <= 6; i++) {
+      await panlePool.query('INSERT IGNORE INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)', ['home', `footer_img_${i}`, `assets/images/instragram/${i}.jpg`]);
     }
     // Clean up deprecated home page sections no longer in use
     await panlePool.query("DELETE FROM section_images WHERE section_key IN ('about_middle', 'about_right')");
@@ -1710,8 +1713,9 @@ app.post('/pannl/upload.php', checkPannlAuth, upload.single('image'), async (req
   }
 
   const isFavorite = sectionKey.startsWith('favorite_') || sectionKey.startsWith('story_img_');
-  const targetWidth = 1080;
-  const targetHeight = isFavorite ? 1080 : 1350;
+  const isFooter = sectionKey.startsWith('footer_img_');
+  const targetWidth = isFooter ? 400 : 1080;
+  const targetHeight = isFooter ? 400 : (isFavorite ? 1080 : 1350);
 
   try {
     // Sharp center crop resize based on section format and convert to buffer
