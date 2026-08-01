@@ -59,11 +59,11 @@ function createGalleryItem(imageUrl, altText = 'Gallery Image') {
 /**
  * Create a footer instagram item HTML
  */
-function createFooterItem(imageUrl, altText = 'Instagram Image') {
+function createFooterItem(imageUrl, altText = 'Instagram Image', linkUrl = 'https://www.instagram.com/whitetake_films/') {
     return `
         <li>
-            <a href="https://www.instagram.com/whitetake_films/" target="_blank">
-                <img src="${imageUrl}" alt="${altText}" loading="lazy">
+            <a href="${linkUrl}" target="_blank">
+                <img src="${imageUrl}" alt="${altText}" loading="lazy" onerror="this.src='assets/images/instragram/1.jpg'">
             </a>
         </li>
     `;
@@ -99,6 +99,32 @@ async function initFooterInstagram() {
     if (!container) return;
 
     console.log('Initializing Footer Instagram...');
+
+    try {
+        const response = await fetch('pannl/api.php?page=home');
+        const res = await response.json();
+        
+        if (res.success && res.feeds && res.feeds.length > 0) {
+            const igFeeds = res.feeds.filter(f => !f.feed_key.startsWith('yt_'));
+            const toShow = igFeeds.slice(0, 6);
+            
+            let footerHTML = '';
+            toShow.forEach((feed) => {
+                let cleanUrl = feed.post_url.trim().split('?')[0];
+                if (!cleanUrl.endsWith('/')) cleanUrl += '/';
+                const thumbUrl = cleanUrl + 'media/?size=t';
+                footerHTML += createFooterItem(thumbUrl, 'Instagram Post', cleanUrl);
+            });
+            
+            for (let i = toShow.length + 1; i <= 6; i++) {
+                footerHTML += createFooterItem(`assets/images/instragram/${i}.jpg`, `Instagram ${i}`);
+            }
+            container.innerHTML = footerHTML;
+            return;
+        }
+    } catch (e) {
+        console.error('Failed to load instagram feeds for footer', e);
+    }
 
     let footerHTML = '';
     for(let i = 1; i <= 6; i++) {
