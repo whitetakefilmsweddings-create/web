@@ -1643,79 +1643,13 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                 $(`#${elementId}`).attr('src', url);
                 if (url) {
                     $(`#${elementId}`).css('display', 'block');
-                    $(`#${elementId.replace('-yt', '-img')}`).css({
-                        'display': 'none',
-                        'height': '100%'
-                    });
-                    
-                    const row = $(`#${elementId}`).closest('.row');
-                    row.removeClass('align-items-center').addClass('align-items-stretch g-0');
-                    
-                    const container = row.closest('.container');
-                    if (container.length) {
-                        container.removeClass('container').addClass('container-fluid p-0');
-                        container.closest('section').css('overflow', 'hidden');
-                    }
-                    
-                    const leftCol = $(`#${elementId}`).closest('.col-lg-5');
-                    leftCol.css({
-                        'display': 'flex',
-                        'flex-direction': 'column'
-                    });
-                    
-                    $(`#${elementId}`).parent().css({
-                        'padding-bottom': '0',
-                        'height': '100%',
-                        'min-height': '400px',
-                        'width': '100%',
-                        'border-radius': '0 20px 20px 0'
-                    });
-                    
-                    const rightCol = leftCol.next('.col-lg-7');
-                    if (rightCol.length) {
-                        rightCol.addClass('py-5').attr('style', (i, style) => {
-                            return (style || '') + ' padding-right: max(15px, calc((100vw - 1140px) / 2)) !important;';
-                        });
-                    }
-                    
+                    $(`#${elementId.replace('-yt', '-img')}`).css('display', 'none');
+                    $(`#${elementId}`).parent().css('padding-bottom', '56.25%');
                     $(`#${elementId}`).closest('.service-dark-section').css('padding', '240px 0 100px');
                 } else {
                     $(`#${elementId}`).css('display', 'none');
-                    $(`#${elementId.replace('-yt', '-img')}`).css({
-                        'display': 'block',
-                        'height': '100%'
-                    });
-                    
-                    const row = $(`#${elementId}`).closest('.row');
-                    row.removeClass('align-items-center').addClass('align-items-stretch g-0');
-                    
-                    const container = row.closest('.container');
-                    if (container.length) {
-                        container.removeClass('container').addClass('container-fluid p-0');
-                        container.closest('section').css('overflow', 'hidden');
-                    }
-                    
-                    const leftCol = $(`#${elementId}`).closest('.col-lg-5');
-                    leftCol.css({
-                        'display': 'flex',
-                        'flex-direction': 'column'
-                    });
-                    
-                    $(`#${elementId}`).parent().css({
-                        'padding-bottom': '0',
-                        'height': '100%',
-                        'min-height': '400px',
-                        'width': '100%',
-                        'border-radius': '0 20px 20px 0'
-                    });
-                    
-                    const rightCol = leftCol.next('.col-lg-7');
-                    if (rightCol.length) {
-                        rightCol.addClass('py-5').attr('style', (i, style) => {
-                            return (style || '') + ' padding-right: max(15px, calc((100vw - 1140px) / 2)) !important;';
-                        });
-                    }
-                    
+                    $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
+                    $(`#${elementId}`).parent().css('padding-bottom', '0');
                     $(`#${elementId}`).closest('.service-dark-section').css('padding', '240px 0 100px');
                 }
             } else {
