@@ -3374,7 +3374,6 @@ img {
   }
 }
 
-.wpo-header-style-2 {
   position: absolute;
   left: 0;
   width: 100%;
@@ -3438,7 +3437,6 @@ img {
 @media (max-width: 991px) {
 
   .wpo-site-header,
-  .wpo-header-style-2 {
     z-index: 99999;
   }
 }
@@ -16994,7 +16992,4 @@ box-shadow: 0px 1px 5px rgba(255, 255, 255, 0.1);
 }
 
 
-/* Custom Header Styling for better visibility on Service Pages */
-.wpo-header-style-2 {
-    background: #000 !important;
 }

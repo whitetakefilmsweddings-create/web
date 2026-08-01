@@ -1644,13 +1644,14 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                 if (url) {
                     $(`#${elementId}`).css('display', 'block');
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'none');
-                    $(`#${elementId}`).parent().css('padding-bottom', '56.25%');
-                    $(`#${elementId}`).closest('.service-dark-section').css('padding', '240px 0 100px');
+                    // Add background hero parameters if missing
+                    if (url && !url.includes('autoplay=1')) {
+                        const separator = url.includes('?') ? '&' : '?';
+                        $(`#${elementId}`).attr('src', url + separator + 'autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1');
+                    }
                 } else {
                     $(`#${elementId}`).css('display', 'none');
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
-                    $(`#${elementId}`).parent().css('padding-bottom', '0');
-                    $(`#${elementId}`).closest('.service-dark-section').css('padding', '240px 0 100px');
                 }
             } else {
                 $(`#${elementId}`).html(final_text_value);
