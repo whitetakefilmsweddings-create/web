@@ -1643,12 +1643,47 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                 $(`#${elementId}`).attr('src', url);
                 if (url) {
                     $(`#${elementId}`).css('display', 'block');
-                    $(`#${elementId.replace('-yt', '-img')}`).css('display', 'none');
-                    $(`#${elementId}`).parent().css('padding-bottom', '56.25%');
+                    $(`#${elementId.replace('-yt', '-img')}`).css({
+                        'display': 'none',
+                        'height': '100%'
+                    });
+                    
+                    // Match content height structure
+                    const row = $(`#${elementId}`).closest('.row');
+                    row.removeClass('align-items-center').addClass('align-items-stretch');
+                    
+                    const leftCol = $(`#${elementId}`).closest('.col-lg-5');
+                    leftCol.css({
+                        'display': 'flex',
+                        'flex-direction': 'column'
+                    });
+                    
+                    $(`#${elementId}`).parent().css({
+                        'padding-bottom': '0',
+                        'height': '100%',
+                        'min-height': '400px'
+                    });
                 } else {
                     $(`#${elementId}`).css('display', 'none');
-                    $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
-                    $(`#${elementId}`).parent().css('padding-bottom', '0');
+                    $(`#${elementId.replace('-yt', '-img')}`).css({
+                        'display': 'block',
+                        'height': '100%'
+                    });
+                    
+                    const row = $(`#${elementId}`).closest('.row');
+                    row.removeClass('align-items-center').addClass('align-items-stretch');
+                    
+                    const leftCol = $(`#${elementId}`).closest('.col-lg-5');
+                    leftCol.css({
+                        'display': 'flex',
+                        'flex-direction': 'column'
+                    });
+                    
+                    $(`#${elementId}`).parent().css({
+                        'padding-bottom': '0',
+                        'height': '100%',
+                        'min-height': '400px'
+                    });
                 }
             } else {
                 $(`#${elementId}`).html(final_text_value);

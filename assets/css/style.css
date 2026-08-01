@@ -16995,18 +16995,6 @@ box-shadow: 0px 1px 5px rgba(255, 255, 255, 0.1);
 
 
 /* Custom Header Styling for better visibility on Service Pages */
-.wpo-header-style-2 #navbar>ul>li>a,
-.wpo-header-style-2 .navigation .navbar-header .logo,
-.wpo-header-style-2 .header-right .cart-toggle-btn .fi,
-.wpo-header-style-2 .header-right .search-toggle-btn .fi,
-.wpo-header-style-2 .header-social-icons a i {
-    color: #000 !important;
-}
-
-.wpo-header-style-2 .navigation.sticky-on #navbar>ul>li>a,
-.wpo-header-style-2 .navigation.sticky-on .navbar-header .logo,
-.wpo-header-style-2 .navigation.sticky-on .header-right .cart-toggle-btn .fi,
-.wpo-header-style-2 .navigation.sticky-on .header-right .search-toggle-btn .fi,
-.wpo-header-style-2 .navigation.sticky-on .header-social-icons a i {
-    color: #fff !important;
+.wpo-header-style-2 {
+    background: #000 !important;
 }
