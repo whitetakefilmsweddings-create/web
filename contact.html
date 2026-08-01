@@ -125,14 +125,14 @@
         <!-- start custom contact section -->
 <style>
 /* Custom Contact Styles - White Background, Black Text */
-.contact-hero { padding: 120px 0 60px; text-align: center; position: relative; background: #ffffff; overflow: hidden; }
+.contact-hero { padding: 160px 0 70px; text-align: center; position: relative; background: #ffffff; overflow: hidden; }
 .contact-hero::before { content:''; position:absolute; top:-100px; right:0; width:500px; height:500px; background: rgba(0,0,0,0.02); border-radius:50%; filter: blur(60px); pointer-events:none; }
 .hero-tag { display: inline-flex; align-items: center; gap: 15px; margin-bottom: 20px; }
 .hero-tag .line { height: 1px; width: 40px; background: #000000; }
 .hero-tag span { color: #555555; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; }
 .contact-hero h1 { font-size: 56px; font-weight: 900; color: #000; margin-bottom: 20px; font-family: 'Cormorant Garamond', serif; }
 .contact-hero h1 .gold-italic { font-style: italic; color: #000000; font-weight: 400; }
-.contact-hero p { color: #555; font-size: 18px; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+.contact-hero p { color: #555555 !important; font-size: 18px; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
 .contact-main { background: #f7f7f7; padding-bottom: 100px; }
 .direct-contact { display: flex; flex-direction: column; gap: 30px; }
@@ -427,22 +427,69 @@
         document.getElementById('addons-input').value = selected.join(', ');
     }
 
-    // Handle form submit visually
+    // Handle form submit - Send to WhatsApp
     document.getElementById('bespoke-form').addEventListener('submit', function(e) {
         e.preventDefault();
+
+        const name     = this.querySelector('[name="name"]').value || '-';
+        const phone    = this.querySelector('[name="phone"]').value || '-';
+        const email    = this.querySelector('[name="email"]').value || '-';
+        const events   = document.getElementById('events-input').value || 'Not selected';
+        const date     = this.querySelector('[name="date"]').value || 'Not specified';
+        const venue    = this.querySelector('[name="venue"]').value || 'Not specified';
+        const days     = document.getElementById('days-input').value || '1 Day';
+        const photos   = document.getElementById('photo-input').value || '1';
+        const videos   = document.getElementById('video-input').value || '1';
+        const addons   = document.getElementById('addons-input').value || 'None';
+        const budget   = document.getElementById('budget-input').value || 'Not specified';
+        const notes    = this.querySelector('[name="notes"]').value || '-';
+
+        const message =
+`*New Wedding Enquiry - WhiteTake Films*
+
+👤 *Name:* ${name}
+📞 *Phone:* ${phone}
+📧 *Email:* ${email}
+
+🎉 *Events:* ${events}
+📅 *Wedding Date:* ${date}
+📍 *Venue:* ${venue}
+🗓️ *Coverage Days:* ${days}
+
+📸 *Photographers:* ${photos}
+🎬 *Videographers:* ${videos}
+✨ *Add-ons:* ${addons}
+💰 *Budget:* ${budget}
+
+📝 *Notes:* ${notes}`;
+
+        const waNumber = '918714128539'; // WhiteTake Films WhatsApp number
+        const waUrl = 'https://wa.me/' + waNumber + '?text=' + encodeURIComponent(message);
+
+        // Open WhatsApp
+        window.open(waUrl, '_blank');
+
+        // Show success on button
         const btn = this.querySelector('.submit-btn');
-        btn.innerText = 'Sending...';
-        btn.style.opacity = '0.7';
+        btn.innerText = '✓ Opening WhatsApp...';
+        btn.style.background = '#25d366';
+        btn.style.color = '#fff';
+        btn.style.borderColor = '#25d366';
+
         setTimeout(() => {
-            btn.innerText = 'Thank you! We will reach out shortly.';
-            btn.style.background = '#4caf50';
-            btn.style.color = '#fff';
+            btn.innerText = 'Send Enquiry →';
+            btn.style.background = '';
+            btn.style.color = '';
+            btn.style.borderColor = '';
             this.reset();
             document.querySelectorAll('.form-pill.active, .addon-btn.active').forEach(el => el.classList.remove('active'));
             document.querySelector('#days-pills .form-pill').classList.add('active');
             document.getElementById('photo-val').innerText = '1';
             document.getElementById('video-val').innerText = '1';
-        }, 1500);
+            document.getElementById('events-input').value = '';
+            document.getElementById('budget-input').value = '';
+            document.getElementById('addons-input').value = '';
+        }, 3000);
     });
 </script>
 <!-- end custom contact section -->
