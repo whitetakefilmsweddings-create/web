@@ -122,174 +122,330 @@
             </div>
         </header>
         <!-- end of header -->
-        <!-- start wpo-page-title -->
-        <style>
-            .wpo-page-title {
-                min-height: 450px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
+        <!-- start custom contact section -->
+<style>
+/* Custom Contact Styles */
+.contact-hero { padding: 120px 0 60px; text-align: center; position: relative; background: #000; overflow: hidden; }
+.contact-hero::before { content:''; position:absolute; top:-100px; right:0; width:500px; height:500px; background: rgba(212,175,55,0.05); border-radius:50%; filter: blur(60px); pointer-events:none; }
+.hero-tag { display: inline-flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+.hero-tag .line { height: 1px; width: 40px; background: #d4af37; }
+.hero-tag span { color: #c5a880; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; }
+.contact-hero h1 { font-size: 56px; font-weight: 900; color: #fff; margin-bottom: 20px; font-family: 'Playfair Display', serif; }
+.contact-hero h1 .gold-italic { font-style: italic; color: #d4af37; font-weight: 400; }
+.contact-hero p { color: #888; font-size: 18px; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
-            .wpo-page-title::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 0;
-            }
+.contact-main { background: #000; padding-bottom: 100px; }
+.direct-contact { display: flex; flex-direction: column; gap: 30px; }
+.direct-contact h2 { font-size: 24px; color: #fff; font-family: 'Playfair Display', serif; margin-bottom: 10px; }
+.contact-link { display: flex; align-items: center; gap: 15px; color: #aaa; text-decoration: none; font-size: 15px; transition: 0.3s; }
+.contact-link:hover { color: #d4af37; }
+.contact-link .icon-box { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.contact-link:hover .icon-box { border-color: rgba(212,175,55,0.4); }
 
-            .wpo-page-title .container {
-                position: relative;
-                z-index: 1;
-                padding-top: 60px;
-            }
+.callback-box { background: rgba(212,175,55,0.05); border: 1px solid rgba(212,175,55,0.2); border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+.callback-box:hover { background: rgba(212,175,55,0.1); border-color: rgba(212,175,55,0.4); }
+.callback-box .cb-icon { width: 45px; height: 45px; background: rgba(212,175,55,0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #d4af37; font-size: 20px; }
+.callback-box .cb-text h4 { color: #fff; font-size: 15px; margin: 0 0 5px; font-weight: 600; }
+.callback-box .cb-text p { color: #888; font-size: 13px; margin: 0; }
+.callback-box .arrow { margin-left: auto; color: #d4af37; font-size: 20px; }
 
-            .wpo-page-title .tagline {
-                font-size: 1.2rem;
-                color: #fff;
-                margin-top: 15px;
-                font-style: italic;
-                opacity: 0.9;
-            }
-        </style>
-        <section class="wpo-page-title"
-            style="background-image: url('pic/service/Engagement%20_Reception.webp'); background-size: cover; background-position: center; position: relative;">
-            <div class="container">
-                <div class="row">
-                    <div class="col col-xs-12">
-                        <div class="wpo-breadcumb-wrap">
-                            <h2>Contact Us</h2>
-                            <p class="tagline">Let's Create Beautiful Memories Together</p>
-                        </div>
+.promise-box { background: rgba(25,25,25,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 25px; margin-top: 20px; }
+.promise-box h5 { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+.promise-box ul { list-style: none; padding: 0; margin: 0; }
+.promise-box li { display: flex; align-items: center; gap: 12px; color: #aaa; font-size: 14px; margin-bottom: 15px; }
+.promise-box li:last-child { margin-bottom: 0; }
+.promise-box li i { color: #d4af37; font-size: 14px; }
+
+/* Form Styles */
+.custom-form { background: rgba(25,25,25,0.5); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 40px; }
+.form-section-title { font-size: 11px; color: #d4af37; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; font-weight: 600; }
+.custom-form .form-group { margin-bottom: 25px; }
+.custom-form label { display: block; font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 500; }
+.custom-input { width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 15px; color: #fff; font-size: 14px; transition: 0.3s; }
+.custom-input:focus { border-color: #d4af37; outline: none; }
+.custom-input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.5; }
+
+/* Pills */
+.pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
+.form-pill { padding: 8px 16px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #aaa; font-size: 13px; cursor: pointer; transition: 0.3s; font-weight: 500; }
+.form-pill:hover { border-color: rgba(212,175,55,0.5); color: #d4af37; }
+.form-pill.active { background: #d4af37; border-color: #d4af37; color: #000; font-weight: 600; }
+
+/* Counters */
+.counter-box { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.counter-box span { color: #aaa; font-size: 14px; }
+.counter-controls { display: flex; align-items: center; gap: 15px; }
+.counter-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: transparent; color: #aaa; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; }
+.counter-btn:hover { border-color: #d4af37; color: #d4af37; }
+.counter-val { font-size: 14px; font-weight: 600; color: #fff; min-width: 15px; text-align: center; }
+
+/* Add-ons */
+.addon-btn { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 15px; display: flex; align-items: center; justify-content: space-between; color: #aaa; font-size: 14px; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
+.addon-btn:hover { border-color: rgba(255,255,255,0.2); }
+.addon-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); transition: 0.3s; position: relative; }
+.addon-btn.active .addon-check { border-color: #d4af37; background: #d4af37; }
+.addon-btn.active .addon-check::after { content:''; position:absolute; left:6px; top:2px; width:5px; height:10px; border:solid #000; border-width:0 2px 2px 0; transform:rotate(45deg); }
+
+.submit-btn { width: 100%; background: #d4af37; color: #000; border: none; border-radius: 30px; padding: 16px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+.submit-btn:hover { background: #c5a880; transform: scale(1.02); }
+
+@media (max-width: 767px) {
+    .contact-hero h1 { font-size: 40px; }
+    .custom-form { padding: 25px; }
+}
+</style>
+
+<section class="contact-hero">
+    <div class="container">
+        <div class="hero-tag">
+            <div class="line"></div>
+            <span>Book Your Date</span>
+            <div class="line"></div>
+        </div>
+        <h1>Let's Create Something <br><span class="gold-italic">Beautiful</span></h1>
+        <p>Tell us about your wedding and we'll put together a bespoke package. We reply within 24 hours.</p>
+    </div>
+</section>
+
+<section class="contact-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 col-md-12 mb-5 mb-lg-0">
+                <div class="direct-contact">
+                    <h2>Get in touch directly</h2>
+                    
+                    <a href="tel:+918714128539" class="contact-link">
+                        <div class="icon-box"><i class="ti-mobile"></i></div>
+                        <span>+91 8714128539</span>
+                    </a>
+                    
+                    <a href="https://wa.me/918714128539" target="_blank" class="contact-link">
+                        <div class="icon-box"><i class="fa fa-whatsapp"></i></div>
+                        <span>Chat on WhatsApp</span>
+                    </a>
+                    
+                    <a href="mailto:weddings@whitetakefilms.com" class="contact-link">
+                        <div class="icon-box"><i class="ti-email"></i></div>
+                        <span>weddings@whitetakefilms.com</span>
+                    </a>
+                    
+                    <a href="https://instagram.com/whitetake_films" target="_blank" class="contact-link">
+                        <div class="icon-box"><i class="ti-instagram"></i></div>
+                        <span>@whitetake_films</span>
+                    </a>
+                    
+                    <div class="contact-link" style="cursor: default;">
+                        <div class="icon-box"><i class="ti-location-pin"></i></div>
+                        <span>Manacaud, Trivandrum, Kerala</span>
                     </div>
-                </div> <!-- end row -->
-            </div> <!-- end container -->
-        </section>
-        <!-- end page-title -->
 
-        <!-- start wpo-contact-pg-section -->
-        <section class="wpo-contact-pg-section section-padding">
-            <div class="container">
-                <div class="row">
-                    <div class="col col-lg-10 offset-lg-1">
-                        <div class="office-info">
-                            <div class="row">
-                                <div class="col col-xl-4 col-lg-6 col-md-6 col-12">
-                                    <div class="office-info-item">
-                                        <div class="office-info-icon">
-                                            <div class="icon">
-                                                <i class="fi flaticon-maps-and-flags"></i>
-                                            </div>
-                                        </div>
-                                        <div class="office-info-text">
-                                            <h2>Address</h2>
-                                            <p>Manacaud, Thiruvananthapuram, Kerala 695009</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col col-xl-4 col-lg-6 col-md-6 col-12">
-                                    <div class="office-info-item">
-                                        <div class="office-info-icon">
-                                            <div class="icon">
-                                                <i class="fi flaticon-email"></i>
-                                            </div>
-                                        </div>
-                                        <div class="office-info-text">
-                                            <h2>Email Us</h2>
-                                            <p>weddings@whitetakefilms.com</p>
-                                            <p>weddings@whitetakefilms.com</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col col-xl-4 col-lg-6 col-md-6 col-12">
-                                    <div class="office-info-item">
-                                        <div class="office-info-icon">
-                                            <div class="icon">
-                                                <i class="fi flaticon-phone-call"></i>
-                                            </div>
-                                        </div>
-                                        <div class="office-info-text">
-                                            <h2>Call Now</h2>
-                                            <p>+91 8714128539</p>
-                                            <p>+91 8714128539</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="callback-box">
+                        <div class="cb-icon"><i class="ti-calendar"></i></div>
+                        <div class="cb-text">
+                            <h4>Prefer a call? Book a callback</h4>
+                            <p>Pick a date & time slot — we'll call you</p>
                         </div>
-                        <div class="wpo-contact-title">
-                            <h2>Have Any Question?</h2>
-                            <p>It is a long established fact that a reader will be distracted
-                                content of a page when looking.</p>
-                        </div>
-                        <div class="wpo-contact-form-area">
-                            <form method="post" class="contact-validation-active" id="contact-form-main">
-                                <div>
-                                    <input type="text" class="form-control" name="name" id="name"
-                                        placeholder="Your Name*">
-                                </div>
-                                <div>
-                                    <input type="email" class="form-control" name="email" id="email"
-                                        placeholder="Your Email*">
-                                </div>
-                                <div>
-                                    <input type="text" class="form-control" name="adress" id="adress"
-                                        placeholder="Adress">
-                                </div>
-                                <div>
-                                    <select name="service" class="form-control">
-                                        <option disabled="disabled" selected="">Services</option>
-                                        <option>Photography</option>
-                                        <option>The Rehearsal Dinner</option>
-                                        <option>The Afterparty</option>
-                                        <option>Videographers</option>
-                                        <option>Perfect Cake</option>
-                                        <option>All Of The Above</option>
-                                    </select>
-                                </div>
-                                <div class="fullwidth">
-                                    <textarea class="form-control" name="note" id="note"
-                                        placeholder="Message..."></textarea>
-                                </div>
-                                <div class="submit-area">
-                                    <button type="submit" class="theme-btn-s4">Get in Touch</button>
-                                    <div id="loader">
-                                        <i class="ti-reload"></i>
-                                    </div>
-                                </div>
-                                <div class="clearfix error-handling-messages">
-                                    <div id="success">Thank you</div>
-                                    <div id="error"> Error occurred while sending email. Please try again later. </div>
-                                </div>
-                            </form>
-                        </div>
+                        <div class="arrow">→</div>
+                    </div>
+
+                    <div class="promise-box">
+                        <h5>Our promise</h5>
+                        <ul>
+                            <li><i class="fa fa-check"></i> Reply within 24 hours</li>
+                            <li><i class="fa fa-check"></i> No generic pricing sheets</li>
+                            <li><i class="fa fa-check"></i> Custom quote tailored to you</li>
+                            <li><i class="fa fa-check"></i> No hidden fees — ever</li>
+                        </ul>
                     </div>
                 </div>
-            </div> <!-- end container -->
-        </section>
-        <!-- end wpo-contact-pg-section -->
+            </div>
 
-        <!--  start wpo-contact-map -->
-        <section class="wpo-contact-map-section">
-            <h2 class="hidden">Contact map</h2>
-            <div class="wpo-contact-map">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3946.2!2d76.9476!3d8.4855!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3b05bb0e8cb5d9e1%3A0xb5c5f46c4f6b8d0a!2sFWGX%2BG5M%2C%20Manacaud%2C%20Thiruvananthapuram%2C%20Kerala%20695009!5e0!3m2!1sen!2sin!4v1706000000000"
-                    allowfullscreen loading="lazy"></iframe>
+            <div class="col-lg-7 offset-lg-1 col-md-12">
+                <form class="custom-form" id="bespoke-form">
+                    
+                    <div class="form-section-title">Your Details</div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Full Name *</label>
+                            <input type="text" name="name" class="custom-input" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" name="phone" class="custom-input" required>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" class="custom-input">
+                        </div>
+                    </div>
+
+                    <div class="form-section-title mt-2">Events to Cover *</div>
+                    <div class="form-group">
+                        <div class="pill-group" id="event-pills">
+                            <div class="form-pill">Wedding</div>
+                            <div class="form-pill">Pre-Wedding</div>
+                            <div class="form-pill">Engagement</div>
+                            <div class="form-pill">Reception</div>
+                            <div class="form-pill">Mehendi</div>
+                            <div class="form-pill">Baptism</div>
+                            <div class="form-pill">Destination Wedding</div>
+                            <div class="form-pill">+ Other</div>
+                        </div>
+                        <input type="hidden" name="events" id="events-input">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Wedding Date</label>
+                            <input type="date" name="date" class="custom-input">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Venue / Location</label>
+                            <input type="text" name="venue" class="custom-input" placeholder="e.g. Leela Kovalam, Kerala">
+                        </div>
+                    </div>
+
+                    <div class="form-section-title mt-2">Coverage Days</div>
+                    <div class="form-group">
+                        <div class="pill-group" id="days-pills">
+                            <div class="form-pill active">1 Day</div>
+                            <div class="form-pill">2 Days</div>
+                            <div class="form-pill">3 Days</div>
+                            <div class="form-pill">4+ Days</div>
+                        </div>
+                        <input type="hidden" name="days" id="days-input" value="1 Day">
+                    </div>
+
+                    <div class="form-section-title mt-2">Crew Required</div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="counter-box">
+                                <span>Photographers</span>
+                                <div class="counter-controls">
+                                    <button type="button" class="counter-btn" onclick="updateCounter('photo', -1)">-</button>
+                                    <div class="counter-val" id="photo-val">1</div>
+                                    <button type="button" class="counter-btn" onclick="updateCounter('photo', 1)">+</button>
+                                </div>
+                                <input type="hidden" name="photographers" id="photo-input" value="1">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="counter-box">
+                                <span>Videographers</span>
+                                <div class="counter-controls">
+                                    <button type="button" class="counter-btn" onclick="updateCounter('video', -1)">-</button>
+                                    <div class="counter-val" id="video-val">1</div>
+                                    <button type="button" class="counter-btn" onclick="updateCounter('video', 1)">+</button>
+                                </div>
+                                <input type="hidden" name="videographers" id="video-input" value="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section-title mt-2">Add-ons</div>
+                    <div class="row form-group">
+                        <div class="col-md-6">
+                            <div class="addon-btn" onclick="this.classList.toggle('active'); updateAddons();">
+                                <span>Wedding Album</span>
+                                <div class="addon-check"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="addon-btn" onclick="this.classList.toggle('active'); updateAddons();">
+                                <span>Drone / Aerial</span>
+                                <div class="addon-check"></div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="addons" id="addons-input">
+                    </div>
+
+                    <div class="form-section-title mt-2">Estimated Budget</div>
+                    <div class="form-group">
+                        <div class="pill-group" id="budget-pills">
+                            <div class="form-pill">₹1,00,000 – ₹2,00,000</div>
+                            <div class="form-pill">₹2,00,000 – ₹5,00,000</div>
+                            <div class="form-pill">₹5,00,000+</div>
+                            <div class="form-pill">Let WhiteTake decide</div>
+                        </div>
+                        <input type="hidden" name="budget" id="budget-input">
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <label>Anything else you'd like us to know?</label>
+                        <textarea name="notes" class="custom-input" rows="3" placeholder="Special requests, specific moments you want captured, etc."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">Send Enquiry &rarr;</button>
+                </form>
             </div>
-            <div class="text-center" style="padding: 20px 0;">
-                <a href="https://www.google.com/maps/place/FWGX%2BG5M,+Manacaud,+Thiruvananthapuram,+Kerala+695009/@8.4855,76.9476,17z"
-                    target="_blank" class="theme-btn-s4"
-                    style="display: inline-block; padding: 12px 30px; text-decoration: none;">
-                    <i class="fi flaticon-maps-and-flags"></i> Open in Google Maps
-                </a>
-            </div>
-        </section>
-        <!-- end wpo-contact-map -->
+        </div>
+    </div>
+</section>
+
+<script>
+    // Handle Event Pills (Multi-select)
+    document.querySelectorAll('#event-pills .form-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const selected = Array.from(document.querySelectorAll('#event-pills .form-pill.active')).map(el => el.innerText);
+            document.getElementById('events-input').value = selected.join(', ');
+        });
+    });
+
+    // Handle Days Pills (Single-select)
+    document.querySelectorAll('#days-pills .form-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('#days-pills .form-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('days-input').value = this.innerText;
+        });
+    });
+
+    // Handle Budget Pills (Single-select)
+    document.querySelectorAll('#budget-pills .form-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+            document.querySelectorAll('#budget-pills .form-pill').forEach(p => p.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById('budget-input').value = this.innerText;
+        });
+    });
+
+    // Handle Counters
+    function updateCounter(type, change) {
+        const valEl = document.getElementById(type + '-val');
+        const inputEl = document.getElementById(type + '-input');
+        let current = parseInt(valEl.innerText);
+        let newVal = current + change;
+        if(newVal < 0) newVal = 0;
+        valEl.innerText = newVal;
+        inputEl.value = newVal;
+    }
+    
+    // Handle Addons
+    function updateAddons() {
+        const selected = Array.from(document.querySelectorAll('.addon-btn.active')).map(el => el.querySelector('span').innerText);
+        document.getElementById('addons-input').value = selected.join(', ');
+    }
+
+    // Handle form submit visually
+    document.getElementById('bespoke-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = this.querySelector('.submit-btn');
+        btn.innerText = 'Sending...';
+        btn.style.opacity = '0.7';
+        setTimeout(() => {
+            btn.innerText = 'Thank you! We will reach out shortly.';
+            btn.style.background = '#4caf50';
+            btn.style.color = '#fff';
+            this.reset();
+            document.querySelectorAll('.form-pill.active, .addon-btn.active').forEach(el => el.classList.remove('active'));
+            document.querySelector('#days-pills .form-pill').classList.add('active');
+            document.getElementById('photo-val').innerText = '1';
+            document.getElementById('video-val').innerText = '1';
+        }, 1500);
+    });
+</script>
+<!-- end custom contact section -->
 
 
         <!-- start of wpo-site-footer-section -->
