@@ -1580,12 +1580,31 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
     return res.json({ success: false, message: 'Missing parameters' });
   }
   try {
+    let final_text_value = text_value || '';
+    if (section_key.endsWith('_yt')) {
+        let url = final_text_value;
+        let videoId = '';
+        if (url.includes('youtu.be/')) {
+            videoId = url.split('youtu.be/')[1].split('?')[0];
+        } else if (url.includes('youtube.com/watch')) {
+            try {
+                const urlParams = new URL(url).searchParams;
+                videoId = urlParams.get('v');
+            } catch (e) {}
+        } else if (url.includes('youtube.com/embed/')) {
+            videoId = url.split('youtube.com/embed/')[1].split('?')[0];
+        }
+        if (videoId) {
+            final_text_value = `https://www.youtube.com/embed/${videoId}`;
+        }
+    }
+
     const [rows] = await panlePool.execute('SELECT id FROM section_images WHERE section_key = ?', [section_key]);
     
     if (rows.length > 0) {
       await panlePool.execute(
         'UPDATE section_images SET image_path = ? WHERE section_key = ?',
-        [text_value || '', section_key]
+        [final_text_value, section_key]
       );
     } else {
       let page_name = 'home';
@@ -1594,7 +1613,7 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
       
       await panlePool.execute(
         'INSERT INTO section_images (page_name, section_key, image_path) VALUES (?, ?, ?)',
-        [page_name, section_key, text_value || '']
+        [page_name, section_key, final_text_value]
       );
     }
     
@@ -1620,7 +1639,7 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
         const elementId = section_key.replace(/_/g, '-');
         if ($(`#${elementId}`).length > 0) {
             if (elementId.endsWith('-yt')) {
-                const url = text_value || '';
+                const url = final_text_value;
                 $(`#${elementId}`).attr('src', url);
                 if (url) {
                     $(`#${elementId}`).css('display', 'block');
@@ -1630,7 +1649,7 @@ app.post('/pannl/update_section_text.php', checkPannlAuth, async (req, res) => {
                     $(`#${elementId.replace('-yt', '-img')}`).css('display', 'block');
                 }
             } else {
-                $(`#${elementId}`).html(text_value || '');
+                $(`#${elementId}`).html(final_text_value);
             }
             fs.writeFileSync(filePath, $.html());
         }
