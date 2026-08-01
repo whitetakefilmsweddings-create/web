@@ -1,3 +1,4 @@
+(() => {
 /**
  * Google Drive Gallery Loader
  * Loads images from a specific public Google Drive folder for the Gallery page
@@ -260,3 +261,5 @@ async function init() {
 
 // Run initialization when DOM is ready
 document.addEventListener('DOMContentLoaded', init);
+
+})();
