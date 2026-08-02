@@ -620,21 +620,25 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
             is_selected: isSelected
           });
         }
-        
-        // Fetch all selected files' metadata efficiently across all folders for the Selected Photos tab
-        if (selections.length > 0) {
-          const selectedDriveFiles = await drive.getFilesByIds(selections);
-          for (const sFile of selectedDriveFiles) {
-            selectedFiles.push({
-              id: sFile.getId(),
-              name: sFile.getName(),
-              src: (sFile.getThumbnailLink() || '').replace('=s220', '=s600'),
-              is_selected: true
-            });
-          }
-        }
       } catch (driveErr) {
         error = `Drive Error: ${driveErr.message}`;
+      }
+    }
+
+    // Fetch all selected files' metadata efficiently across all folders for the Selected Photos tab
+    if (selections.length > 0) {
+      try {
+        const selectedDriveFiles = await drive.getFilesByIds(selections);
+        for (const sFile of selectedDriveFiles) {
+          selectedFiles.push({
+            id: sFile.getId(),
+            name: sFile.getName(),
+            src: (sFile.getThumbnailLink() || '').replace('=s220', '=s600'),
+            is_selected: true
+          });
+        }
+      } catch (selErr) {
+        if (!error) error = `Selections Error: ${selErr.message}`;
       }
     }
 

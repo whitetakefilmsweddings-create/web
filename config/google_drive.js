@@ -143,29 +143,15 @@ class GoogleDrive {
   async getFilesByIds(fileIds) {
     const files = [];
     if (!fileIds || fileIds.length === 0) return files;
-    await this.authenticateServiceAccount();
 
-    for (let i = 0; i < fileIds.length; i += 50) {
-      const batch = fileIds.slice(i, i + 50);
-      const q = batch.map(id => `id='${id}'`).join(' or ');
-      const params = {
-        pageSize: 100,
-        fields: 'files(id, name, mimeType, webContentLink, webViewLink, thumbnailLink)',
-        q: `(${q}) and trashed = false`
-      };
-
-      if (!this.accessToken) {
-        params.key = this.apiKey;
-      }
-
-      const queryString = new URLSearchParams(params).toString();
-      const url = `${this.endpoint}?${queryString}`;
-      
-      const res = await this.request(url);
-      if (res.code === 200 && res.data && res.data.files) {
-        for (const fileData of res.data.files) {
-          files.push(new SimpleDriveFile(fileData));
-        }
+    const batchSize = 25;
+    for (let i = 0; i < fileIds.length; i += batchSize) {
+      const batch = fileIds.slice(i, i + batchSize);
+      const results = await Promise.all(
+        batch.map(id => this.getFileMetadata(id))
+      );
+      for (const f of results) {
+        if (f) files.push(f);
       }
     }
     return files;
