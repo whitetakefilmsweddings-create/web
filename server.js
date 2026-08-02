@@ -72,6 +72,25 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+async function requireAdminOrEditor(req, res, next) {
+  if (req.session.userId && req.session.role === 'admin') {
+    return next();
+  }
+  const clientId = req.query.id || req.query.client_id || req.body.client_id;
+  if (req.session.userId && req.session.role === 'editor' && req.session.editorClientId) {
+    if (!clientId || req.session.editorClientId == clientId) {
+      try {
+        const [rows] = await tdsPool.execute('SELECT editor_password FROM clients WHERE id = ?', [req.session.editorClientId]);
+        if (rows.length > 0 && rows[0].editor_password) {
+          req.query.id = req.session.editorClientId;
+          return next();
+        }
+      } catch (e) {}
+    }
+  }
+  return res.redirect('/Admin/editor/login.php');
+}
+
 function requireClient(req, res, next) {
   if (!req.session.userId || req.session.role !== 'client') {
     return res.redirect('/Admin/client/login.php');
@@ -114,9 +133,14 @@ async function initDatabases() {
         folder_id VARCHAR(255) DEFAULT NULL,
         ai_folder_id VARCHAR(255) DEFAULT NULL,
         gallery_code VARCHAR(50) DEFAULT NULL,
+        editor_password VARCHAR(255) DEFAULT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    try {
+      await tdsPool.query('ALTER TABLE clients ADD COLUMN editor_password VARCHAR(255) DEFAULT NULL');
+    } catch (e) {}
 
     await tdsPool.query(`
       CREATE TABLE IF NOT EXISTS invoices (
@@ -502,6 +526,13 @@ app.get('/Admin/admin/view_client.php', requireAdmin, async (req, res) => {
     }
     const shareTextFace = `Find your photos from the event using Face AI:\n${faceAppUrl}`;
 
+    let editorAppUrl = '';
+    let shareTextEditor = '';
+    if (client.editor_password) {
+      editorAppUrl = `${protocol}://${host}/Admin/editor/login.php?id=${client.id}&pass=${encodeURIComponent(client.editor_password)}`;
+      shareTextEditor = `Hello Editor,\n\nHere is your direct access link for Client: ${client.name}\n${editorAppUrl}\n\nPassword: ${client.editor_password}`;
+    }
+
     res.render('admin/view_client', {
       client,
       msg: req.session.flashMsg || '',
@@ -511,7 +542,9 @@ app.get('/Admin/admin/view_client.php', requireAdmin, async (req, res) => {
       totalApp: appointments.length,
       faceAppUrl,
       shareText,
-      shareTextFace
+      shareTextFace,
+      editorAppUrl,
+      shareTextEditor
     });
     req.session.flashMsg = null;
   } catch (err) {
@@ -536,6 +569,19 @@ app.post('/Admin/admin/view_client.php', requireAdmin, async (req, res) => {
         [folder_id, gallery_code, id]
       );
       req.session.flashMsg = 'Gallery settings updated!';
+    } else if (req.body.update_editor_access) {
+      const { editor_password } = req.body;
+      await tdsPool.execute(
+        'UPDATE clients SET editor_password = ? WHERE id = ?',
+        [editor_password || null, id]
+      );
+      req.session.flashMsg = 'Editor access updated!';
+    } else if (req.body.remove_editor_access) {
+      await tdsPool.execute(
+        'UPDATE clients SET editor_password = NULL WHERE id = ?',
+        [id]
+      );
+      req.session.flashMsg = 'Editor access revoked!';
     } else if (req.body.update_face_ai) {
       const { ai_folder_id } = req.body;
       await tdsPool.execute(
@@ -571,7 +617,7 @@ app.post('/Admin/admin/delete_client.php', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
+app.get('/Admin/admin/client_selection.php', requireAdminOrEditor, async (req, res) => {
   const clientId = req.query.id;
   let folderId = req.query.folder || null;
   if (!clientId) return res.status(400).send('Client ID required');
@@ -653,6 +699,7 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
       folderId,
       rootFolderId: client.folder_id,
       error,
+      isEditor: req.session.role === 'editor',
       successMsg: req.session.flashSuccess || ''
     });
     req.session.flashSuccess = null;
@@ -661,7 +708,7 @@ app.get('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => {
+app.post('/Admin/admin/client_selection.php', requireAdminOrEditor, async (req, res) => {
   const clientId = req.query.id;
   if (!clientId) return res.status(400).send('Client ID required');
 
@@ -702,7 +749,7 @@ app.post('/Admin/admin/client_selection.php', requireAdmin, async (req, res) => 
   }
 });
 
-app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
+app.get('/Admin/admin/cleanup_drive.php', requireAdminOrEditor, async (req, res) => {
   const clientId = req.query.client_id;
   const type = req.query.type || 'gallery';
   let currentFolderId = req.query.folder || null;
@@ -776,7 +823,7 @@ app.get('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
   }
 });
 
-app.post('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
+app.post('/Admin/admin/cleanup_drive.php', requireAdminOrEditor, async (req, res) => {
   const clientId = req.query.client_id;
   const filesToDelete = req.body.files || [];
 
@@ -808,7 +855,7 @@ app.post('/Admin/admin/cleanup_drive.php', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/Admin/admin/download_file.php', requireAdmin, async (req, res) => {
+app.get('/Admin/admin/download_file.php', requireAdminOrEditor, async (req, res) => {
   const fileId = req.query.file_id;
   if (!fileId) return res.status(400).send('File ID required');
 
@@ -828,7 +875,7 @@ app.get('/Admin/admin/download_file.php', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/Admin/admin/download_zip.php', requireAdmin, async (req, res) => {
+app.get('/Admin/admin/download_zip.php', requireAdminOrEditor, async (req, res) => {
   const clientId = req.query.client_id;
   if (!clientId) return res.status(400).send('Client ID required');
 
@@ -871,6 +918,77 @@ app.get('/Admin/admin/download_zip.php', requireAdmin, async (req, res) => {
   } catch (err) {
     res.status(500).send(err.message);
   }
+});
+
+// ----------------------------------------------------
+// EDITOR ACTIONS
+// ----------------------------------------------------
+app.get('/Admin/editor/login.php', async (req, res) => {
+  const id = req.query.id || '';
+  const pass = req.query.pass || '';
+
+  if (id && pass) {
+    try {
+      const [rows] = await tdsPool.execute(
+        'SELECT * FROM clients WHERE id = ? AND editor_password = ? AND editor_password IS NOT NULL AND editor_password != ""',
+        [id, pass]
+      );
+      const client = rows[0];
+      if (client) {
+        req.session.userId = client.id;
+        req.session.role = 'editor';
+        req.session.editorClientId = client.id;
+        return res.redirect(`/Admin/admin/client_selection.php?id=${client.id}`);
+      }
+    } catch (err) {}
+  }
+
+  if (req.session.userId && req.session.role === 'editor' && req.session.editorClientId) {
+    return res.redirect(`/Admin/admin/client_selection.php?id=${req.session.editorClientId}`);
+  }
+
+  try {
+    const [clients] = await tdsPool.query(
+      'SELECT id, name FROM clients WHERE editor_password IS NOT NULL AND editor_password != "" ORDER BY name ASC'
+    );
+    res.render('editor/login', { clients, selectedClientId: id, presetPassword: pass, error: '' });
+  } catch (err) {
+    res.render('editor/login', { clients: [], selectedClientId: id, presetPassword: pass, error: err.message });
+  }
+});
+
+app.post('/Admin/editor/login.php', async (req, res) => {
+  const { client_id, editor_password } = req.body;
+  try {
+    const [rows] = await tdsPool.execute(
+      'SELECT * FROM clients WHERE id = ? AND editor_password = ? AND editor_password IS NOT NULL AND editor_password != ""',
+      [client_id, editor_password]
+    );
+    const client = rows[0];
+
+    if (client) {
+      req.session.userId = client.id;
+      req.session.role = 'editor';
+      req.session.editorClientId = client.id;
+      return res.redirect(`/Admin/admin/client_selection.php?id=${client.id}`);
+    } else {
+      const [clients] = await tdsPool.query(
+        'SELECT id, name FROM clients WHERE editor_password IS NOT NULL AND editor_password != "" ORDER BY name ASC'
+      );
+      res.render('editor/login', { clients, selectedClientId: client_id, presetPassword: '', error: 'Invalid client selection or editor password.' });
+    }
+  } catch (err) {
+    const [clients] = await tdsPool.query(
+      'SELECT id, name FROM clients WHERE editor_password IS NOT NULL AND editor_password != "" ORDER BY name ASC'
+    );
+    res.render('editor/login', { clients, selectedClientId: client_id, presetPassword: '', error: err.message });
+  }
+});
+
+app.get('/Admin/editor/logout.php', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/Admin/editor/login.php');
+  });
 });
 
 app.get('/Admin/admin/create_invoice.php', requireAdmin, async (req, res) => {

@@ -127,13 +127,18 @@
 <body>
     <div class="container py-5">
         <div class="d-flex align-items-center mb-4">
-            <% if (folderId !== rootFolderId) { %>
+            <% if (typeof isEditor !== 'undefined' && isEditor) { %>
+                <% if (folderId !== rootFolderId) { %>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
+                <% } %>
+                <a href="/Admin/editor/logout.php" class="btn btn-outline-danger me-3"><i class="bi bi-box-arrow-right"></i> Logout Editor</a>
+            <% } else if (folderId !== rootFolderId) { %>
                 <a href="javascript:history.back()" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
             <% } else { %>
                 <a href="/Admin/admin/view_client.php?id=<%= client.id %>" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-left"></i> Back</a>
             <% } %>
             <div>
-                <h2 class="mb-0 fw-bold">Client Selections</h2>
+                <h2 class="mb-0 fw-bold">Client Selections <% if (typeof isEditor !== 'undefined' && isEditor) { %><span class="badge bg-primary fs-6 align-middle ms-2">Editor Workspace</span><% } %></h2>
                 <p class="text-muted mb-0">Client: <%= client.name %></p>
             </div>
             <div class="ms-auto">
