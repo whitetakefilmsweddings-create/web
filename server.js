@@ -87,6 +87,8 @@ async function requireAdminOrEditor(req, res, next) {
         }
       } catch (e) {}
     }
+  if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1) || (req.headers['content-type'] && req.headers['content-type'].indexOf('json') > -1)) {
+    return res.status(401).json({ success: false, message: 'Session expired. Please log in again.' });
   }
   return res.redirect('/Admin/editor/login.php');
 }
