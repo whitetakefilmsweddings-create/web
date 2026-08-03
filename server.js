@@ -931,8 +931,72 @@ app.get('/Admin/admin/download_zip.php', requireAdminOrEditor, async (req, res) 
 });
 
 // ----------------------------------------------------
+// SAVE SELECTIONS TO DRIVE SUBFOLDER
+// ----------------------------------------------------
+app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, async (req, res) => {
+  const clientId = req.query.id;
+  if (!clientId) return res.status(400).json({ success: false, message: 'Client ID required' });
+
+  const { folder_name } = req.body;
+
+  try {
+    // Fetch client info
+    const [clients] = await tdsPool.execute('SELECT name, folder_id FROM clients WHERE id = ?', [clientId]);
+    const client = clients[0];
+    if (!client) return res.status(404).json({ success: false, message: 'Client not found' });
+    if (!client.folder_id) return res.status(400).json({ success: false, message: 'No Drive folder configured for this client' });
+
+    // Fetch selected file IDs
+    const [selRows] = await tdsPool.execute('SELECT file_id FROM client_selections WHERE client_id = ?', [clientId]);
+    if (selRows.length === 0) {
+      return res.status(400).json({ success: false, message: 'No photos selected by the client yet' });
+    }
+    const selectedIds = selRows.map(r => r.file_id);
+
+    // Build subfolder name
+    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const safeName = (folder_name || `${client.name} - Selected Photos - ${today}`).trim();
+
+    const drive = new GoogleDrive();
+
+    // Create the subfolder inside the client's root Drive folder
+    const newFolderId = await drive.createFolder(safeName, client.folder_id);
+
+    // Copy each selected file into the new subfolder
+    let copiedCount = 0;
+    let failedCount = 0;
+    const errors = [];
+
+    await Promise.allSettled(
+      selectedIds.map(async (fileId) => {
+        try {
+          await drive.copyFile(fileId, newFolderId);
+          copiedCount++;
+        } catch (err) {
+          failedCount++;
+          errors.push(`${fileId}: ${err.message}`);
+        }
+      })
+    );
+
+    return res.json({
+      success: true,
+      message: `${copiedCount} photo${copiedCount !== 1 ? 's' : ''} saved to "${safeName}"${failedCount > 0 ? `. ${failedCount} failed.` : ''}`,
+      newFolderId,
+      folderName: safeName,
+      copiedCount,
+      failedCount
+    });
+
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ----------------------------------------------------
 // EDITOR ACTIONS
 // ----------------------------------------------------
+
 app.get('/Admin/editor/login.php', async (req, res) => {
   const id = req.query.id || '';
   const pass = req.query.pass || '';

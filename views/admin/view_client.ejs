@@ -105,6 +105,11 @@
                             <a href="/Admin/admin/client_selection.php?id=<%= client.id %>" class="btn btn-outline-primary">
                                 <i class="bi bi-grid-3x3"></i> View Selections
                             </a>
+                            <% if (client.folder_id) { %>
+                            <button class="btn btn-outline-success" onclick="quickSaveToDrive(<%= client.id %>, '<%= client.name %>')" id="quickSaveBtn">
+                                <i class="bi bi-folder-plus"></i> Save Selections to Subfolder
+                            </button>
+                            <% } %>
                         </div>
                     </div>
                     
@@ -391,6 +396,43 @@
                 container.classList.remove('d-none');
             } else {
                 container.classList.add('d-none');
+            }
+        }
+
+        async function quickSaveToDrive(clientId, clientName) {
+            const today = new Date().toISOString().slice(0, 10);
+            const defaultName = `${clientName} - Selected Photos - ${today}`;
+            const folderName = prompt('Enter a name for the new Drive subfolder:', defaultName);
+            if (!folderName) return;
+
+            const btn = document.getElementById('quickSaveBtn');
+            const origText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
+
+            try {
+                const formData = new FormData();
+                formData.append('folder_name', folderName.trim());
+
+                const resp = await fetch(`/Admin/admin/save_selections_to_drive.php?id=${clientId}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await resp.json();
+
+                if (data.success) {
+                    const driveLink = `https://drive.google.com/drive/folders/${data.newFolderId}`;
+                    if (confirm(`✅ ${data.message}\n\nOpen the new folder in Google Drive?`)) {
+                        window.open(driveLink, '_blank');
+                    }
+                } else {
+                    alert(`❌ ${data.message}`);
+                }
+            } catch (err) {
+                alert(`❌ Network error: ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = origText;
             }
         }
     </script>

@@ -278,6 +278,29 @@ class GoogleDrive {
     return res.data.id;
   }
 
+  async copyFile(fileId, destinationFolderId) {
+    await this.authenticateServiceAccount();
+    if (!this.accessToken) {
+      throw new Error('Copying requires a Service Account. Please configure service_account.json');
+    }
+
+    const url = `${this.endpoint}/${fileId}/copy`;
+    const body = { parents: [destinationFolderId] };
+
+    const res = await axios.post(url, body, {
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (res.status !== 200 && res.status !== 201) {
+      throw new Error(`Copy File Failed (${res.status}): ${res.data?.error?.message || 'Unknown Error'}`);
+    }
+
+    return res.data.id; // ID of the new copy
+  }
+
   async getFolderCover(folderId) {
     const params = {
       pageSize: 1,
