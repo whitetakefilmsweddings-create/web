@@ -26,18 +26,30 @@ class GoogleDrive {
   }
 
   tryLoadServiceAccount() {
+    // 1. Try loading from file (local dev)
     const keyFile = path.join(__dirname, '../Admin/config/service_account.json');
     if (fs.existsSync(keyFile)) {
       try {
         this.creds = JSON.parse(fs.readFileSync(keyFile, 'utf8'));
+        return;
       } catch (err) {
         console.error('Failed to parse service_account.json:', err);
+      }
+    }
+    // 2. Fall back to environment variable (production server)
+    if (process.env.GOOGLE_SERVICE_ACCOUNT) {
+      try {
+        this.creds = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
+      } catch (err) {
+        console.error('Failed to parse GOOGLE_SERVICE_ACCOUNT env var:', err);
       }
     }
   }
 
   async authenticateServiceAccount() {
-    if (!this.creds) return;
+    if (!this.creds) {
+      throw new Error('Service account credentials not found. Add GOOGLE_SERVICE_ACCOUNT to .env on the server.');
+    }
     const now = Math.floor(Date.now() / 1000);
     // Reuse token if still valid for next 5 minutes
     if (this.accessToken && this.tokenExpiry > now + 300) {
