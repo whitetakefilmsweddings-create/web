@@ -895,28 +895,38 @@ app.get('/Admin/admin/download_zip.php', requireAdminOrEditor, async (req, res) 
     if (end > totalFiles) end = totalFiles;
 
     const batchSelections = selections.slice(start - 1, end);
-    const rangeStr = (start === 1 && end === totalFiles) ? '' : `_Target_${start}-${end}`;
+    const rangeStr = (start === 1 && end === totalFiles) ? '' : `_Part_${start}-${end}`;
     const zipName = `WhiteTake_Selections_${clientName.replace(/[^a-zA-Z0-9_\-]/g, '_')}${rangeStr}.zip`;
 
     res.attachment(zipName);
-    const archive = archiver('zip', { zlib: { level: 9 } });
+    // Use level 1 (fastest) — JPEGs/PNGs don't compress further; saves CPU & time
+    const archive = archiver('zip', { zlib: { level: 1 } });
     archive.pipe(res);
 
     const drive = new GoogleDrive();
-    for (const fileId of batchSelections) {
-      try {
-        const meta = await drive.getFileMetadata(fileId);
-        if (meta) {
+
+    // Step 1: Fetch ALL metadata in parallel (avoids 40 sequential API round-trips)
+    const metaResults = await Promise.allSettled(
+      batchSelections.map(fileId => drive.getFileMetadata(fileId).then(meta => ({ fileId, meta })))
+    );
+
+    // Step 2: Download and append all streams concurrently into the archive
+    await Promise.all(
+      metaResults.map(async (result) => {
+        if (result.status !== 'fulfilled' || !result.value.meta) return;
+        const { fileId, meta } = result.value;
+        try {
           const stream = await drive.downloadFileStream(fileId);
           archive.append(stream, { name: meta.getName() });
+        } catch (err) {
+          console.error(`Error streaming file ${fileId} into zip:`, err.message);
         }
-      } catch (err) {
-        console.error(`Error zipping file ${fileId}:`, err.message);
-      }
-    }
+      })
+    );
+
     await archive.finalize();
   } catch (err) {
-    res.status(500).send(err.message);
+    if (!res.headersSent) res.status(500).send(err.message);
   }
 });
 
