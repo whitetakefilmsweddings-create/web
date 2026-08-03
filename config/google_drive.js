@@ -65,7 +65,53 @@ class GoogleDrive {
 
 
 
+  async authenticateOAuth() {
+    const oauthFile = path.join(__dirname, '../Admin/config/google_oauth.json');
+    let oauthData = null;
+
+    if (fs.existsSync(oauthFile)) {
+      try {
+        oauthData = JSON.parse(fs.readFileSync(oauthFile, 'utf8'));
+      } catch (e) {}
+    }
+
+    const refreshToken = oauthData?.refresh_token || process.env.GOOGLE_REFRESH_TOKEN;
+    const clientId = oauthData?.client_id || process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = oauthData?.client_secret || process.env.GOOGLE_CLIENT_SECRET;
+
+    if (refreshToken && clientId && clientSecret) {
+      const now = Math.floor(Date.now() / 1000);
+      if (this.accessToken && this.tokenExpiry > now + 300) {
+        return true;
+      }
+
+      try {
+        const response = await axios.post('https://oauth2.googleapis.com/token', new URLSearchParams({
+          grant_type: 'refresh_token',
+          client_id: clientId,
+          client_secret: clientSecret,
+          refresh_token: refreshToken
+        }));
+
+        if (response.data && response.data.access_token) {
+          this.accessToken = response.data.access_token;
+          this.tokenExpiry = now + (response.data.expires_in || 3600);
+          this.isUserAuth = true;
+          return true;
+        }
+      } catch (err) {
+        console.error('Admin Google OAuth token refresh failed:', err.response?.data || err.message);
+      }
+    }
+    return false;
+  }
+
   async authenticateServiceAccount() {
+    // 1. Prioritize Admin's Google OAuth Account if connected
+    const isOAuth = await this.authenticateOAuth();
+    if (isOAuth) return;
+
+    // 2. Fallback to Service Account
     if (!this.creds) {
       throw new Error('Service account credentials not found. Add GOOGLE_SERVICE_ACCOUNT to .env on the server.');
     }

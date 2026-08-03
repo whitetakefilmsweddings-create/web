@@ -127,6 +127,14 @@ async function initDatabases() {
     `);
 
     await tdsPool.query(`
+      CREATE TABLE IF NOT EXISTS system_settings (
+        setting_key VARCHAR(100) PRIMARY KEY,
+        setting_value TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      );
+    `);
+
+    await tdsPool.query(`
       CREATE TABLE IF NOT EXISTS clients (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -400,9 +408,27 @@ async function initDatabases() {
       await panlePool.query('INSERT IGNORE INTO instagram_feeds (feed_key, post_url) VALUES (?, ?)', row);
     }
 
-    console.log('Databases initialized and updated.');
   } catch (err) {
     console.error('Error during database initialization/migrations:', err);
+  }
+}
+
+async function getSystemSetting(key, defaultValue = '') {
+  try {
+    const [rows] = await tdsPool.execute('SELECT setting_value FROM system_settings WHERE setting_key = ?', [key]);
+    if (rows.length > 0) return rows[0].setting_value;
+  } catch (e) {}
+  return defaultValue;
+}
+
+async function setSystemSetting(key, value) {
+  try {
+    await tdsPool.execute(
+      'INSERT INTO system_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
+      [key, value, value]
+    );
+  } catch (e) {
+    console.error(`Failed to set system_setting ${key}:`, e.message);
   }
 }
 
@@ -930,6 +956,167 @@ app.get('/Admin/admin/download_zip.php', requireAdminOrEditor, async (req, res) 
     await archive.finalize();
   } catch (err) {
     if (!res.headersSent) res.status(500).send(err.message);
+  }
+});
+
+// ----------------------------------------------------
+// GOOGLE DRIVE OAUTH SETUP & CONNECT ROUTES
+// ----------------------------------------------------
+app.get('/Admin/admin/google_drive_setup.php', requireAdmin, async (req, res) => {
+  try {
+    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || '');
+    const clientSecret = await getSystemSetting('google_client_secret', process.env.GOOGLE_CLIENT_SECRET || '');
+    const refreshToken = await getSystemSetting('google_refresh_token', process.env.GOOGLE_REFRESH_TOKEN || '');
+    const connectedEmail = await getSystemSetting('google_user_email', '');
+
+    const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const host = req.get('host');
+    const redirectUri = `${protocol}://${host}/Admin/admin/google_auth_callback.php`;
+
+    res.render('admin/google_drive_setup', {
+      clientId,
+      clientSecret,
+      redirectUri,
+      isConnected: !!refreshToken,
+      connectedEmail,
+      hasCredentials: !!(clientId && clientSecret),
+      msg: req.session.flashSetupMsg || '',
+      error: req.session.flashSetupErr || ''
+    });
+    req.session.flashSetupMsg = null;
+    req.session.flashSetupErr = null;
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.post('/Admin/admin/google_drive_setup.php', requireAdmin, async (req, res) => {
+  const { client_id, client_secret } = req.body;
+  try {
+    await setSystemSetting('google_client_id', (client_id || '').trim());
+    await setSystemSetting('google_client_secret', (client_secret || '').trim());
+    
+    const oauthFile = path.join(__dirname, 'Admin/config/google_oauth.json');
+    let oauthData = {};
+    if (fs.existsSync(oauthFile)) {
+      try { oauthData = JSON.parse(fs.readFileSync(oauthFile, 'utf8')); } catch (e) {}
+    }
+    oauthData.client_id = (client_id || '').trim();
+    oauthData.client_secret = (client_secret || '').trim();
+    fs.writeFileSync(oauthFile, JSON.stringify(oauthData, null, 2));
+
+    req.session.flashSetupMsg = 'Google OAuth Credentials saved successfully!';
+    res.redirect('/Admin/admin/google_drive_setup.php');
+  } catch (err) {
+    req.session.flashSetupErr = err.message;
+    res.redirect('/Admin/admin/google_drive_setup.php');
+  }
+});
+
+app.get('/Admin/admin/connect_google_drive.php', requireAdmin, async (req, res) => {
+  try {
+    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || '');
+    if (!clientId) {
+      req.session.flashSetupErr = 'Please configure Google Client ID first.';
+      return res.redirect('/Admin/admin/google_drive_setup.php');
+    }
+
+    const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const host = req.get('host');
+    const redirectUri = `${protocol}://${host}/Admin/admin/google_auth_callback.php`;
+
+    const scope = encodeURIComponent('https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email');
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${scope}&access_type=offline&prompt=consent`;
+
+    res.redirect(googleAuthUrl);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/Admin/admin/google_auth_callback.php', requireAdmin, async (req, res) => {
+  const { code, error } = req.query;
+
+  if (error) {
+    req.session.flashSetupErr = `Google Authorization Canceled or Failed: ${error}`;
+    return res.redirect('/Admin/admin/google_drive_setup.php');
+  }
+
+  if (!code) {
+    req.session.flashSetupErr = 'No authorization code returned from Google.';
+    return res.redirect('/Admin/admin/google_drive_setup.php');
+  }
+
+  try {
+    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || '');
+    const clientSecret = await getSystemSetting('google_client_secret', process.env.GOOGLE_CLIENT_SECRET || '');
+
+    const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
+    const host = req.get('host');
+    const redirectUri = `${protocol}://${host}/Admin/admin/google_auth_callback.php`;
+
+    const tokenRes = await axios.post('https://oauth2.googleapis.com/token', new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code'
+    }));
+
+    const tokens = tokenRes.data;
+    if (!tokens || !tokens.refresh_token) {
+      throw new Error('Google did not return a refresh token. Try disconnecting and reconnecting.');
+    }
+
+    let userEmail = 'Admin Google Account';
+    try {
+      const userRes = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${tokens.access_token}` }
+      });
+      if (userRes.data && userRes.data.email) userEmail = userRes.data.email;
+    } catch (e) {}
+
+    await setSystemSetting('google_refresh_token', tokens.refresh_token);
+    await setSystemSetting('google_user_email', userEmail);
+
+    const oauthFile = path.join(__dirname, 'Admin/config/google_oauth.json');
+    const oauthData = {
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: tokens.refresh_token,
+      user_email: userEmail
+    };
+    fs.writeFileSync(oauthFile, JSON.stringify(oauthData, null, 2));
+
+    req.session.flashSetupMsg = `Successfully connected to Google Drive as ${userEmail}! Zero folder sharing is now required.`;
+    res.redirect('/Admin/admin/google_drive_setup.php');
+  } catch (err) {
+    const msg = err.response?.data?.error_description || err.message;
+    req.session.flashSetupErr = `Google OAuth Connection Error: ${msg}`;
+    res.redirect('/Admin/admin/google_drive_setup.php');
+  }
+});
+
+app.post('/Admin/admin/disconnect_google_drive.php', requireAdmin, async (req, res) => {
+  try {
+    await setSystemSetting('google_refresh_token', '');
+    await setSystemSetting('google_user_email', '');
+
+    const oauthFile = path.join(__dirname, 'Admin/config/google_oauth.json');
+    if (fs.existsSync(oauthFile)) {
+      try {
+        const oauthData = JSON.parse(fs.readFileSync(oauthFile, 'utf8'));
+        delete oauthData.refresh_token;
+        delete oauthData.user_email;
+        fs.writeFileSync(oauthFile, JSON.stringify(oauthData, null, 2));
+      } catch (e) {}
+    }
+
+    req.session.flashSetupMsg = 'Google Drive Account disconnected. System reverted to Service Account.';
+    res.redirect('/Admin/admin/google_drive_setup.php');
+  } catch (err) {
+    req.session.flashSetupErr = err.message;
+    res.redirect('/Admin/admin/google_drive_setup.php');
   }
 });
 

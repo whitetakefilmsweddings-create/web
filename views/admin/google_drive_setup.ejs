@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive Setup - WhiteTake Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/Admin/assets/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container py-5" style="max-width: 850px;">
+        <a href="/Admin/admin/dashboard.php" class="text-decoration-none text-muted mb-4 d-inline-block">
+            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </a>
+
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h2 class="fw-bold mb-1"><i class="bi bi-google text-primary me-2"></i>Google Drive Account</h2>
+                <p class="text-muted mb-0">Connect your Google Account to eliminate manual folder sharing forever.</p>
+            </div>
+        </div>
+
+        <% if (msg) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i><%= msg %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+        <% if (error) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i><%= error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <% } %>
+
+        <!-- Status Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3">Connection Status</h5>
+                <% if (isConnected) { %>
+                    <div class="alert alert-success d-flex align-items-center mb-3">
+                        <i class="bi bi-check-circle-fill fs-3 me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0">Connected as <%= connectedEmail || 'Admin Google Account' %></h6>
+                            <small>Full owner permissions enabled. Zero folder sharing required!</small>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="/Admin/admin/connect_google_drive.php" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-repeat me-1"></i> Re-authorize / Switch Google Account
+                        </a>
+                        <form method="POST" action="/Admin/admin/disconnect_google_drive.php" onsubmit="return confirm('Disconnect Admin Google Account? System will fall back to Service Account.');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="bi bi-x-circle me-1"></i> Disconnect Account
+                            </button>
+                        </form>
+                    </div>
+                <% } else { %>
+                    <div class="alert alert-warning d-flex align-items-center mb-3">
+                        <i class="bi bi-exclamation-circle-fill fs-3 me-3 text-warning"></i>
+                        <div>
+                            <h6 class="fw-bold mb-0">Not Connected</h6>
+                            <small>Connect your Google Account so the admin system can manage client folders without manual sharing.</small>
+                        </div>
+                    </div>
+                    <% if (hasCredentials) { %>
+                        <a href="/Admin/admin/connect_google_drive.php" class="btn btn-success btn-lg px-4 fw-bold">
+                            <i class="bi bi-google me-2"></i> Connect Admin Google Drive Account
+                        </a>
+                    <% } else { %>
+                        <button class="btn btn-secondary btn-lg px-4" disabled>
+                            <i class="bi bi-lock me-2"></i> Configure Client ID & Secret Below First
+                        </button>
+                    <% } %>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Credentials Settings Form -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-key me-2"></i>Google OAuth Credentials</h5>
+                <form method="POST" action="/Admin/admin/google_drive_setup.php">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Google Client ID</label>
+                        <input type="text" name="client_id" class="form-control" value="<%= clientId %>" placeholder="e.g. 123456789-abc.apps.googleusercontent.com" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Google Client Secret</label>
+                        <input type="text" name="client_secret" class="form-control" value="<%= clientSecret %>" placeholder="e.g. GOCSPX-abc123xyz" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-muted">Redirect URI (Configured in Google Console)</label>
+                        <input type="text" class="form-control bg-light" value="<%= redirectUri %>" readonly>
+                        <small class="text-muted">Copy this URL into your Google Cloud Console Web Application Redirect URIs.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-save me-1"></i> Save Credentials
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- How-To Guide -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-info-circle me-2 text-info"></i>2-Minute Setup Guide (Google Cloud Console)</h5>
+                <ol class="ps-3 mb-0 text-secondary lh-lg">
+                    <li>Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="fw-bold">Google Cloud Console → Credentials</a>.</li>
+                    <li>Click <strong>+ Create Credentials</strong> → <strong>OAuth client ID</strong>.</li>
+                    <li>Select Application type: <strong>Web application</strong>.</li>
+                    <li>Add Authorized redirect URI: <code class="bg-light p-1 rounded"><%= redirectUri %></code></li>
+                    <li>Click <strong>Create</strong> and copy your <strong>Client ID</strong> and <strong>Client Secret</strong> into the form above!</li>
+                    <li>Click <strong>Save Credentials</strong> and then click <strong>Connect Admin Google Drive Account</strong>!</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

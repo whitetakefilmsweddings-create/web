@@ -31,9 +31,12 @@
                     <div class="stat-value">₹<%= Number(pendingRevenue).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %></div>
                 </div>
             </div>
-            <div class="col-12">
+            <div class="col-12 d-flex gap-2">
                 <a href="/Admin/admin/create_client.php" class="btn btn-primary">
                     <i class="bi bi-person-plus me-2"></i>New Client
+                </a>
+                <a href="/Admin/admin/google_drive_setup.php" class="btn btn-outline-success">
+                    <i class="bi bi-google me-2"></i>Google Drive Setup
                 </a>
             </div>
         </div>
