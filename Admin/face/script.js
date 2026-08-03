@@ -638,21 +638,42 @@ async function downloadAllMatches() {
         const folder = zip.folder('my_photos');
 
         let done = 0;
-        await Promise.all(matchedImages.map(async (file) => {
+        let failed = 0;
+
+        // Fetch one image with a timeout + 1 retry
+        async function fetchWithTimeout(url, timeoutMs = 30000) {
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    const response = await fetch(url, { signal: controller.signal });
+                    clearTimeout(timer);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return await response.blob();
+                } catch (e) {
+                    clearTimeout(timer);
+                    if (attempt === 2) throw e; // Give up after 2nd attempt
+                    log(`Retrying ${url}...`, 'warning');
+                    await new Promise(r => setTimeout(r, 1500)); // Wait before retry
+                }
+            }
+        }
+
+        // Download ONE BY ONE to avoid flooding Google Drive (causes 504)
+        for (const file of matchedImages) {
             try {
                 const directUrl = getDirectDownloadUrl(file.originalLink);
-                const response = await fetch(directUrl);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                const blob = await response.blob();
+                const blob = await fetchWithTimeout(directUrl);
                 const ext = blob.type.includes('png') ? '.png' : '.jpg';
                 const safeName = file.name.includes('.') ? file.name : file.name + ext;
                 folder.file(safeName, blob);
             } catch (e) {
+                failed++;
                 log(`Could not add ${file.name} to ZIP: ${e.message}`, 'error');
             }
             done++;
-            btn.innerHTML = `<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Downloading ${done}/${matchedImages.length}...`;
-        }));
+            btn.innerHTML = `<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> ${done}/${matchedImages.length} photos...`;
+        }
 
         btn.innerHTML = `<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Creating ZIP...`;
         const content = await zip.generateAsync({ type: 'blob' });
