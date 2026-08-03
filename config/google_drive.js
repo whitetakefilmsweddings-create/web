@@ -308,41 +308,47 @@ class GoogleDrive {
       parents: [parentId]
     };
 
-    const res = await axios.post(this.endpoint, metadata, {
-      headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json'
+    try {
+      const res = await axios.post(this.endpoint, metadata, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return res.data.id;
+    } catch (err) {
+      const msg = err.response?.data?.error?.message || err.message;
+      if (err.response?.status === 403) {
+        throw new Error(`Drive Permission Error (403): ${msg}. Make sure the client's Google Drive folder is shared with "audit-admin@web2026-485207.iam.gserviceaccount.com" as Editor.`);
       }
-    });
-
-    if (res.status !== 200 && res.status !== 201) {
-      throw new Error(`Create Folder Failed (${res.status}): ${res.data?.error?.message || 'Unknown Error'}`);
+      throw new Error(`Create Folder Failed: ${msg}`);
     }
-
-    return res.data.id;
   }
 
   async copyFile(fileId, destinationFolderId) {
     await this.authenticateServiceAccount();
     if (!this.accessToken) {
-      throw new Error('Copying requires a Service Account. Please configure service_account.json');
+      throw new Error('Copying requires a Service Account.');
     }
 
     const url = `${this.endpoint}/${fileId}/copy`;
     const body = { parents: [destinationFolderId] };
 
-    const res = await axios.post(url, body, {
-      headers: {
-        'Authorization': `Bearer ${this.accessToken}`,
-        'Content-Type': 'application/json'
+    try {
+      const res = await axios.post(url, body, {
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return res.data.id;
+    } catch (err) {
+      const msg = err.response?.data?.error?.message || err.message;
+      if (err.response?.status === 403) {
+        throw new Error(`Drive Permission Error (403): ${msg}. Make sure the client's Google Drive folder is shared with "audit-admin@web2026-485207.iam.gserviceaccount.com" as Editor.`);
       }
-    });
-
-    if (res.status !== 200 && res.status !== 201) {
-      throw new Error(`Copy File Failed (${res.status}): ${res.data?.error?.message || 'Unknown Error'}`);
+      throw new Error(`Copy File Failed: ${msg}`);
     }
-
-    return res.data.id; // ID of the new copy
   }
 
   async getFolderCover(folderId) {
