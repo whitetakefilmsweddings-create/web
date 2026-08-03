@@ -64,14 +64,27 @@ class GoogleDrive {
       if (response.data && response.data.access_token) {
         this.accessToken = response.data.access_token;
         this.tokenExpiry = now + response.data.expires_in;
+      } else {
+        throw new Error('Google Auth: No access token in response');
       }
     } catch (err) {
-      console.error('Google Auth Token exchange failed:', err.response?.data || err.message);
+      const detail = err.response?.data?.error_description || err.response?.data?.error || err.message;
+      console.error('Google Auth Token exchange failed:', detail);
+      throw new Error(`Google Drive authentication failed: ${detail}`);
+    }
+  }
+
+  // Silent version — used by read operations so they can fall back to API key
+  async tryAuthenticateServiceAccount() {
+    try {
+      await this.authenticateServiceAccount();
+    } catch (err) {
+      // Silently fall back to API key for reads
     }
   }
 
   async request(url, method = 'GET', body = null, responseType = 'json') {
-    await this.authenticateServiceAccount();
+    await this.tryAuthenticateServiceAccount();
     const headers = {};
     if (this.accessToken) {
       headers['Authorization'] = `Bearer ${this.accessToken}`;
