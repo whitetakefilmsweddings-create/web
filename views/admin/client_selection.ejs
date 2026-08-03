@@ -461,51 +461,84 @@
 
             const btn = document.getElementById('confirmSaveToDrive');
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Saving to Drive...';
 
             const resultEl = document.getElementById('saveDriveResult');
-            resultEl.className = 'd-none';
+            resultEl.className = 'mt-3';
+            resultEl.innerHTML = `
+                <div class="card bg-light border-0 p-3">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span id="saveProgressLabel" class="fw-bold text-primary">Creating subfolder...</span>
+                        <span id="saveProgressPercent" class="fw-bold">0%</span>
+                    </div>
+                    <div class="progress" style="height: 10px;">
+                        <div id="saveProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            `;
+
+            let targetFolderId = null;
+            let batchStart = 0;
+            let isComplete = false;
+            let totalSelected = 0;
+            const BATCH_LIMIT = 20;
 
             try {
-                const resp = await fetch(`/Admin/admin/save_selections_to_drive.php?id=${CLIENT_ID}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ folder_name: folderName })
-                });
+                while (!isComplete) {
+                    const payload = {
+                        folder_name: folderName,
+                        target_folder_id: targetFolderId,
+                        batch_start: batchStart,
+                        batch_limit: BATCH_LIMIT
+                    };
 
-                const rawText = await resp.text();
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (e) {
-                    throw new Error(resp.status === 401 || resp.redirected ? 'Session expired. Please log in again.' : 'Server returned invalid response: ' + rawText.slice(0, 100));
+                    const resp = await fetch(`/Admin/admin/save_selections_to_drive.php?id=${CLIENT_ID}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const rawText = await resp.text();
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (e) {
+                        throw new Error(resp.status === 401 || resp.redirected ? 'Session expired. Please log in again.' : 'Server error: ' + rawText.slice(0, 100));
+                    }
+
+                    if (!data.success) {
+                        throw new Error(data.message || 'Error saving photos');
+                    }
+
+                    targetFolderId = data.newFolderId;
+                    batchStart = data.nextIdx;
+                    totalSelected = data.totalSelected;
+                    isComplete = data.isComplete;
+
+                    const percent = Math.round((batchStart / totalSelected) * 100);
+                    document.getElementById('saveProgressLabel').textContent = `Copying photos (${Math.min(batchStart, totalSelected)} / ${totalSelected})...`;
+                    document.getElementById('saveProgressPercent').textContent = `${Math.min(percent, 100)}%`;
+                    document.getElementById('saveProgressBar').style.width = `${Math.min(percent, 100)}%`;
+                    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving (${Math.min(batchStart, totalSelected)}/${totalSelected})...`;
                 }
 
-                if (data.success) {
-                    const driveLink = `https://drive.google.com/drive/folders/${data.newFolderId}`;
-                    resultEl.className = 'alert alert-success mt-3 mb-0';
-                    resultEl.innerHTML = `
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        <strong>${data.message}</strong><br>
-                        <a href="${driveLink}" target="_blank" class="btn btn-sm btn-outline-success mt-2">
-                            <i class="bi bi-box-arrow-up-right me-1"></i>Open Folder in Drive
+                const driveLink = `https://drive.google.com/drive/folders/${targetFolderId}`;
+                resultEl.innerHTML = `
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                        <strong>Successfully saved all ${totalSelected} photos to "${folderName}"!</strong><br>
+                        <a href="${driveLink}" target="_blank" class="btn btn-sm btn-success mt-2 fw-bold">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Open Subfolder in Google Drive
                         </a>
-                    `;
-                    btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Done!';
-                    showToast(data.message, 'bg-success');
-                    saveFolderToPanel(data.newFolderId, folderName);
-                } else {
-                    resultEl.className = 'alert alert-danger mt-3 mb-0';
-                    resultEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>${data.message}`;
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-folder-check me-1"></i> Create Folder & Copy Photos';
-                    showToast(data.message, 'bg-danger');
-                }
+                    </div>
+                `;
+                btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Completed!';
+                showToast(`Saved all ${totalSelected} photos to Drive!`, 'bg-success');
+                saveFolderToPanel(targetFolderId, folderName);
+
             } catch (err) {
-                resultEl.className = 'alert alert-danger mt-3 mb-0';
-                resultEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>${err.message}`;
+                resultEl.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i>${err.message}</div>`;
                 btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-folder-check me-1"></i> Create Folder & Copy Photos';
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Retry Saving';
                 showToast(err.message, 'bg-danger');
             }
         }

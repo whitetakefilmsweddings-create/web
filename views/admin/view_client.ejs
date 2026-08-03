@@ -410,27 +410,46 @@
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
 
+            let targetFolderId = null;
+            let batchStart = 0;
+            let isComplete = false;
+            let totalSelected = 0;
+
             try {
-                const resp = await fetch(`/Admin/admin/save_selections_to_drive.php?id=${clientId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ folder_name: folderName.trim() })
-                });
-                const rawText = await resp.text();
-                let data;
-                try {
-                    data = JSON.parse(rawText);
-                } catch (e) {
-                    throw new Error(resp.status === 401 || resp.redirected ? 'Session expired. Please log in again.' : 'Server returned invalid response.');
+                while (!isComplete) {
+                    const resp = await fetch(`/Admin/admin/save_selections_to_drive.php?id=${clientId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            folder_name: folderName.trim(),
+                            target_folder_id: targetFolderId,
+                            batch_start: batchStart,
+                            batch_limit: 20
+                        })
+                    });
+                    const rawText = await resp.text();
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (e) {
+                        throw new Error(resp.status === 401 || resp.redirected ? 'Session expired. Please log in again.' : 'Server returned invalid response.');
+                    }
+
+                    if (!data.success) {
+                        throw new Error(data.message || 'Error saving photos');
+                    }
+
+                    targetFolderId = data.newFolderId;
+                    batchStart = data.nextIdx;
+                    totalSelected = data.totalSelected;
+                    isComplete = data.isComplete;
+
+                    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving (${Math.min(batchStart, totalSelected)}/${totalSelected})...`;
                 }
 
-                if (data.success) {
-                    const driveLink = `https://drive.google.com/drive/folders/${data.newFolderId}`;
-                    if (confirm(`✅ ${data.message}\n\nOpen the new folder in Google Drive?`)) {
-                        window.open(driveLink, '_blank');
-                    }
-                } else {
-                    alert(`❌ ${data.message}`);
+                const driveLink = `https://drive.google.com/drive/folders/${targetFolderId}`;
+                if (confirm(`✅ Successfully saved all ${totalSelected} photos to "${folderName.trim()}"!\n\nOpen the new folder in Google Drive?`)) {
+                    window.open(driveLink, '_blank');
                 }
             } catch (err) {
                 alert(`❌ ${err.message}`);

@@ -933,13 +933,13 @@ app.get('/Admin/admin/download_zip.php', requireAdminOrEditor, async (req, res) 
 });
 
 // ----------------------------------------------------
-// SAVE SELECTIONS TO DRIVE SUBFOLDER
+// SAVE SELECTIONS TO DRIVE SUBFOLDER (Batched & Chunked)
 // ----------------------------------------------------
 app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, async (req, res) => {
   const clientId = req.query.id;
   if (!clientId) return res.status(400).json({ success: false, message: 'Client ID required' });
 
-  const { folder_name } = req.body;
+  const { folder_name, target_folder_id, batch_start = 0, batch_limit = 20 } = req.body;
 
   try {
     // Fetch client info
@@ -954,46 +954,65 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
       return res.status(400).json({ success: false, message: 'No photos selected by the client yet' });
     }
     const selectedIds = selRows.map(r => r.file_id);
-
-    // Build subfolder name
-    const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-    const safeName = (folder_name || `${client.name} - Selected Photos - ${today}`).trim();
+    const totalSelected = selectedIds.length;
 
     const drive = new GoogleDrive();
+    let newFolderId = target_folder_id;
+    const today = new Date().toISOString().slice(0, 10);
+    const safeName = (folder_name || `${client.name} - Selected Photos - ${today}`).trim();
 
-    // Create the subfolder inside the client's root Drive folder
-    const newFolderId = await drive.createFolder(safeName, client.folder_id);
+    // 1. Create subfolder if not already created
+    if (!newFolderId) {
+      newFolderId = await drive.createFolder(safeName, client.folder_id);
+    }
 
-    // Copy each selected file into the new subfolder
+    // 2. Slice batch range for this call
+    const startIdx = parseInt(batch_start, 10) || 0;
+    const limit = parseInt(batch_limit, 10) || 20;
+    const batchFileIds = selectedIds.slice(startIdx, startIdx + limit);
+
+    // 3. Copy files with limited internal concurrency (5 at a time) to prevent 503 / socket exhaustion
     let copiedCount = 0;
     let failedCount = 0;
-    const errors = [];
+    const CONCURRENCY_LIMIT = 5;
 
-    await Promise.allSettled(
-      selectedIds.map(async (fileId) => {
-        try {
-          await drive.copyFile(fileId, newFolderId);
-          copiedCount++;
-        } catch (err) {
-          failedCount++;
-          errors.push(`${fileId}: ${err.message}`);
-        }
-      })
-    );
+    for (let i = 0; i < batchFileIds.length; i += CONCURRENCY_LIMIT) {
+      const chunk = batchFileIds.slice(i, i + CONCURRENCY_LIMIT);
+      await Promise.allSettled(
+        chunk.map(async (fileId) => {
+          try {
+            await drive.copyFile(fileId, newFolderId);
+            copiedCount++;
+          } catch (err) {
+            failedCount++;
+          }
+        })
+      );
+    }
+
+    const nextIdx = startIdx + batchFileIds.length;
+    const isComplete = nextIdx >= totalSelected;
 
     return res.json({
       success: true,
-      message: `${copiedCount} photo${copiedCount !== 1 ? 's' : ''} saved to "${safeName}"${failedCount > 0 ? `. ${failedCount} failed.` : ''}`,
       newFolderId,
       folderName: safeName,
       copiedCount,
-      failedCount
+      failedCount,
+      startIdx,
+      nextIdx,
+      totalSelected,
+      isComplete,
+      message: isComplete 
+        ? `Successfully saved all ${totalSelected} photos to "${safeName}".` 
+        : `Saved ${nextIdx} of ${totalSelected} photos...`
     });
 
   } catch (err) {
     return res.status(500).json({ success: false, message: err.message });
   }
 });
+
 
 // ----------------------------------------------------
 // EDITOR ACTIONS
