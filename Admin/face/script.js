@@ -546,18 +546,54 @@ function updateProgress(current, total) {
     progressPercent.innerText = `${current} / ${total}`;
 }
 
+// Convert a Google Drive webContentLink to a direct download URL
+function getDirectDownloadUrl(webContentLink) {
+    // webContentLink format: https://drive.google.com/uc?id=FILE_ID&export=download
+    // Extract file ID and build a clean export URL
+    try {
+        const url = new URL(webContentLink);
+        const fileId = url.searchParams.get('id');
+        if (fileId) {
+            return `https://drive.google.com/uc?export=download&id=${fileId}&confirm=t`;
+        }
+    } catch (e) { /* fall through */ }
+    return webContentLink;
+}
+
+// Force-download a file via fetch + blob (bypasses cross-origin download restriction)
+async function downloadFileAsBlob(url, filename) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Network response was not ok');
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+    } catch (err) {
+        console.error('Download error:', err);
+        // Fallback: open in new tab
+        window.open(url, '_blank');
+    }
+}
+
 function addMatchToGrid(file) {
     const card = document.createElement('div');
     card.className = 'result-card';
+    const directUrl = getDirectDownloadUrl(file.originalLink);
     card.innerHTML = `
         <img src="${file.url}" loading="lazy">
         <div class="btn-group">
             <a href="${file.originalLink}" target="_blank" class="action-icon" title="View Fullsize">
                 <i class="ri-eye-line"></i>
             </a>
-            <a href="${file.originalLink}" download class="action-icon" title="Download">
+            <button class="action-icon" title="Download" onclick="downloadFileAsBlob('${directUrl}', '${file.name}')">
                 <i class="ri-download-2-line"></i>
-            </a>
+            </button>
         </div>
     `;
     resultsGrid.appendChild(card);
@@ -582,12 +618,58 @@ function urlToImage(url) {
     });
 }
 
-function downloadAllMatches() {
-    if (confirm(`Download ${matchedImages.length} photos? Popups must be allowed.`)) {
-        matchedImages.forEach((file, i) => {
-            setTimeout(() => {
-                window.open(file.originalLink, '_blank');
-            }, i * 500);
-        });
+async function downloadAllMatches() {
+    if (!matchedImages.length) return;
+    if (!confirm(`Download ${matchedImages.length} photos as a ZIP file?`)) return;
+
+    // Check if JSZip is available
+    if (typeof JSZip === 'undefined') {
+        alert('ZIP library not loaded. Please refresh the page.');
+        return;
+    }
+
+    const btn = downloadAllBtn;
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Building ZIP...`;
+
+    try {
+        const zip = new JSZip();
+        const folder = zip.folder('my_photos');
+
+        let done = 0;
+        await Promise.all(matchedImages.map(async (file) => {
+            try {
+                const directUrl = getDirectDownloadUrl(file.originalLink);
+                const response = await fetch(directUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const blob = await response.blob();
+                const ext = blob.type.includes('png') ? '.png' : '.jpg';
+                const safeName = file.name.includes('.') ? file.name : file.name + ext;
+                folder.file(safeName, blob);
+            } catch (e) {
+                log(`Could not add ${file.name} to ZIP: ${e.message}`, 'error');
+            }
+            done++;
+            btn.innerHTML = `<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Downloading ${done}/${matchedImages.length}...`;
+        }));
+
+        btn.innerHTML = `<i class="ri-loader-4-line" style="animation:spin 1s linear infinite"></i> Creating ZIP...`;
+        const content = await zip.generateAsync({ type: 'blob' });
+        const blobUrl = URL.createObjectURL(content);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = 'my_photos.zip';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
+
+    } catch (err) {
+        console.error('ZIP error:', err);
+        alert('Failed to create ZIP: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
     }
 }
