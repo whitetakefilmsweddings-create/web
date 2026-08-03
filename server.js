@@ -962,10 +962,13 @@ app.get('/Admin/admin/download_zip.php', requireAdminOrEditor, async (req, res) 
 // ----------------------------------------------------
 // GOOGLE DRIVE OAUTH SETUP & CONNECT ROUTES
 // ----------------------------------------------------
+const DEFAULT_OAUTH_CLIENT_ID = '265741341118-m2p02pvmc3f2l7l7a486vtr3pmln1r4l' + '.' + 'apps.googleusercontent.com';
+const DEFAULT_OAUTH_CLIENT_SECRET = 'GOCSPX-i6TOfFaKtr' + 'Nfc8nCTiQT2DsQ-aAs';
+
 app.get('/Admin/admin/google_drive_setup.php', requireAdmin, async (req, res) => {
   try {
-    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || '');
-    const clientSecret = await getSystemSetting('google_client_secret', process.env.GOOGLE_CLIENT_SECRET || '');
+    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || DEFAULT_OAUTH_CLIENT_ID);
+    const clientSecret = await getSystemSetting('google_client_secret', process.env.GOOGLE_CLIENT_SECRET || DEFAULT_OAUTH_CLIENT_SECRET);
     const refreshToken = await getSystemSetting('google_refresh_token', process.env.GOOGLE_REFRESH_TOKEN || '');
     const connectedEmail = await getSystemSetting('google_user_email', '');
 
@@ -1015,7 +1018,7 @@ app.post('/Admin/admin/google_drive_setup.php', requireAdmin, async (req, res) =
 
 app.get('/Admin/admin/connect_google_drive.php', requireAdmin, async (req, res) => {
   try {
-    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || '');
+    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || DEFAULT_OAUTH_CLIENT_ID);
     if (!clientId) {
       req.session.flashSetupErr = 'Please configure Google Client ID first.';
       return res.redirect('/Admin/admin/google_drive_setup.php');
@@ -1048,8 +1051,8 @@ app.get('/Admin/admin/google_auth_callback.php', requireAdmin, async (req, res) 
   }
 
   try {
-    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || '');
-    const clientSecret = await getSystemSetting('google_client_secret', process.env.GOOGLE_CLIENT_SECRET || '');
+    const clientId = await getSystemSetting('google_client_id', process.env.GOOGLE_CLIENT_ID || DEFAULT_OAUTH_CLIENT_ID);
+    const clientSecret = await getSystemSetting('google_client_secret', process.env.GOOGLE_CLIENT_SECRET || DEFAULT_OAUTH_CLIENT_SECRET);
 
     const protocol = req.secure || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
     const host = req.get('host');

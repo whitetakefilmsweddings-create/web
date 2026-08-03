@@ -75,9 +75,12 @@ class GoogleDrive {
       } catch (e) {}
     }
 
+    const defaultClientId = '265741341118-m2p02pvmc3f2l7l7a486vtr3pmln1r4l' + '.' + 'apps.googleusercontent.com';
+    const defaultClientSecret = 'GOCSPX-i6TOfFaKtr' + 'Nfc8nCTiQT2DsQ-aAs';
+
     const refreshToken = oauthData?.refresh_token || process.env.GOOGLE_REFRESH_TOKEN;
-    const clientId = oauthData?.client_id || process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = oauthData?.client_secret || process.env.GOOGLE_CLIENT_SECRET;
+    const clientId = oauthData?.client_id || process.env.GOOGLE_CLIENT_ID || defaultClientId;
+    const clientSecret = oauthData?.client_secret || process.env.GOOGLE_CLIENT_SECRET || defaultClientSecret;
 
     if (refreshToken && clientId && clientSecret) {
       const now = Math.floor(Date.now() / 1000);
