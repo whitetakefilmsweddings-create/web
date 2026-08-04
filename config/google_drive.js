@@ -415,11 +415,21 @@ class GoogleDrive {
       removeParentsParam = `&removeParents=${meta.parents.join(',')}`;
     }
 
-    const url = `${this.endpoint}/${fileId}?addParents=${destinationFolderId}${removeParentsParam}&supportsAllDrives=true`;
+    // Try moving (add to subfolder + remove from parent)
+    let url = `${this.endpoint}/${fileId}?addParents=${destinationFolderId}${removeParentsParam}&supportsAllDrives=true`;
+    let res = await this.request(url, 'PATCH');
 
-    const res = await this.request(url, 'PATCH');
     if (res.code === 200) {
       return res.data.id;
+    }
+
+    // Fallback: If removing from parent is restricted by permissions, try adding to subfolder without removeParents
+    if (removeParentsParam) {
+      url = `${this.endpoint}/${fileId}?addParents=${destinationFolderId}&supportsAllDrives=true`;
+      res = await this.request(url, 'PATCH');
+      if (res.code === 200) {
+        return res.data.id;
+      }
     }
 
     const msg = res.data?.error?.message || 'Unknown API Error';
