@@ -1001,6 +1001,10 @@ app.post('/Admin/admin/google_drive_setup.php', requireAdmin, async (req, res) =
     await setSystemSetting('google_client_secret', (client_secret || '').trim());
     
     const oauthFile = path.join(__dirname, 'Admin/config/google_oauth.json');
+    const oauthDir = path.dirname(oauthFile);
+    if (!fs.existsSync(oauthDir)) {
+      fs.mkdirSync(oauthDir, { recursive: true });
+    }
     let oauthData = {};
     if (fs.existsSync(oauthFile)) {
       try { oauthData = JSON.parse(fs.readFileSync(oauthFile, 'utf8')); } catch (e) {}
@@ -1084,6 +1088,10 @@ app.get('/Admin/admin/google_auth_callback.php', requireAdmin, async (req, res) 
     await setSystemSetting('google_user_email', userEmail);
 
     const oauthFile = path.join(__dirname, 'Admin/config/google_oauth.json');
+    const oauthDir = path.dirname(oauthFile);
+    if (!fs.existsSync(oauthDir)) {
+      fs.mkdirSync(oauthDir, { recursive: true });
+    }
     const oauthData = {
       client_id: clientId,
       client_secret: clientSecret,
