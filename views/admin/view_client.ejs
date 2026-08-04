@@ -448,7 +448,7 @@
                 }
 
                 const driveLink = `https://drive.google.com/drive/folders/${targetFolderId}`;
-                if (confirm(`✅ Successfully saved all ${totalSelected} photos to "${folderName.trim()}"!\n\nOpen the new folder in Google Drive?`)) {
+                if (confirm(`✅ Folder created and photos copied to "${folderName.trim()}"!\n\nOpen the new folder in Google Drive?`)) {
                     window.open(driveLink, '_blank');
                 }
             } catch (err) {

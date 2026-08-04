@@ -200,7 +200,9 @@ class GoogleDrive {
         pageSize: 1000,
         fields: 'nextPageToken, files(id, name, mimeType, webContentLink, webViewLink, thumbnailLink)',
         q: `'${folderId}' in parents and (mimeType contains 'image/' or mimeType = 'application/vnd.google-apps.folder' or mimeType contains 'zip') and trashed = false`,
-        orderBy: 'folder, name'
+        orderBy: 'folder, name',
+        supportsAllDrives: 'true',
+        includeItemsFromAllDrives: 'true'
       };
 
       if (!this.accessToken) {
@@ -335,7 +337,7 @@ class GoogleDrive {
   }
 
   async getFileMetadata(fileId) {
-    let url = `${this.endpoint}/${fileId}?fields=id,name,mimeType,webContentLink,webViewLink,thumbnailLink`;
+    let url = `${this.endpoint}/${fileId}?fields=id,name,mimeType,webContentLink,webViewLink,thumbnailLink&supportsAllDrives=true`;
     if (!this.accessToken) {
       url += `&key=${this.apiKey}`;
     }
@@ -358,7 +360,8 @@ class GoogleDrive {
     };
 
     try {
-      const res = await axios.post(this.endpoint, metadata, {
+      const url = `${this.endpoint}?supportsAllDrives=true`;
+      const res = await axios.post(url, metadata, {
         headers: {
           'Authorization': `Bearer ${this.accessToken}`,
           'Content-Type': 'application/json'
@@ -380,7 +383,7 @@ class GoogleDrive {
       throw new Error('Copying requires a Service Account.');
     }
 
-    const url = `${this.endpoint}/${fileId}/copy`;
+    const url = `${this.endpoint}/${fileId}/copy?supportsAllDrives=true`;
     const body = { parents: [destinationFolderId] };
 
     try {
@@ -405,7 +408,9 @@ class GoogleDrive {
       pageSize: 1,
       fields: 'files(thumbnailLink)',
       q: `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`,
-      orderBy: 'modifiedTime desc'
+      orderBy: 'modifiedTime desc',
+      supportsAllDrives: 'true',
+      includeItemsFromAllDrives: 'true'
     };
 
     if (!this.accessToken) {

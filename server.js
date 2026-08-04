@@ -1166,6 +1166,7 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
     // 3. Copy files with limited internal concurrency (5 at a time) to prevent 503 / socket exhaustion
     let copiedCount = 0;
     let failedCount = 0;
+    const errors = [];
     const CONCURRENCY_LIMIT = 5;
 
     for (let i = 0; i < batchFileIds.length; i += CONCURRENCY_LIMIT) {
@@ -1176,7 +1177,11 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
             await drive.copyFile(fileId, newFolderId);
             copiedCount++;
           } catch (err) {
+            console.error(`[save_selections_to_drive] Error copying file ${fileId}:`, err.message);
             failedCount++;
+            if (!errors.includes(err.message)) {
+              errors.push(err.message);
+            }
           }
         })
       );
@@ -1185,19 +1190,27 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
     const nextIdx = startIdx + batchFileIds.length;
     const isComplete = nextIdx >= totalSelected;
 
+    const overallSuccess = copiedCount > 0 || (isComplete && failedCount === 0);
+    const failureMsg = errors.length > 0 ? errors.join('; ') : 'Failed to copy photos to destination subfolder.';
+
     return res.json({
-      success: true,
+      success: overallSuccess,
       newFolderId,
       folderName: safeName,
       copiedCount,
       failedCount,
+      errors,
       startIdx,
       nextIdx,
       totalSelected,
       isComplete,
-      message: isComplete 
-        ? `Successfully saved all ${totalSelected} photos to "${safeName}".` 
-        : `Saved ${nextIdx} of ${totalSelected} photos...`
+      message: !overallSuccess
+        ? `Error copying photos: ${failureMsg}`
+        : isComplete 
+          ? (failedCount > 0 
+              ? `Saved ${copiedCount} photos to "${safeName}" (${failedCount} failed).`
+              : `Successfully saved all ${totalSelected} photos to "${safeName}".`)
+          : `Saved ${nextIdx} of ${totalSelected} photos...`
     });
 
   } catch (err) {
