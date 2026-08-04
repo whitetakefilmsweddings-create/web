@@ -1163,8 +1163,8 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
     const limit = parseInt(batch_limit, 10) || 20;
     const batchFileIds = selectedIds.slice(startIdx, startIdx + limit);
 
-    // 3. Copy files with limited internal concurrency (5 at a time) to prevent 503 / socket exhaustion
-    let copiedCount = 0;
+    // 3. Move files with limited internal concurrency (5 at a time) to prevent 503 / socket exhaustion
+    let movedCount = 0;
     let failedCount = 0;
     const errors = [];
     const CONCURRENCY_LIMIT = 5;
@@ -1174,10 +1174,10 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
       await Promise.allSettled(
         chunk.map(async (fileId) => {
           try {
-            await drive.copyFile(fileId, newFolderId);
-            copiedCount++;
+            await drive.moveFile(fileId, newFolderId);
+            movedCount++;
           } catch (err) {
-            console.error(`[save_selections_to_drive] Error copying file ${fileId}:`, err.message);
+            console.error(`[save_selections_to_drive] Error moving file ${fileId}:`, err.message);
             failedCount++;
             if (!errors.includes(err.message)) {
               errors.push(err.message);
@@ -1190,14 +1190,15 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
     const nextIdx = startIdx + batchFileIds.length;
     const isComplete = nextIdx >= totalSelected;
 
-    const overallSuccess = copiedCount > 0 || (isComplete && failedCount === 0);
-    const failureMsg = errors.length > 0 ? errors.join('; ') : 'Failed to copy photos to destination subfolder.';
+    const overallSuccess = movedCount > 0 || (isComplete && failedCount === 0);
+    const failureMsg = errors.length > 0 ? errors.join('; ') : 'Failed to move photos to destination subfolder.';
 
     return res.json({
       success: overallSuccess,
       newFolderId,
       folderName: safeName,
-      copiedCount,
+      movedCount,
+      copiedCount: movedCount, // backward compatibility
       failedCount,
       errors,
       startIdx,
@@ -1205,12 +1206,12 @@ app.post('/Admin/admin/save_selections_to_drive.php', requireAdminOrEditor, asyn
       totalSelected,
       isComplete,
       message: !overallSuccess
-        ? `Error copying photos: ${failureMsg}`
+        ? `Error moving photos: ${failureMsg}`
         : isComplete 
           ? (failedCount > 0 
-              ? `Saved ${copiedCount} photos to "${safeName}" (${failedCount} failed).`
-              : `Successfully saved all ${totalSelected} photos to "${safeName}".`)
-          : `Saved ${nextIdx} of ${totalSelected} photos...`
+              ? `Moved ${movedCount} photos to "${safeName}" (${failedCount} failed).`
+              : `Successfully moved all ${totalSelected} photos to "${safeName}".`)
+          : `Moved ${nextIdx} of ${totalSelected} photos...`
     });
 
   } catch (err) {

@@ -249,7 +249,7 @@
                         <h6 class="mb-0 fw-bold"><i class="bi bi-check2-circle text-success me-2"></i>Selected Photos (<%= selectedFiles.length %>)</h6>
                         <% if (selectedFiles.length > 0) { %>
                         <button class="btn btn-success btn-sm" id="saveToDriveBtn" onclick="openSaveToDriveModal()">
-                            <i class="bi bi-folder-plus me-1"></i> Save to Drive Subfolder
+                            <i class="bi bi-folder-plus me-1"></i> Move to Drive Subfolder
                         </button>
                         <% } %>
                     </div>
@@ -363,7 +363,7 @@
           <div class="modal-body p-4">
             <p class="text-muted mb-3">
               A new subfolder will be created inside <strong><%= client.name %>'s</strong> Google Drive folder,
-              and all <strong><%= selectedFiles.length %> selected photos</strong> will be copied into it.
+              and all <strong><%= selectedFiles.length %> selected photos</strong> will be moved into it.
             </p>
             <div class="mb-3">
               <label for="driveFolderNameInput" class="form-label fw-semibold">Subfolder Name</label>
@@ -377,7 +377,7 @@
           <div class="modal-footer border-0">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-success px-4" id="confirmSaveToDrive" onclick="executeSaveToDrive()">
-              <i class="bi bi-folder-check me-1"></i> Create Folder & Copy Photos
+              <i class="bi bi-folder-check me-1"></i> Create Folder & Move Photos
             </button>
           </div>
         </div>
@@ -447,7 +447,7 @@
         function openSaveToDriveModal() {
             document.getElementById('saveDriveResult').className = 'd-none';
             document.getElementById('confirmSaveToDrive').disabled = false;
-            document.getElementById('confirmSaveToDrive').innerHTML = '<i class="bi bi-folder-check me-1"></i> Create Folder & Copy Photos';
+            document.getElementById('confirmSaveToDrive').innerHTML = '<i class="bi bi-folder-check me-1"></i> Create Folder & Move Photos';
             const modal = new bootstrap.Modal(document.getElementById('saveToDriveModal'));
             modal.show();
         }
@@ -506,7 +506,7 @@
                     }
 
                     if (!data.success) {
-                        throw new Error(data.message || 'Error saving photos');
+                        throw new Error(data.message || 'Error moving photos');
                     }
 
                     targetFolderId = data.newFolderId;
@@ -515,30 +515,30 @@
                     isComplete = data.isComplete;
 
                     const percent = Math.round((batchStart / totalSelected) * 100);
-                    document.getElementById('saveProgressLabel').textContent = `Copying photos (${Math.min(batchStart, totalSelected)} / ${totalSelected})...`;
+                    document.getElementById('saveProgressLabel').textContent = `Moving photos (${Math.min(batchStart, totalSelected)} / ${totalSelected})...`;
                     document.getElementById('saveProgressPercent').textContent = `${Math.min(percent, 100)}%`;
                     document.getElementById('saveProgressBar').style.width = `${Math.min(percent, 100)}%`;
-                    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Saving (${Math.min(batchStart, totalSelected)}/${totalSelected})...`;
+                    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Moving (${Math.min(batchStart, totalSelected)}/${totalSelected})...`;
                 }
 
                 const driveLink = `https://drive.google.com/drive/folders/${targetFolderId}`;
                 resultEl.innerHTML = `
                     <div class="alert alert-success mb-0">
                         <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-                        <strong>Folder created and photos copied to "${folderName}"!</strong><br>
+                        <strong>Folder created and photos moved to "${folderName}"!</strong><br>
                         <a href="${driveLink}" target="_blank" class="btn btn-sm btn-success mt-2 fw-bold">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Open Subfolder in Google Drive
                         </a>
                     </div>
                 `;
                 btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Completed!';
-                showToast(`Saved photos to Drive!`, 'bg-success');
+                showToast(`Moved photos to Drive!`, 'bg-success');
                 saveFolderToPanel(targetFolderId, folderName);
 
             } catch (err) {
-                resultEl.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Copy Failed:</strong> ${err.message}</div>`;
+                resultEl.innerHTML = `<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Move Failed:</strong> ${err.message}</div>`;
                 btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Retry Saving';
+                btn.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i> Retry Moving';
                 showToast(err.message, 'bg-danger');
             }
         }

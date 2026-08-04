@@ -107,7 +107,7 @@
                             </a>
                             <% if (client.folder_id) { %>
                             <button class="btn btn-outline-success" onclick="quickSaveToDrive(<%= client.id %>, '<%= client.name %>')" id="quickSaveBtn">
-                                <i class="bi bi-folder-plus"></i> Save Selections to Subfolder
+                                <i class="bi bi-folder-plus"></i> Move Selections to Subfolder
                             </button>
                             <% } %>
                         </div>
@@ -408,7 +408,7 @@
             const btn = document.getElementById('quickSaveBtn');
             const origText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...';
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Moving...';
 
             let targetFolderId = null;
             let batchStart = 0;
@@ -436,7 +436,7 @@
                     }
 
                     if (!data.success) {
-                        throw new Error(data.message || 'Error saving photos');
+                        throw new Error(data.message || 'Error moving photos');
                     }
 
                     targetFolderId = data.newFolderId;
@@ -444,11 +444,11 @@
                     totalSelected = data.totalSelected;
                     isComplete = data.isComplete;
 
-                    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving (${Math.min(batchStart, totalSelected)}/${totalSelected})...`;
+                    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Moving (${Math.min(batchStart, totalSelected)}/${totalSelected})...`;
                 }
 
                 const driveLink = `https://drive.google.com/drive/folders/${targetFolderId}`;
-                if (confirm(`✅ Folder created and photos copied to "${folderName.trim()}"!\n\nOpen the new folder in Google Drive?`)) {
+                if (confirm(`✅ Folder created and photos moved to "${folderName.trim()}"!\n\nOpen the new folder in Google Drive?`)) {
                     window.open(driveLink, '_blank');
                 }
             } catch (err) {

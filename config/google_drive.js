@@ -403,6 +403,32 @@ class GoogleDrive {
     }
   }
 
+  async moveFile(fileId, destinationFolderId) {
+    await this.authenticateServiceAccount();
+    if (!this.accessToken) {
+      throw new Error('Moving requires a Service Account.');
+    }
+
+    const meta = await this.getFileMetadataRaw(fileId);
+    let removeParentsParam = '';
+    if (meta && meta.parents && meta.parents.length > 0) {
+      removeParentsParam = `&removeParents=${meta.parents.join(',')}`;
+    }
+
+    const url = `${this.endpoint}/${fileId}?addParents=${destinationFolderId}${removeParentsParam}&supportsAllDrives=true`;
+
+    const res = await this.request(url, 'PATCH');
+    if (res.code === 200) {
+      return res.data.id;
+    }
+
+    const msg = res.data?.error?.message || 'Unknown API Error';
+    if (res.code === 403) {
+      throw new Error(`Drive Permission Error (403): ${msg}. Make sure the client's Google Drive folder is shared with "audit-admin@web2026-485207.iam.gserviceaccount.com" as Editor.`);
+    }
+    throw new Error(`Move File Failed (${res.code}): ${msg}`);
+  }
+
   async getFolderCover(folderId) {
     const params = {
       pageSize: 1,
